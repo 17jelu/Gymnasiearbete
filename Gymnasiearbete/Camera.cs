@@ -1,17 +1,30 @@
-﻿namespace Gymnasiearbete
+﻿using Microsoft.Xna.Framework;
+
+namespace Gymnasiearbete
 {
     class Camera
     {
-        private int x, y;
-        public int X // Temporary
+        private Vector2 pos;
+        public Vector2 Position
         {
-            get { return x; }
-            set { x = value; }
+            get { return pos; }
+            set { pos = value; }
         }
-        public int Y // Temporary
+
+        public float X // Temporary? | +2019-10-01 14:54
         {
-            get { return y; }
-            set { y = value; }
+            get { return pos.X; }
+            set { pos.X = value; }
+        }
+        public float Y // Temporary? | +2019-10-01 14:54
+        {
+            get { return pos.Y; }
+            set { pos.Y = value; }
+        }
+
+        public Camera(Vector2 position) // Temporary? | +2019-10-01 14:33
+        {
+            pos = position;
         }
     }
 }

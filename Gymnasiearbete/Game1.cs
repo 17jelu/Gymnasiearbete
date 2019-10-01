@@ -19,6 +19,8 @@ namespace Gymnasiearbete
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        Grid grid;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -33,7 +35,10 @@ namespace Gymnasiearbete
         /// </summary>
         protected override void Initialize()
         {
+            IsMouseVisible = true;
+
             // TODO: Add your initialization logic here
+            grid = new Grid();
 
             base.Initialize();
         }
@@ -48,6 +53,7 @@ namespace Gymnasiearbete
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
+            grid.LoadContent(GraphicsDevice);
         }
 
         /// <summary>
@@ -75,16 +81,23 @@ namespace Gymnasiearbete
             base.Update(gameTime);
         }
 
+        #region TEMPORARY - USED FOR DEBUGGING
+        // Comment created 2019-10-01 14:33
+        Camera camera = new Camera(Vector2.Zero);
+        #endregion
+
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
             // TODO: Add your drawing code here
 
+            grid.Draw(GraphicsDevice, spriteBatch, camera.X, camera.Y);
+            camera.X += 0.010f;
+            camera.Y += 0.0025f;
+            
             base.Draw(gameTime);
         }
     }
