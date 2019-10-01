@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Gymnasiearbete
 {
-  class Grid
-  {
-  }
+    class Grid
+    {
+    }
 }
