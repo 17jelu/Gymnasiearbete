@@ -7,14 +7,54 @@ using Microsoft.Xna.Framework;
 namespace Gymnasiearbete
 {
     /// <summary>
-    /// Grund Cell klassen
+    /// Grundklass för alla spelplansobjekt
     /// </summary>
-    class Cell
+    class GameObject
     {
-        CellManager CM;
-
         Vector2 position = Vector2.Zero;
         double rotation = 0;
+        double size = 0;
+
+        public GameObject()
+        {
+
+        }
+
+        Vector2 Forward()
+        {
+            return new Vector2((float)Math.Cos(rotation), (float)Math.Sin(rotation));
+        }
+
+        public virtual void Update()
+        {
+
+        }
+
+        /// <summary>
+        /// Retunerar data för att rita. x-pos, y-pos, size, rotation
+        /// </summary>
+        public float[] DrawData
+        {
+            get { return new float[4] { position.X, position.Y, (float)size, (float)rotation }; }
+        }
+    }
+
+    class food : GameObject
+    {
+        int energy = 100;
+
+        public food()
+        {
+
+        }
+    }
+
+    /// <summary>
+    /// Grund Cell klassen
+    /// </summary>
+    class Cell : GameObject
+    {
+        CellManager CM;
 
         int curiosity = 0;
         int energy = 0;
@@ -26,7 +66,9 @@ namespace Gymnasiearbete
 
         int energyRequirement = 0;
 
-        public Cell(CellManager setCellManager)
+        Vector2[] perceptionChecks;
+
+        public Cell(CellManager setCellManager) : base()
         {
             CM = setCellManager;
         }
@@ -42,24 +84,9 @@ namespace Gymnasiearbete
             }
         }
 
-        Vector2 Forward()
-        {
-            return new Vector2((float)Math.Cos(rotation), (float)Math.Sin(rotation));
-        }
-
-
-
-        public void Update()
+        public override void Update()
         {
 
-        }
-
-        /// <summary>
-        /// Retunerar data för att rita. x-pos, y-pos, size, rotation
-        /// </summary>
-        public float[] DrawData
-        {
-            get { return new float[4] { position.X, position.Y, size, (float)rotation }; }
         }
     }
 }
