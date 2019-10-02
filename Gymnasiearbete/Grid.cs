@@ -5,8 +5,24 @@ namespace Gymnasiearbete
 {
     class Grid
     {
-        // Used to draw lines
-        Texture2D texture;
+        // XNA.Framework stuff
+        Texture2D texture; // Used to draw lines
+        Rectangle horizontalR;
+        Rectangle verticalR;
+
+        // Constants
+        const int tileWidth = 50;
+        const int lineWidth = 2;
+
+        // Colors
+        Color BACKGROUND_COLOR = Color.Black;
+        Color LINE_COLOR = Color.WhiteSmoke;
+
+        public Grid(Rectangle clientBounds)
+        {
+            horizontalR = new Rectangle(0, 0, clientBounds.Width, lineWidth);
+            verticalR = new Rectangle(0, 0, lineWidth, clientBounds.Height);
+        }
 
         /// <summary>
         /// Uses Game.GraphicsDevice to create neccessary texture used by Grid.cs
@@ -25,7 +41,21 @@ namespace Gymnasiearbete
         /// </summary>
         public void Draw(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch, float x, float y)
         {
-            graphicsDevice.Clear(Color.White);
+            graphicsDevice.Clear(BACKGROUND_COLOR);
+
+            horizontalR.Y = horizontalR.Height - (int)y % tileWidth;
+            for (int i = 0; i < (verticalR.Height / tileWidth) + 2; i++)
+            {
+                spriteBatch.Draw(texture, horizontalR, LINE_COLOR);
+                horizontalR.Y += tileWidth;
+            }
+
+            verticalR.X = verticalR.Width - (int)x % tileWidth;
+            for (int i = 0; i < (horizontalR.Width / tileWidth) + 2; i++)
+            {
+                spriteBatch.Draw(texture, verticalR, LINE_COLOR);
+                verticalR.X += tileWidth;
+            }
         }
     }
 }

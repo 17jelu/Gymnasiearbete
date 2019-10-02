@@ -38,7 +38,9 @@ namespace Gymnasiearbete
             IsMouseVisible = true;
 
             // TODO: Add your initialization logic here
-            grid = new Grid();
+            grid = new Grid(Window.ClientBounds);
+
+            Window.AllowUserResizing = true;
 
             base.Initialize();
         }
@@ -65,6 +67,8 @@ namespace Gymnasiearbete
             // TODO: Unload any non ContentManager content here
         }
 
+        float tick = 0;
+
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -77,6 +81,11 @@ namespace Gymnasiearbete
                 this.Exit();
 
             // TODO: Add your update logic here
+
+            tick = tick >= 360 ? tick - 360 : tick + 0.005f;
+
+            camera.X = (float)Math.Sin(tick) * 2000;
+            camera.Y = (float)Math.Cos(tick) * 2000;
 
             base.Update(gameTime);
         }
@@ -93,11 +102,11 @@ namespace Gymnasiearbete
         protected override void Draw(GameTime gameTime)
         {
             // TODO: Add your drawing code here
+            spriteBatch.Begin();
 
             grid.Draw(GraphicsDevice, spriteBatch, camera.X, camera.Y);
-            camera.X += 0.010f;
-            camera.Y += 0.0025f;
-            
+
+            spriteBatch.End();
             base.Draw(gameTime);
         }
     }
