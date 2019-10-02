@@ -73,6 +73,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera.cs" />
+    <Compile Include="Cell.cs" />
+    <Compile Include="CellManager.cs" />
     <Compile Include="Circle.cs" />
     <Compile Include="Grid.cs" />
     <Compile Include="PreCalc.cs" />
