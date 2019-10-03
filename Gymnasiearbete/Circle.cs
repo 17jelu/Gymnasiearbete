@@ -61,8 +61,8 @@ namespace Gymnasiearbete
             GraphicsDevice.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.TriangleStrip, vertices, 0, 14);
         }
 
-        /* LATER USE FOR JESPER
-        public void Update(GameTime gameTime, bool isFixed)
+        /* LATER USE FOR JESPER */
+        public void Update(/*GameTime gameTime, bool isFixed*/)
         {
             // Positionate each vertex
             for (int i = 0, j = 0; i < vertices.Length; i++)
@@ -83,6 +83,6 @@ namespace Gymnasiearbete
                 }
             }
         }
-        */
+        //*/
     }
 }

@@ -20,6 +20,7 @@ namespace Gymnasiearbete
         SpriteBatch spriteBatch;
 
         Grid grid;
+        Circle circle;
 
         public Game1()
         {
@@ -41,6 +42,8 @@ namespace Gymnasiearbete
             grid = new Grid(Window.ClientBounds);
 
             Window.AllowUserResizing = true;
+
+            circle = new Circle(GraphicsDevice, Color.Red, 50, 200, 150);
 
             base.Initialize();
         }
@@ -84,8 +87,10 @@ namespace Gymnasiearbete
 
             tick = tick >= 360 ? tick - 360 : tick + 0.005f;
 
-            camera.X = (float)Math.Sin(tick) * 2000;
-            camera.Y = (float)Math.Cos(tick) * 2000;
+            camera.X = (float)Math.Sin(tick) * 500;
+            camera.Y = (float)Math.Cos(tick) * 500;
+
+            circle.Update();
 
             base.Update(gameTime);
         }
@@ -108,6 +113,8 @@ namespace Gymnasiearbete
 
             spriteBatch.End();
             base.Draw(gameTime);
+
+            circle.Render(GraphicsDevice);
         }
     }
 }
