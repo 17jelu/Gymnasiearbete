@@ -36,21 +36,24 @@ namespace Gymnasiearbete
             texture.SetData(new Color[] { Color.White });
         }
 
+        /*|                    ==:TODO:=                        |*\
+        |*|    The Draw method must support different Camera    |*|
+        \*| properties, such as Angle (rotate) and Zoom (scale) |*/
         /// <summary>
         /// Clears the screen and draws grid lines in relation to the current Camera position.
         /// </summary>
-        public void Draw(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch, float x, float y)
+        public void Draw(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch, Camera camera)
         {
             graphicsDevice.Clear(BACKGROUND_COLOR);
 
-            horizontalR.Y = horizontalR.Height - (int)y % tileWidth;
+            horizontalR.Y = horizontalR.Height - (int)camera.Y % tileWidth;
             for (int i = 0; i < (verticalR.Height / tileWidth) + 2; i++)
             {
                 spriteBatch.Draw(texture, horizontalR, LINE_COLOR);
                 horizontalR.Y += tileWidth;
             }
 
-            verticalR.X = verticalR.Width - (int)x % tileWidth;
+            verticalR.X = verticalR.Width - (int)camera.X % tileWidth;
             for (int i = 0; i < (horizontalR.Width / tileWidth) + 2; i++)
             {
                 spriteBatch.Draw(texture, verticalR, LINE_COLOR);

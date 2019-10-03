@@ -104,7 +104,7 @@ namespace Gymnasiearbete
             // TODO: Add your drawing code here
             spriteBatch.Begin();
 
-            grid.Draw(GraphicsDevice, spriteBatch, camera.X, camera.Y);
+            grid.Draw(GraphicsDevice, spriteBatch, camera);
 
             spriteBatch.End();
             base.Draw(gameTime);
