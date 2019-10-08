@@ -11,7 +11,7 @@ namespace Gymnasiearbete
     /// </summary>
     class GameObject
     {
-        Vector2 position = Vector2.Zero;
+        public Vector2 position = Vector2.Zero;
         double rotation = 0;
         double size = 0;
 
@@ -66,7 +66,7 @@ namespace Gymnasiearbete
 
         int energyRequirement = 0;
 
-        Vector2[] perceptionChecks;
+        int[][] grid;
 
         public Cell(CellManager setCellManager) : base()
         {
@@ -82,6 +82,11 @@ namespace Gymnasiearbete
 
                 CM.cells.Add(new Cell(CM));
             }
+        }
+
+        void PerceptionCheck(List<Cell> cl, List<Food> fl)
+        {
+
         }
 
         public override void Update()
