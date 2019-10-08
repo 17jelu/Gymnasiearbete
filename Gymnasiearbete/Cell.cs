@@ -39,11 +39,11 @@ namespace Gymnasiearbete
         }
     }
 
-    class food : GameObject
+    class Food : GameObject
     {
         int energy = 100;
 
-        public food()
+        public Food()
         {
 
         }
