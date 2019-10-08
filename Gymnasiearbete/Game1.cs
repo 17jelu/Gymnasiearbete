@@ -43,7 +43,7 @@ namespace Gymnasiearbete
 
             Window.AllowUserResizing = true;
 
-            circle = new Circle(GraphicsDevice, Color.Red, 50, 200, 150);
+            circle = new Circle(Circle.UnitCircle.Point16, GraphicsDevice, Color.Red, 50, new Vector2(200, 150));
 
             base.Initialize();
         }
@@ -90,7 +90,7 @@ namespace Gymnasiearbete
             camera.X = (float)Math.Sin(tick) * 500;
             camera.Y = (float)Math.Cos(tick) * 500;
 
-            circle.Update();
+            //circle.Update();
 
             base.Update(gameTime);
         }
@@ -113,7 +113,7 @@ namespace Gymnasiearbete
 
             spriteBatch.End();
             base.Draw(gameTime);
-
+            
             circle.Render(GraphicsDevice);
         }
     }
