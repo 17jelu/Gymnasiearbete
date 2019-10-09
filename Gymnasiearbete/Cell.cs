@@ -15,6 +15,8 @@ namespace Gymnasiearbete
         double rotation = 0;
         double size = 0;
 
+        public bool isMarkedForDelete = false;
+
         public GameObject()
         {
 
@@ -66,8 +68,6 @@ namespace Gymnasiearbete
 
         int energyRequirement = 0;
 
-        int[][] grid;
-
         public Cell(CellManager setCellManager) : base()
         {
             CM = setCellManager;
@@ -84,14 +84,27 @@ namespace Gymnasiearbete
             }
         }
 
-        void PerceptionCheck(List<Cell> cl, List<Food> fl)
+        void PerceptionCheck(List<GameObject> cl)
         {
-
+            foreach (Cell c in cl)
+            {
+                if (c != this)
+                {
+                    //PERCEPTION
+                    if (
+                        c.position.X*c.position.X - (this.position.X + this.size + this.perception) * (this.position.X + this.size + this.perception) >= 0 && 
+                        c.position.Y*c.position.Y - (this.position.Y + this.size + this.perception) * (this.position.Y + this.size + this.perception) <= 0
+                        )
+                    {
+                        //DECITIONS
+                    }
+                }
+            }
         }
 
-        public override void Update()
+        public void Update(List<GameObject> detectionRange)
         {
-
+            PerceptionCheck(detectionRange);
         }
     }
 }
