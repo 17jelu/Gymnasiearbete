@@ -22,16 +22,10 @@ namespace Gymnasiearbete
         /// </summary>
         int triangles;
 
-        public Circle(UnitCircle type, GraphicsDevice graphicsDevice, Color color, float radius, Vector2 position)
+        public Circle(UnitCircle type, BasicEffect effect, GraphicsDevice graphicsDevice, Color color, float radius, Vector2 position)
         {
             // Load BasicEffect
-            effect = new BasicEffect(graphicsDevice);
-            effect.VertexColorEnabled = true;
-            effect.Projection = Matrix.CreateOrthographicOffCenter
-                (0, graphicsDevice.Viewport.Width,     // left, right
-                graphicsDevice.Viewport.Height, 0,    // bottom, top
-                0, 1);
-            effect.CurrentTechnique.Passes[0].Apply();
+            this.effect = effect;
 
             // Properties
             this.radius = radius;
@@ -85,6 +79,87 @@ namespace Gymnasiearbete
                 vertices,
                 0,
                 triangles);
+        }
+    }
+
+    class GraphicRectangle
+    {
+        BasicEffect effect;
+        VertexPositionColor[] vertices;
+
+        Rect rect;
+        private struct Rect
+        {
+            public int X, Y, Width, Height;
+            public Rect(int x, int y, int width, int height)
+            {
+                X = x;
+                Y = y;
+                Width = width;
+                Height = height;
+            }
+        }
+        public int X
+        {
+            get { return rect.X; }
+            set { rect.X = value; UpdateVertices(); }
+        }
+        public int Y
+        {
+            get { return rect.Y; }
+            set { rect.Y = value; UpdateVertices(); }
+        }
+        public int Width
+        {
+            get { return rect.Width; }
+            set { rect.Width = value; UpdateVertices(); }
+        }
+        public int Height
+        {
+            get { return rect.Height; }
+            set { rect.Height = value; UpdateVertices(); }
+        }
+
+        public GraphicRectangle(BasicEffect effect, GraphicsDevice GraphicsDevice, Color color, int x, int y, int width, int height)
+        {
+            // Load BasicEffect
+            this.effect = effect;
+
+            rect = new Rect(x, y, width, height);
+
+            vertices = new VertexPositionColor[4];
+
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                vertices[i].Color = color;
+            }
+
+            UpdateVertices();
+        }
+
+        private void UpdateVertices()
+        {
+            vertices[0].Position.X = rect.X;
+            vertices[0].Position.Y = rect.Y + rect.Height;
+
+            vertices[1].Position.X = rect.X;
+            vertices[1].Position.Y = rect.Y;
+
+            vertices[2].Position.X = rect.X + rect.Width;
+            vertices[2].Position.Y = rect.Y + rect.Height;
+
+            vertices[3].Position.X = rect.X + rect.Width;
+            vertices[3].Position.Y = rect.Y;
+        }
+
+        public void Draw(GraphicsDevice GraphicsDevice)
+        {
+            effect.CurrentTechnique.Passes[0].Apply();
+            GraphicsDevice.DrawUserPrimitives<VertexPositionColor>(
+                PrimitiveType.TriangleStrip,
+                vertices,
+                0,
+                2);
         }
     }
 }

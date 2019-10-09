@@ -19,8 +19,13 @@ namespace Gymnasiearbete
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        BasicEffect effect;
+
         Grid grid;
         Circle circle;
+        Circle cirkel;
+
+        GraphicRectangle dummy;
 
         public Game1()
         {
@@ -39,11 +44,24 @@ namespace Gymnasiearbete
             IsMouseVisible = true;
 
             // TODO: Add your initialization logic here
-            grid = new Grid(Window.ClientBounds);
 
             Window.AllowUserResizing = true;
 
-            circle = new Circle(Circle.UnitCircle.Point16, GraphicsDevice, Color.Red, 50, new Vector2(200, 150));
+            // Load BasicEffect
+            effect = new BasicEffect(GraphicsDevice);
+            effect.VertexColorEnabled = true;
+            effect.Projection = Matrix.CreateOrthographicOffCenter
+                (0, GraphicsDevice.Viewport.Width,     // left, right
+                GraphicsDevice.Viewport.Height, 0,    // bottom, top
+                0, 1);
+            effect.CurrentTechnique.Passes[0].Apply();
+
+            grid = new Grid(effect, GraphicsDevice, Window.ClientBounds);
+
+            circle = new Circle(Circle.UnitCircle.Point16, effect, GraphicsDevice, Color.Red, 50, new Vector2(200, 150));
+            cirkel = new Circle(Circle.UnitCircle.Point8, effect, GraphicsDevice, Color.Pink, 50, new Vector2(200, 150));
+
+            dummy = new GraphicRectangle(effect, GraphicsDevice, Color.GreenYellow, 50, 50, 50, 75);
 
             base.Initialize();
         }
@@ -107,14 +125,19 @@ namespace Gymnasiearbete
         protected override void Draw(GameTime gameTime)
         {
             // TODO: Add your drawing code here
-            spriteBatch.Begin();
+            //spriteBatch.Begin();
 
-            grid.Draw(GraphicsDevice, spriteBatch, camera);
-
-            spriteBatch.End();
-            base.Draw(gameTime);
             
+
+            //spriteBatch.End();
+            base.Draw(gameTime);
+
+            grid.Draw(GraphicsDevice, camera);
+
             circle.Render(GraphicsDevice);
+            cirkel.Render(GraphicsDevice);
+
+            dummy.Draw(GraphicsDevice);
         }
     }
 }

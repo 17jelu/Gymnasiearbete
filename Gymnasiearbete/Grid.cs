@@ -7,21 +7,21 @@ namespace Gymnasiearbete
     {
         // XNA.Framework stuff
         Texture2D texture; // Used to draw lines
-        Rectangle horizontalR;
-        Rectangle verticalR;
+        GraphicRectangle horizontalR;
+        GraphicRectangle verticalR;
 
         // Constants
-        const int tileWidth = 50;
+        const int tileWidth = 500;
         const int lineWidth = 2;
 
         // Colors
         Color BACKGROUND_COLOR = Color.Black;
         Color LINE_COLOR = Color.WhiteSmoke;
 
-        public Grid(Rectangle clientBounds)
+        public Grid(BasicEffect effect, GraphicsDevice GraphicsDevice, Rectangle clientBounds)
         {
-            horizontalR = new Rectangle(0, 0, clientBounds.Width, lineWidth);
-            verticalR = new Rectangle(0, 0, lineWidth, clientBounds.Height);
+            horizontalR = new GraphicRectangle(effect, GraphicsDevice, LINE_COLOR, 0, 0, clientBounds.Width, lineWidth);
+            verticalR = new GraphicRectangle(effect, GraphicsDevice, LINE_COLOR,0, 0, lineWidth, clientBounds.Height);
         }
 
         /// <summary>
@@ -42,21 +42,21 @@ namespace Gymnasiearbete
         /// <summary>
         /// Clears the screen and draws grid lines in relation to the current Camera position.
         /// </summary>
-        public void Draw(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch, Camera camera)
+        public void Draw(GraphicsDevice graphicsDevice, Camera camera)
         {
             graphicsDevice.Clear(BACKGROUND_COLOR);
 
             horizontalR.Y = horizontalR.Height - (int)camera.Y % tileWidth;
             for (int i = 0; i < (verticalR.Height / tileWidth) + 2; i++)
             {
-                spriteBatch.Draw(texture, horizontalR, LINE_COLOR);
+                horizontalR.Draw(graphicsDevice);
                 horizontalR.Y += tileWidth;
             }
 
             verticalR.X = verticalR.Width - (int)camera.X % tileWidth;
             for (int i = 0; i < (horizontalR.Width / tileWidth) + 2; i++)
             {
-                spriteBatch.Draw(texture, verticalR, LINE_COLOR);
+                verticalR.Draw(graphicsDevice);
                 verticalR.X += tileWidth;
             }
         }
