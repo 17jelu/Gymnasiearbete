@@ -10,8 +10,7 @@ namespace Gymnasiearbete
             Point8,
             Point16
         }
-
-        BasicEffect effect;
+        
         VertexPositionColor[] vertices;
 
         float radius;
@@ -22,11 +21,8 @@ namespace Gymnasiearbete
         /// </summary>
         int triangles;
 
-        public Circle(UnitCircle type, BasicEffect effect, GraphicsDevice graphicsDevice, Color color, float radius, Vector2 position)
+        public Circle(UnitCircle type, GraphicsDevice graphicsDevice, Color color, float radius, Vector2 position)
         {
-            // Load BasicEffect
-            this.effect = effect;
-
             // Properties
             this.radius = radius;
             this.pos = position;
@@ -73,7 +69,6 @@ namespace Gymnasiearbete
 
         public void Render(GraphicsDevice GraphicsDevice)
         {
-            effect.CurrentTechnique.Passes[0].Apply();
             GraphicsDevice.DrawUserPrimitives<VertexPositionColor>(
                 PrimitiveType.TriangleStrip,
                 vertices,
@@ -154,7 +149,6 @@ namespace Gymnasiearbete
 
         public void Draw(GraphicsDevice GraphicsDevice)
         {
-            effect.CurrentTechnique.Passes[0].Apply();
             GraphicsDevice.DrawUserPrimitives<VertexPositionColor>(
                 PrimitiveType.TriangleStrip,
                 vertices,

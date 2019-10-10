@@ -56,8 +56,8 @@ namespace Gymnasiearbete
 
             grid = new Grid(effect, GraphicsDevice, Window.ClientBounds);
 
-            circle = new Circle(Circle.UnitCircle.Point16, effect, GraphicsDevice, Color.Red, 50, new Vector2(200, 150));
-            cirkel = new Circle(Circle.UnitCircle.Point16, effect, GraphicsDevice, Color.Purple, 100, new Vector2(250, 250));
+            circle = new Circle(Circle.UnitCircle.Point16, GraphicsDevice, Color.Red, 50, new Vector2(200, 150));
+            cirkel = new Circle(Circle.UnitCircle.Point16, GraphicsDevice, Color.Purple, 100, new Vector2(250, 250));
 
             base.Initialize();
         }
@@ -128,8 +128,10 @@ namespace Gymnasiearbete
             //spriteBatch.End();
             base.Draw(gameTime);
 
-            grid.Draw(GraphicsDevice, camera);
+            effect.CurrentTechnique.Passes[0].Apply();
 
+            grid.Draw(GraphicsDevice, camera);
+            
             circle.Render(GraphicsDevice);
             cirkel.Render(GraphicsDevice);
         }
