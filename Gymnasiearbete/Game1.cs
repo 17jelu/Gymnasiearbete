@@ -25,8 +25,6 @@ namespace Gymnasiearbete
         Circle circle;
         Circle cirkel;
 
-        GraphicRectangle dummy;
-
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -59,9 +57,7 @@ namespace Gymnasiearbete
             grid = new Grid(effect, GraphicsDevice, Window.ClientBounds);
 
             circle = new Circle(Circle.UnitCircle.Point16, effect, GraphicsDevice, Color.Red, 50, new Vector2(200, 150));
-            cirkel = new Circle(Circle.UnitCircle.Point8, effect, GraphicsDevice, Color.Pink, 50, new Vector2(200, 150));
-
-            dummy = new GraphicRectangle(effect, GraphicsDevice, Color.GreenYellow, 50, 50, 50, 75);
+            cirkel = new Circle(Circle.UnitCircle.Point16, effect, GraphicsDevice, Color.Purple, 100, new Vector2(250, 250));
 
             base.Initialize();
         }
@@ -136,8 +132,6 @@ namespace Gymnasiearbete
 
             circle.Render(GraphicsDevice);
             cirkel.Render(GraphicsDevice);
-
-            dummy.Draw(GraphicsDevice);
         }
     }
 }
