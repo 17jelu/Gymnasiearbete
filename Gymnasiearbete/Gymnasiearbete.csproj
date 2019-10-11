@@ -72,9 +72,11 @@
     <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Camera.cs" />
     <Compile Include="Cell.cs" />
     <Compile Include="CellManager.cs" />
     <Compile Include="Circle.cs" />
+    <Compile Include="Grid.cs" />
     <Compile Include="PreCalc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
