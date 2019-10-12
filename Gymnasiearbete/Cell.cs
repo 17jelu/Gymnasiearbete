@@ -27,6 +27,11 @@ namespace Gymnasiearbete
             return new Vector2((float)Math.Cos(rotation), (float)Math.Sin(rotation));
         }
 
+        public void Move(Vector2 direction)
+        {
+            position += direction;
+        }
+
         public virtual void Update()
         {
 
@@ -68,6 +73,14 @@ namespace Gymnasiearbete
 
         int energyRequirement = 0;
 
+        public int Detectionrange
+        {
+            get
+            {
+                return size + perception;
+            }
+        }
+
         public Cell(CellManager setCellManager) : base()
         {
             CM = setCellManager;
@@ -84,27 +97,69 @@ namespace Gymnasiearbete
             }
         }
 
-        void PerceptionCheck(List<GameObject> cl)
+        //Perception
+        void PerceptionCheck(List<GameObject> pc)
         {
-            foreach (Cell c in cl)
+            List<GameObject> percivableObjects = new List<GameObject>();
+            foreach (GameObject g in pc)
             {
-                if (c != this)
+                if (g != this)
                 {
                     //PERCEPTION
                     if (
-                        c.position.X*c.position.X - (this.position.X + this.size + this.perception) * (this.position.X + this.size + this.perception) >= 0 && 
-                        c.position.Y*c.position.Y - (this.position.Y + this.size + this.perception) * (this.position.Y + this.size + this.perception) <= 0
+                        g.position.X*g.position.X - (this.position.X + this.Detectionrange) * (this.position.X + this.Detectionrange) <= 0 && 
+                        g.position.Y*g.position.Y - (this.position.Y + this.Detectionrange) * (this.position.Y + this.Detectionrange) <= 0
                         )
                     {
-                        //DECITIONS
+                        percivableObjects.Add(g);
                     }
                 }
             }
         }
 
-        public void Update(List<GameObject> detectionRange)
+        void Intresst(List<GameObject> percivableObjects)
         {
-            PerceptionCheck(detectionRange);
+            GameObject intresst = null;
+            if (percivableObjects.Count > 0)
+            {
+                intresst = percivableObjects[0];
+
+                foreach (GameObject g in percivableObjects)
+                {
+                    if (
+                        g.position.X * g.position.X - (this.position.X + this.Detectionrange) * (this.position.X + this.Detectionrange) <= intresst.position.X &&
+                        g.position.Y * g.position.Y - (this.position.Y + this.Detectionrange) * (this.position.Y + this.Detectionrange) <= intresst.position.Y
+                        )
+                    {
+                        intresst = g;
+                    }
+                }
+            }
+
+            Decision(intresst);
+        }
+
+        void Decision(GameObject intresst)
+        {
+            if (intresst == null)
+            {
+                Move(new Vector2(1,1));
+            }
+
+            if (intresst.GetType() == typeof(Cell))
+            {
+                Move(-new Vector2(intresst.position.X - this.position.X, intresst.position.Y - this.position.Y));
+            }
+
+            if (intresst.GetType() == typeof(Food))
+            {
+                Move(-new Vector2(intresst.position.X - this.position.X, intresst.position.Y - this.position.Y));
+            }
+        }
+
+        public void Update(List<GameObject> detectionCheck)
+        {
+            PerceptionCheck(detectionCheck);
         }
     }
 }

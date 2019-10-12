@@ -31,6 +31,7 @@ namespace Gymnasiearbete
                 Cell c = cells[i];
                 if (!c.isMarkedForDelete)
                 {
+                    //får sectorposition
                     string sectorPos = new Vector2((float)Math.Floor(c.position.X / sectorSize), (float)Math.Floor(c.position.Y / sectorSize)).ToString();
 
                     if (!sectors.ContainsKey(sectorPos.ToString()))
@@ -48,7 +49,22 @@ namespace Gymnasiearbete
             //OfixeradUpdatering
             foreach (Cell c in cells)
             {
-                c.Update();
+                List<GameObject> detectionCheck = new List<GameObject>();
+
+                int xMax = (int)Math.Floor((c.position.X + c.Detectionrange) / sectorSize);
+                int xMin = (int)Math.Floor((c.position.X - c.Detectionrange) / sectorSize);
+                int yMax = (int)Math.Floor((c.position.Y + c.Detectionrange) / sectorSize);
+                int yMin = (int)Math.Floor((c.position.Y - c.Detectionrange) / sectorSize);
+
+                for (int x = xMin; x < xMax; x++)
+                {
+                    for (int y = yMin; y < yMax; y++)
+                    {
+                        detectionCheck.AddRange(sectors[new Vector2(x, y).ToString()]);
+                    }
+                }
+                
+                c.Update(detectionCheck);
             }
         }
     }
