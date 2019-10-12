@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -22,6 +23,10 @@ namespace Gymnasiearbete
         Grid grid;
         Circle circle;
 
+        CellManager CM;
+
+        Random random;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -36,14 +41,31 @@ namespace Gymnasiearbete
         /// </summary>
         protected override void Initialize()
         {
+            // TODO: Add your initialization logic here
             IsMouseVisible = true;
 
-            // TODO: Add your initialization logic here
+            random = new Random();
+            
             grid = new Grid(Window.ClientBounds);
 
             Window.AllowUserResizing = true;
 
             circle = new Circle(Circle.UnitCircle.Point16, GraphicsDevice, Color.Red, 50, new Vector2(200, 150));
+
+            CM = new CellManager();
+            CM.AddObjects
+                (
+                
+                    new GameObject[6]
+                    {
+                        new Cell(CM, new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height))),
+                        new Cell(CM, new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height))),
+                        new Food(new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height))),
+                        new Food(new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height))),
+                        new Food(new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height))),
+                        new Food(new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)))
+                    }
+                );
 
             base.Initialize();
         }
@@ -85,10 +107,15 @@ namespace Gymnasiearbete
 
             // TODO: Add your update logic here
 
+            /*
             tick = tick >= 360 ? tick - 360 : tick + 0.005f;
-
             camera.X = (float)Math.Sin(tick) * 500;
             camera.Y = (float)Math.Cos(tick) * 500;
+            */
+
+            CM.Update(Window, random);
+
+            //camera.Position += new Vector2(1.0f, 1.0f);
 
             //circle.Update();
 
@@ -108,13 +135,15 @@ namespace Gymnasiearbete
         {
             // TODO: Add your drawing code here
             spriteBatch.Begin();
-
             grid.Draw(GraphicsDevice, spriteBatch, camera);
+
+
+            CM.Draw(GraphicsDevice, camera);
 
             spriteBatch.End();
             base.Draw(gameTime);
             
-            circle.Render(GraphicsDevice);
+            //circle.Render(GraphicsDevice);
         }
     }
 }

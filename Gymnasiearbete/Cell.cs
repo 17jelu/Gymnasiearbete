@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
@@ -13,13 +14,15 @@ namespace Gymnasiearbete
     {
         public Vector2 position = Vector2.Zero;
         double rotation = 0;
-        double size = 0;
+        public double size = 0;
+        int speed = 1;
 
         public bool isMarkedForDelete = false;
 
-        public GameObject()
+        public GameObject(Vector2 startPosition)
         {
-
+            position = startPosition;
+            size = 10;
         }
 
         Vector2 Forward()
@@ -29,20 +32,13 @@ namespace Gymnasiearbete
 
         public void Move(Vector2 direction)
         {
-            position += direction;
+            //direction.Normalize();
+            position += direction * speed;
         }
 
         public virtual void Update()
         {
 
-        }
-
-        /// <summary>
-        /// Retunerar data för att rita. x-pos, y-pos, size, rotation
-        /// </summary>
-        public float[] DrawData
-        {
-            get { return new float[4] { position.X, position.Y, (float)size, (float)rotation }; }
         }
     }
 
@@ -50,7 +46,7 @@ namespace Gymnasiearbete
     {
         int energy = 100;
 
-        public Food()
+        public Food(Vector2 startPosition) : base(startPosition)
         {
 
         }
@@ -64,36 +60,43 @@ namespace Gymnasiearbete
         CellManager CM;
 
         int curiosity = 0;
-        int energy = 0;
-        int speed = 0;
-        int size = 0;
+        //int speed = 0;
+        //int size = 0;
         int perception = 0;
 
         int preformancepoints = 0;
-
+        int energy = 0;
         int energyRequirement = 0;
+
+        Vector2 idleDirection = new Vector2(1, 1);
 
         public int Detectionrange
         {
             get
             {
-                return size + perception;
+                return (int)size + perception;
             }
         }
 
-        public Cell(CellManager setCellManager) : base()
+        public Cell(CellManager setCellManager, Vector2 startPosition) : base(startPosition)
         {
             CM = setCellManager;
+            size = 20;
+            perception = 75;
         }
 
-        void Reproduce()
+        void Reproduce(GameWindow window, Random random)
         {
-            if (energy > energyRequirement)
+            if (energy > 2 * energyRequirement)
             {
                 energy -= energyRequirement;
-                for (int i = 0; i < energy/energyRequirement; i++)
-
-                CM.cells.Add(new Cell(CM));
+                CM.AddObjects(
+                    new GameObject[2]
+                    {
+                        new Cell(CM, new Vector2(this.position.X + this.Detectionrange, this.position.Y)),
+                        new Food(new Vector2(random.Next(0, window.ClientBounds.Width), random.Next(0, window.ClientBounds.Height)))
+                    }
+                    );
             }
         }
 
@@ -107,14 +110,16 @@ namespace Gymnasiearbete
                 {
                     //PERCEPTION
                     if (
-                        g.position.X*g.position.X - (this.position.X + this.Detectionrange) * (this.position.X + this.Detectionrange) <= 0 && 
-                        g.position.Y*g.position.Y - (this.position.Y + this.Detectionrange) * (this.position.Y + this.Detectionrange) <= 0
+                        Math.Pow(g.position.X - this.position.X, 2) + Math.Pow(g.position.Y - this.position.Y, 2) <= 
+                        Math.Pow(this.Detectionrange, 2) + Math.Pow(g.size, 2)
                         )
                     {
                         percivableObjects.Add(g);
                     }
                 }
             }
+
+            Intresst(percivableObjects);
         }
 
         void Intresst(List<GameObject> percivableObjects)
@@ -127,8 +132,8 @@ namespace Gymnasiearbete
                 foreach (GameObject g in percivableObjects)
                 {
                     if (
-                        g.position.X * g.position.X - (this.position.X + this.Detectionrange) * (this.position.X + this.Detectionrange) <= intresst.position.X &&
-                        g.position.Y * g.position.Y - (this.position.Y + this.Detectionrange) * (this.position.Y + this.Detectionrange) <= intresst.position.Y
+                        Math.Pow(g.position.X - this.position.X, 2) + Math.Pow(g.position.Y - this.position.Y, 2) <=
+                        Math.Pow(intresst.position.X - this.position.X, 2) + Math.Pow(intresst.position.Y - this.position.Y, 2)
                         )
                     {
                         intresst = g;
@@ -143,23 +148,63 @@ namespace Gymnasiearbete
         {
             if (intresst == null)
             {
-                Move(new Vector2(1,1));
+                idleDirection.Normalize();
+                Move(idleDirection);
             }
-
+            else
             if (intresst.GetType() == typeof(Cell))
             {
-                Move(-new Vector2(intresst.position.X - this.position.X, intresst.position.Y - this.position.Y));
+                if (intresst.size > this.size)
+                {
+                    Vector2 direction = -new Vector2(intresst.position.X - this.position.X, intresst.position.Y - this.position.Y);
+                    if (direction != Vector2.Zero)
+                    {
+                        direction.Normalize();
+                        Move(direction);
+                    }
+                } else
+                {
+                    idleDirection.Normalize();
+                    Move(idleDirection);
+                }
             }
-
+            else
             if (intresst.GetType() == typeof(Food))
             {
-                Move(-new Vector2(intresst.position.X - this.position.X, intresst.position.Y - this.position.Y));
+                Vector2 direction = new Vector2(intresst.position.X - this.position.X, intresst.position.Y - this.position.Y);
+                if (direction != Vector2.Zero)
+                {
+                    direction.Normalize();
+                    Move(direction);
+                }
             }
         }
 
-        public void Update(List<GameObject> detectionCheck)
+        public void Update(List<GameObject> detectionCheck, GameWindow window, Random random)
         {
             PerceptionCheck(detectionCheck);
+
+            if(this.position.X >= window.ClientBounds.Width)
+            {
+                idleDirection.X = -1;
+            }
+
+            if (this.position.X <= 0)
+            {
+                idleDirection.X = 1;
+            }
+
+            if (this.position.Y >= window.ClientBounds.Height)
+            {
+                idleDirection.Y = -1;
+            }
+
+            if (this.position.Y <= 0)
+            {
+                idleDirection.Y = 1;
+            }
+
+            Reproduce(window, random);
         }
     }
 }
