@@ -98,7 +98,7 @@ namespace Gymnasiearbete
                 {
                     clr = Color.Red;
                     Cell c = (Cell)g;
-                    new Circle(Circle.UnitCircle.Point16, graphicsDevice, new Color(0.5f, 0.5f, 0.5f, 0.3f), (float)c.Detectionrange, g.position - camera.Position).Render(graphicsDevice, camera);
+                    new Circle(Circle.UnitCircle.Point16, graphicsDevice, new Color(0.5f, 0.5f, 0.5f, 0.3f), (float)c.Detectionrange, g.position - camera.Position).Render(graphicsDevice);
                 }
 
                 if (g.GetType() == typeof(Food))
@@ -106,7 +106,7 @@ namespace Gymnasiearbete
                     clr = Color.Green;
                 }
 
-                new Circle(Circle.UnitCircle.Point16, graphicsDevice, clr, (float)g.size, g.position - camera.Position).Render(graphicsDevice, camera);
+                new Circle(Circle.UnitCircle.Point16, graphicsDevice, clr, (float)g.size, g.position - camera.Position).Render(graphicsDevice);
             }
         }
     }
