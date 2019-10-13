@@ -14,8 +14,8 @@ namespace Gymnasiearbete
     {
         public Vector2 position = Vector2.Zero;
         double rotation = 0;
-        public int size = 0;
-        public int speed = 1;
+        public float size = 0;
+        public float speed = 1;
 
         public bool isMarkedForDelete = false;
 
@@ -84,37 +84,40 @@ namespace Gymnasiearbete
     {
         CellManager CM;
 
-        int curiosity = 0;
+        //int curiosity = 0;
         //int speed = 0;
         //int size = 0;
-        int perception = 0;
+        public float perception = 0;
 
         int preformancepoints = 0;
-        public int energy = 0;
-        int energyRequirement = 1000;
+        
+        public float energy = 0;
+        float energyRequirement = 1000;
 
         Vector2 idleDirection = new Vector2(1, 1);
 
         public bool isMarkForReproduce = false;
 
-        public int Detectionrange
+        public float Detectionrange
         {
             get
             {
-                return (int)size + perception;
+                return size + perception;
             }
         }
 
-        public Cell(CellManager setCellManager, Vector2 startPosition) : base(startPosition)
+        public Cell(CellManager setCellManager, Vector2 startPosition, float dnaSize, float dnaSpeed, float dnaPerception) : base(startPosition)
         {
             CM = setCellManager;
-            size = 20;
-            perception = 75;
+            size = dnaSize;
+            speed = dnaSpeed;
+            perception = dnaPerception;
+
 
             energy = energyRequirement;
         }
 
-        void Reproduce(GameWindow window, Random random)
+        void ReproduceCheck()
         {
             if (energy > 2 * energyRequirement)
             {
@@ -126,10 +129,24 @@ namespace Gymnasiearbete
             }
         }
 
+        public Cell Reproduce(GameWindow window, Random random)
+        {
+            Cell cchild = new Cell(CM, new Vector2(this.position.X - this.Detectionrange, this.position.Y - this.Detectionrange), this.size, this.speed, this.perception);
+            
+            if (random.Next(0, 100) <= 50)
+            {
+                cchild.size = Math.Max(1, cchild.size + random.Next(-1, 2) * 20 / 5);
+                cchild.speed = Math.Max(1, cchild.speed + random.Next(-1, 2) * 1);
+                cchild.perception = Math.Max(1, cchild.perception + random.Next(-1, 2) * 50 / 5);
+            }
+
+            return cchild;
+        }
+        
         void EnergyManagement()
         {
-            //energy -= (int)size + perception - speed;
-            energy--;
+            //energy--;
+            energy -= Math.Max(0.05f, 1 * this.size/20 * this.speed/1 * this.perception/50);
             if (energy <= 0)
             {
                 this.isMarkedForDelete = true;
@@ -190,7 +207,7 @@ namespace Gymnasiearbete
             else
             if (intresst.GetType() == typeof(Cell))
             {
-                if (intresst.size > this.size)
+                if (intresst.size > 1.2 * this.size)
                 {
                     Vector2 direction = -new Vector2(intresst.position.X - this.position.X, intresst.position.Y - this.position.Y);
                     if (direction != Vector2.Zero)
@@ -198,7 +215,18 @@ namespace Gymnasiearbete
                         direction.Normalize();
                         Move(direction);
                     }
-                } else
+                }
+                else
+                if (this.size > 1.2 * intresst.size && this.speed > intresst.speed)
+                {
+                    Vector2 direction = new Vector2(intresst.position.X - this.position.X, intresst.position.Y - this.position.Y);
+                    if (direction != Vector2.Zero)
+                    {
+                        direction.Normalize();
+                        Move(direction);
+                    }
+                }
+                else
                 {
                     idleDirection.Normalize();
                     Move(idleDirection);
@@ -220,7 +248,7 @@ namespace Gymnasiearbete
         {
             PerceptionCheck(detectionCheck);
             CollisionCheck(detectionCheck);
-            Reproduce(window, random);
+            ReproduceCheck();
             EnergyManagement();
 
             if (this.position.X >= window.ClientBounds.Width)
@@ -254,7 +282,7 @@ namespace Gymnasiearbete
             if (g.GetType() == typeof(Cell))
             {
                 Cell c = (Cell)g;
-                if(2 * g.size < this.size)
+                if(1.2 * g.size < this.size)
                 {
                     g.isMarkedForDelete = true;
                     this.energy += c.energy;

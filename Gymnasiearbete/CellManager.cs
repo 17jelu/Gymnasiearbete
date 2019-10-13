@@ -76,13 +76,10 @@ namespace Gymnasiearbete
                     if (g.GetType() == typeof(Cell))
                     {
                         Cell c = (Cell)g;
+
                         if (c.isMarkForReproduce)
                         {
-                            AddObjects(new GameObject[1]
-                            {
-                                new Cell(this, new Vector2(g.position.X, g.position.Y - (float)g.size))
-                            }
-                            );
+                            this.AddObjects(new GameObject[1] { c.Reproduce(window, random) });
                         }
                     }
                 }
@@ -127,9 +124,10 @@ namespace Gymnasiearbete
 
                 if (g.GetType() == typeof(Cell))
                 {
-                    clr = Color.Red;
                     Cell c = (Cell)g;
-                    new Circle(Circle.UnitCircle.Point16, graphicsDevice, new Color(0.5f, 0.5f, 0.5f, 0.3f), (float)c.Detectionrange, g.position - camera.Position).Render(graphicsDevice);
+
+                    clr = new Color((int) c.size * 10, (int) c.speed * 10, (int) c.perception * 10);
+                    new Circle(Circle.UnitCircle.Point16, graphicsDevice, new Color(0.1f, 0.1f, 0.1f, 0.1f), (float)c.Detectionrange, g.position - camera.Position).Render(graphicsDevice);
                 }
 
                 if (g.GetType() == typeof(Food))
