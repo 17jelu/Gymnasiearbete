@@ -14,8 +14,8 @@ namespace Gymnasiearbete
     {
         public Vector2 position = Vector2.Zero;
         double rotation = 0;
-        public double size = 0;
-        int speed = 1;
+        public int size = 0;
+        public int speed = 1;
 
         public bool isMarkedForDelete = false;
 
@@ -28,6 +28,25 @@ namespace Gymnasiearbete
         Vector2 Forward()
         {
             return new Vector2((float)Math.Cos(rotation), (float)Math.Sin(rotation));
+        }
+
+        public void CollisionCheck(List<GameObject> gs)
+        {
+            foreach (GameObject g in gs)
+            {
+                if (
+                    Math.Pow(g.position.X - this.position.X, 2) + Math.Pow(g.position.Y - this.position.Y, 2) <=
+                    Math.Pow(g.size - this.size, 2)
+                    )
+                {
+                    Collision(g);
+                }
+            }
+        }
+
+        public virtual void Collision(GameObject g)
+        {
+
         }
 
         public void Move(Vector2 direction)
@@ -44,7 +63,13 @@ namespace Gymnasiearbete
 
     class Food : GameObject
     {
-        int energy = 100;
+        public int Energy
+        {
+            get
+            {
+                return 300;
+            }
+        }
 
         public Food(Vector2 startPosition) : base(startPosition)
         {
@@ -65,10 +90,12 @@ namespace Gymnasiearbete
         int perception = 0;
 
         int preformancepoints = 0;
-        int energy = 0;
-        int energyRequirement = 0;
+        public int energy = 0;
+        int energyRequirement = 1000;
 
         Vector2 idleDirection = new Vector2(1, 1);
+
+        public bool isMarkForReproduce = false;
 
         public int Detectionrange
         {
@@ -83,6 +110,8 @@ namespace Gymnasiearbete
             CM = setCellManager;
             size = 20;
             perception = 75;
+
+            energy = energyRequirement;
         }
 
         void Reproduce(GameWindow window, Random random)
@@ -90,13 +119,20 @@ namespace Gymnasiearbete
             if (energy > 2 * energyRequirement)
             {
                 energy -= energyRequirement;
-                CM.AddObjects(
-                    new GameObject[2]
-                    {
-                        new Cell(CM, new Vector2(this.position.X + this.Detectionrange, this.position.Y)),
-                        new Food(new Vector2(random.Next(0, window.ClientBounds.Width), random.Next(0, window.ClientBounds.Height)))
-                    }
-                    );
+                isMarkForReproduce = true;
+            } else
+            {
+                isMarkForReproduce = false;
+            }
+        }
+
+        void EnergyManagement()
+        {
+            //energy -= (int)size + perception - speed;
+            energy--;
+            if (energy <= 0)
+            {
+                this.isMarkedForDelete = true;
             }
         }
 
@@ -183,8 +219,11 @@ namespace Gymnasiearbete
         public void Update(List<GameObject> detectionCheck, GameWindow window, Random random)
         {
             PerceptionCheck(detectionCheck);
+            CollisionCheck(detectionCheck);
+            Reproduce(window, random);
+            EnergyManagement();
 
-            if(this.position.X >= window.ClientBounds.Width)
+            if (this.position.X >= window.ClientBounds.Width)
             {
                 idleDirection.X = -1;
             }
@@ -203,8 +242,31 @@ namespace Gymnasiearbete
             {
                 idleDirection.Y = 1;
             }
+        }
 
-            Reproduce(window, random);
+        public override void Collision(GameObject g)
+        {
+            if (g == null)
+            {
+
+            }
+            else
+            if (g.GetType() == typeof(Cell))
+            {
+                Cell c = (Cell)g;
+                if(2 * g.size < this.size)
+                {
+                    g.isMarkedForDelete = true;
+                    this.energy += c.energy;
+                }
+            }
+            else
+            if (g.GetType() == typeof(Food))
+            {
+                Food f = (Food)g;
+                g.isMarkedForDelete = true;
+                this.energy += f.Energy;
+            }
         }
     }
 }

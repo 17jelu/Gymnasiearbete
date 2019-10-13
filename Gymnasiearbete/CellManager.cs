@@ -36,28 +36,59 @@ namespace Gymnasiearbete
                 s.Value.Clear();
             }
 
-            //Fixerad Updatering
+            if (random.Next(0, 100) <= 1)
+            {
+                AddObjects(
+                    new GameObject[1]
+                    {
+                        new Food
+                        (
+                            new Vector2
+                            (
+                                random.Next(0, window.ClientBounds.Width), 
+                                random.Next(0, window.ClientBounds.Height)
+                            )
+                        )
+                    }
+                    );
+            }
+
+            //Ofixerad Updatering
             for (int i = 0; i < objects.Count; i++)
             {
-                GameObject c = objects[i];
-                if (!c.isMarkedForDelete)
-                {
-                    //får sectorposition
-                    string sectorPos = new Vector2((float)Math.Floor(c.position.X / SectorSize), (float)Math.Floor(c.position.Y / SectorSize)).ToString();
+                GameObject g = objects[i];
 
-                    if (!sectors.ContainsKey(sectorPos))
+                if (g.isMarkedForDelete)
+                {
+                    objects.Remove(g);
+                }
+                else
+                {
+                    int px = (int)Math.Floor(g.position.X / SectorSize);
+                    int py = (int)Math.Floor(g.position.Y / SectorSize);
+
+                    if (!sectors.ContainsKey(new Vector2(px, py).ToString()))
                     {
-                        sectors.Add(sectorPos, new List<GameObject>());
+                        sectors.Add(new Vector2(px, py).ToString(), new List<GameObject>());
                     }
+                    sectors[new Vector2(px, py).ToString()].Add(g);
 
-                    sectors[sectorPos].Add(c);
-                } else
-                {
-                    objects.Remove(c);
+                    if (g.GetType() == typeof(Cell))
+                    {
+                        Cell c = (Cell)g;
+                        if (c.isMarkForReproduce)
+                        {
+                            AddObjects(new GameObject[1]
+                            {
+                                new Cell(this, new Vector2(g.position.X, g.position.Y - (float)g.size))
+                            }
+                            );
+                        }
+                    }
                 }
             }
 
-            //OfixeradUpdatering
+            //FixeradUpdatering
             foreach (GameObject g in objects)
             {
                 if (g.GetType() == typeof(Cell))
