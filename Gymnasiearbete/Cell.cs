@@ -63,17 +63,18 @@ namespace Gymnasiearbete
 
     class Food : GameObject
     {
-        public int Energy
+        float energy = 300;
+        public float Energy
         {
             get
             {
-                return 300;
+                return energy;
             }
         }
 
-        public Food(Vector2 startPosition) : base(startPosition)
+        public Food(Vector2 startPosition, float energySet = 300) : base(startPosition)
         {
-
+            energy = energySet;
         }
     }
 
@@ -145,8 +146,9 @@ namespace Gymnasiearbete
         
         void EnergyManagement()
         {
+            energy--;
             //energy -= Math.Max(0.05f, 1 * this.size/20 * this.speed/1 * this.perception/50);
-            energy -= Math.Max(0.05f, this.size / 20 - this.speed / 1 - this.perception / 50);
+            //energy -= Math.Max(0.05f, this.size / 20 - this.speed / 1 - this.perception / 50);
             if (energy <= 0)
             {
                 this.isMarkedForDelete = true;

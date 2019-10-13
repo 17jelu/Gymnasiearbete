@@ -55,10 +55,11 @@ namespace Gymnasiearbete
             CM = new CellManager();
             CM.AddObjects
                 (
-                    new GameObject[2]
+                    new GameObject[3]
                     {
                         new Cell(CM, new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 20, 1, 50),
                         new Cell(CM, new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 40, 0.5f, 10),
+                        new Cell(CM, new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 5, 3, 300),
                     }
                 );
 

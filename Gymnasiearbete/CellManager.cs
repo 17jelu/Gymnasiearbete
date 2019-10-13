@@ -61,6 +61,7 @@ namespace Gymnasiearbete
                 s.Value.Clear();
             }
 
+            //MatSpawn
             if (random.Next(0, 100) <= 1)
             {
                 AddObjects(
@@ -85,6 +86,11 @@ namespace Gymnasiearbete
 
                 if (g.isMarkedForDelete)
                 {
+                    if (g.GetType() == typeof(Cell))
+                    {
+                        Cell c = (Cell)g;
+                        AddObjects(new GameObject[1] { new Food(g.position, c.energy) });
+                    }
                     objects.Remove(g);
                 }
                 else
