@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
@@ -26,6 +27,28 @@ namespace Gymnasiearbete
         public void AddObjects(GameObject[] gs)
         {
             objects.AddRange(gs);
+        }
+
+        public void DebugSector(float Xposition, float Yposition)
+        {
+            int x = (int)Math.Floor(Xposition / SectorSize);
+            int y = (int)Math.Floor(Yposition / SectorSize);
+
+            if (!sectors.ContainsKey(new Vector2(x, y).ToString()))
+            {
+                sectors.Add(new Vector2(x, y).ToString(), new List<GameObject>());
+            }
+
+            foreach (GameObject g in sectors[new Vector2(x, y).ToString()])
+            {
+                Debug.Print("_");
+                if (g.GetType() == typeof(Cell))
+                {
+                    Cell c = (Cell)g;
+                    
+                    Debug.Print("---" + objects.IndexOf(g) + "| SZ:" + c.size + "| SP:" + c.speed + "| PC:" + c.perception);
+                }
+            }
         }
 
         public void Update(GameWindow window, Random random)

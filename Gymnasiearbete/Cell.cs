@@ -13,7 +13,7 @@ namespace Gymnasiearbete
     class GameObject
     {
         public Vector2 position = Vector2.Zero;
-        double rotation = 0;
+        readonly double rotation = 0;
         public float size = 0;
         public float speed = 1;
 
@@ -82,7 +82,7 @@ namespace Gymnasiearbete
     /// </summary>
     class Cell : GameObject
     {
-        CellManager CM;
+        static CellManager CM;
 
         //int curiosity = 0;
         //int speed = 0;

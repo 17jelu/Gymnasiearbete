@@ -117,7 +117,10 @@ namespace Gymnasiearbete
 
             CM.Update(Window, random);
 
-            //camera.Position += new Vector2(1.0f, 1.0f);
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            {
+                CM.DebugSector(Mouse.GetState().X, Mouse.GetState().Y);
+            }
 
             //circle.Update();
 
