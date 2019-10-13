@@ -36,7 +36,7 @@ namespace Gymnasiearbete
             {
                 if (
                     Math.Pow(g.position.X - this.position.X, 2) + Math.Pow(g.position.Y - this.position.Y, 2) <=
-                    Math.Pow(g.size - this.size, 2)
+                    Math.Pow(g.size + this.size, 2)
                     )
                 {
                     Collision(g);
@@ -135,9 +135,9 @@ namespace Gymnasiearbete
             
             if (random.Next(0, 100) <= 50)
             {
-                cchild.size = Math.Max(1, cchild.size + random.Next(-1, 2) * 20 / 5);
+                cchild.size = Math.Max(1, cchild.size + random.Next(-1, 2) * 2);
                 cchild.speed = Math.Max(1, cchild.speed + random.Next(-1, 2) * 1);
-                cchild.perception = Math.Max(1, cchild.perception + random.Next(-1, 2) * 50 / 5);
+                cchild.perception = Math.Max(1, cchild.perception + random.Next(-1, 2) * 5);
             }
 
             return cchild;
@@ -145,8 +145,8 @@ namespace Gymnasiearbete
         
         void EnergyManagement()
         {
-            //energy--;
-            energy -= Math.Max(0.05f, 1 * this.size/20 * this.speed/1 * this.perception/50);
+            //energy -= Math.Max(0.05f, 1 * this.size/20 * this.speed/1 * this.perception/50);
+            energy -= Math.Max(0.05f, this.size / 20 - this.speed / 1 - this.perception / 50);
             if (energy <= 0)
             {
                 this.isMarkedForDelete = true;

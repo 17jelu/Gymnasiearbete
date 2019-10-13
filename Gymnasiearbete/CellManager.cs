@@ -29,8 +29,9 @@ namespace Gymnasiearbete
             objects.AddRange(gs);
         }
 
-        public void DebugSector(float Xposition, float Yposition)
+        public string DebugSector(float Xposition, float Yposition)
         {
+            string output = "";
             int x = (int)Math.Floor(Xposition / SectorSize);
             int y = (int)Math.Floor(Yposition / SectorSize);
 
@@ -41,14 +42,15 @@ namespace Gymnasiearbete
 
             foreach (GameObject g in sectors[new Vector2(x, y).ToString()])
             {
-                Debug.Print("_");
                 if (g.GetType() == typeof(Cell))
                 {
                     Cell c = (Cell)g;
                     
-                    Debug.Print("---" + objects.IndexOf(g) + "| SZ:" + c.size + "| SP:" + c.speed + "| PC:" + c.perception);
+                    output += "---" + objects.IndexOf(g) + "| SZ:" + c.size + "| SP:" + c.speed + "| PC:" + c.perception + "| E:" + c.energy + "\n";
                 }
             }
+
+            return output;
         }
 
         public void Update(GameWindow window, Random random)

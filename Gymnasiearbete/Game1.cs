@@ -20,11 +20,12 @@ namespace Gymnasiearbete
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        SpriteFont spriteFont;
+
         Grid grid;
-        Circle circle;
 
         CellManager CM;
-        Cell debugCell;
+        string debugMessage = "";
 
         Random random;
 
@@ -51,23 +52,26 @@ namespace Gymnasiearbete
 
             Window.AllowUserResizing = true;
 
-            circle = new Circle(Circle.UnitCircle.Point16, GraphicsDevice, Color.Red, 50, new Vector2(200, 150));
-
-            debugCell = new Cell(CM, new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 20, 1, 50);
             CM = new CellManager();
             CM.AddObjects
                 (
-                
-                    new GameObject[6]
+                    new GameObject[2]
                     {
-                        debugCell,
+                        new Cell(CM, new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 20, 1, 50),
                         new Cell(CM, new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 40, 0.5f, 10),
-                        new Food(new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height))),
-                        new Food(new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height))),
-                        new Food(new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height))),
-                        new Food(new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)))
                     }
                 );
+
+            for (int i = 0; i < 6; i++)
+            {
+                CM.AddObjects
+                    (
+                        new GameObject[1]
+                        {
+                            new Food(new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)))
+                        }
+                    );
+            }
 
             base.Initialize();
         }
@@ -80,6 +84,7 @@ namespace Gymnasiearbete
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            spriteFont = Content.Load<SpriteFont>("FontDefault");
 
             // TODO: use this.Content to load your game content here
             grid.LoadContent(GraphicsDevice);
@@ -104,25 +109,24 @@ namespace Gymnasiearbete
         protected override void Update(GameTime gameTime)
         {
             // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
                 this.Exit();
+            }
 
-            // TODO: Add your update logic here
+            CM.Update(Window, random);
+
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            {
+                Debug.Print(CM.DebugSector(Mouse.GetState().X, Mouse.GetState().Y));
+                debugMessage = CM.DebugSector(Mouse.GetState().X, Mouse.GetState().Y);
+            }
 
             /*
             tick = tick >= 360 ? tick - 360 : tick + 0.005f;
             camera.X = (float)Math.Sin(tick) * 500;
             camera.Y = (float)Math.Cos(tick) * 500;
             */
-
-            CM.Update(Window, random);
-
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
-            {
-                CM.DebugSector(Mouse.GetState().X, Mouse.GetState().Y);
-            }
-
-            //circle.Update();
 
             base.Update(gameTime);
         }
@@ -142,13 +146,12 @@ namespace Gymnasiearbete
             spriteBatch.Begin();
             grid.Draw(GraphicsDevice, spriteBatch, camera);
 
-
             CM.Draw(GraphicsDevice, camera);
+
+            spriteBatch.DrawString(spriteFont, debugMessage, new Vector2(10, 10), Color.Gold);
 
             spriteBatch.End();
             base.Draw(gameTime);
-            
-            //circle.Render(GraphicsDevice);
         }
     }
 }
