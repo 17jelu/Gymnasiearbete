@@ -2,6 +2,12 @@
 
 namespace Gymnasiearbete
 {
+    /* IDÉER
+     * kunna zooma ut så att man ser hela "brädet"
+     * följa efter en cell
+     */
+
+
     class Camera
     {
         private Vector2 pos;

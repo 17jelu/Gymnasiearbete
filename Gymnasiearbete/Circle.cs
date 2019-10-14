@@ -15,6 +15,7 @@ namespace Gymnasiearbete
 
         float radius;
         Vector2 pos;
+        Vector2[] preCalc;
 
         /// <summary>
         /// Used in Render() to tell how many triangles shall be rendered.
@@ -26,8 +27,7 @@ namespace Gymnasiearbete
             // Properties
             this.radius = radius;
             this.pos = position;
-
-            Vector2[] preCalc;
+            
             if (type == UnitCircle.Point16)
             {
                 vertices = new VertexPositionColor[16];
@@ -67,8 +67,37 @@ namespace Gymnasiearbete
             }
         }
 
-        public void Render(GraphicsDevice GraphicsDevice)
+        private void UpdateVertices()
         {
+            // Positionate each vertex
+            for (int i = 0, j = 0; i < vertices.Length; i++)
+            {
+                if (i == 0)
+                    vertices[0].Position = new Vector3(pos + preCalc[0] * radius, 0);
+                else
+                {
+                    if (i % 2 == 1)
+                    {
+                        j++;
+                        vertices[i].Position = new Vector3(pos + preCalc[j] * radius, 0);
+                    }
+                    else
+                    {
+                        vertices[i].Position = new Vector3(pos + preCalc[preCalc.Length - j] * radius, 0);
+                    }
+                }
+            }
+        }
+
+        public void Render(GraphicsDevice GraphicsDevice, Camera camera)
+        {
+            Vector2 oldpos = pos;
+
+            pos = pos - camera.Position;
+
+            UpdateVertices();
+            pos = oldpos;
+
             GraphicsDevice.DrawUserPrimitives<VertexPositionColor>(
                 PrimitiveType.TriangleStrip,
                 vertices,
