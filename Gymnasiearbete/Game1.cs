@@ -101,8 +101,8 @@ namespace Gymnasiearbete
 
             tick = tick >= 360 ? tick - 360 : tick + 0.005f;
 
-            camera.X = (float)Math.Sin(tick) * 500;
-            camera.Y = (float)Math.Cos(tick) * 500;
+            camera.X = (float)Math.Sin(tick) * 100;
+            camera.Y = (float)Math.Cos(tick) * 100;
 
             //circle.Update();
 
@@ -132,8 +132,8 @@ namespace Gymnasiearbete
 
             grid.Draw(GraphicsDevice, camera);
             
-            circle.Render(GraphicsDevice);
-            cirkel.Render(GraphicsDevice);
+            circle.Render(GraphicsDevice, camera);
+            cirkel.Render(GraphicsDevice, camera);
         }
     }
 }
