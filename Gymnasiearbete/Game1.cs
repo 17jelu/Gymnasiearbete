@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -19,8 +20,16 @@ namespace Gymnasiearbete
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        SpriteFont spriteFont;
+
         Grid grid;
-        Circle circle;
+
+        CellManager CM;
+        string debugMessage = "";
+
+        Random random;
+
+        bool restart = false;
 
         public Game1()
         {
@@ -36,14 +45,35 @@ namespace Gymnasiearbete
         /// </summary>
         protected override void Initialize()
         {
+            // TODO: Add your initialization logic here
             IsMouseVisible = true;
 
-            // TODO: Add your initialization logic here
+            random = new Random();
+            
             grid = new Grid(Window.ClientBounds);
 
             Window.AllowUserResizing = true;
 
-            circle = new Circle(GraphicsDevice, Color.Red, 50, 200, 150);
+            CM = new CellManager();
+            CM.AddObjects
+                (
+                    new GameObject[2]
+                    {
+                        new Cell(CM, new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 10, 1, 10),
+                        new Cell(CM, new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 10, 2, 10)
+                    }
+                );
+
+            for (int i = 0; i < 10; i++)
+            {
+                CM.AddObjects
+                    (
+                        new GameObject[1]
+                        {
+                            new Food(new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)))
+                        }
+                    );
+            }
 
             base.Initialize();
         }
@@ -56,6 +86,7 @@ namespace Gymnasiearbete
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            spriteFont = Content.Load<SpriteFont>("FontDefault");
 
             // TODO: use this.Content to load your game content here
             grid.LoadContent(GraphicsDevice);
@@ -80,17 +111,39 @@ namespace Gymnasiearbete
         protected override void Update(GameTime gameTime)
         {
             // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
                 this.Exit();
+            }
 
-            // TODO: Add your update logic here
+            if (Keyboard.GetState().IsKeyDown(Keys.R) && restart == false)
+            {
+                Initialize();
+                restart = true;
+            }
 
-            tick = tick >= 360 ? tick - 360 : tick + 0.005f;
+            if (Keyboard.GetState().IsKeyUp(Keys.R) && restart == true)
+            {
+                restart = false;
+            }
 
-            camera.X = (float)Math.Sin(tick) * 500;
-            camera.Y = (float)Math.Cos(tick) * 500;
+            int h = (int)(Math.Floor((CM.civilazationTime) / 60) / 60);
+            int m = (int)(Math.Floor(CM.civilazationTime) / 60) - (60 * h);
+            int s = (int)Math.Floor(CM.civilazationTime) - (60 * m);
+            debugMessage = "";
+            if (h > 0){debugMessage += " h:" + h;}
+            if (m > 0){debugMessage += " m:" + m;}
+            debugMessage += " s:" + s;
 
-            circle.Update();
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Space))
+            {
+                CM.pause = true;
+                debugMessage = CM.DebugSector(Mouse.GetState().X, Mouse.GetState().Y);
+            } else
+            {
+                CM.pause = false;
+            }
+            CM.Update(Window, random, gameTime);
 
             base.Update(gameTime);
         }
@@ -108,13 +161,14 @@ namespace Gymnasiearbete
         {
             // TODO: Add your drawing code here
             spriteBatch.Begin();
-
             grid.Draw(GraphicsDevice, spriteBatch, camera);
+
+            CM.Draw(GraphicsDevice, camera);
+
+            spriteBatch.DrawString(spriteFont, debugMessage, new Vector2(4, 10), Color.Gold);
 
             spriteBatch.End();
             base.Draw(gameTime);
-
-            circle.Render(GraphicsDevice);
         }
     }
 }
