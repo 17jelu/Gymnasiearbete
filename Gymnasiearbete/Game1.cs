@@ -34,6 +34,8 @@ namespace Gymnasiearbete
 
         Random random;
 
+        bool restart = false;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -75,12 +77,12 @@ namespace Gymnasiearbete
                 (
                     new GameObject[2]
                     {
-                        new Cell(CM, new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 20, 1, 50),
-                        new Cell(CM, new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 40, 0.5f, 10),
+                        new Cell(CM, new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 10, 1, 10),
+                        new Cell(CM, new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 10, 2, 10)
                     }
                 );
 
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < 10; i++)
             {
                 CM.AddObjects
                     (
@@ -132,16 +134,37 @@ namespace Gymnasiearbete
                 this.Exit();
             }
 
-            CM.Update(Window, random);
-
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            if (Keyboard.GetState().IsKeyDown(Keys.R) && restart == false)
             {
-                Debug.Print(CM.DebugSector(Mouse.GetState().X, Mouse.GetState().Y));
-                debugMessage = CM.DebugSector(Mouse.GetState().X, Mouse.GetState().Y);
+                Initialize();
+                restart = true;
+            }
+
+            if (Keyboard.GetState().IsKeyUp(Keys.R) && restart == true)
+            {
+                restart = false;
             }
 
             camera.X = (float)Math.Sin(tick) * 100;
             camera.Y = (float)Math.Cos(tick) * 100;
+
+            int h = (int)(Math.Floor((CM.civilazationTime) / 60) / 60);
+            int m = (int)(Math.Floor(CM.civilazationTime) / 60) - (60 * h);
+            int s = (int)Math.Floor(CM.civilazationTime) - (60 * m);
+            debugMessage = "";
+            if (h > 0){debugMessage += " h:" + h;}
+            if (m > 0){debugMessage += " m:" + m;}
+            debugMessage += " s:" + s;
+
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Space))
+            {
+                CM.pause = true;
+                debugMessage = CM.DebugSector(Mouse.GetState().X, Mouse.GetState().Y);
+            } else
+            {
+                CM.pause = false;
+            }
+            CM.Update(Window, random, gameTime);
 
             base.Update(gameTime);
         }
@@ -175,7 +198,7 @@ namespace Gymnasiearbete
             CM.Draw(GraphicsDevice, camera);
 
             spriteBatch.Begin();
-            spriteBatch.DrawString(spriteFont, debugMessage, new Vector2(10, 10), Color.Gold);
+            spriteBatch.DrawString(spriteFont, debugMessage, new Vector2(4, 10), Color.Gold);
             spriteBatch.End();
             base.Draw(gameTime);
         }

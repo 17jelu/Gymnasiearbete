@@ -13,7 +13,13 @@ namespace Gymnasiearbete
     /// </summary>
     class CellManager
     {
+        public double civilazationTime = 0;
         List<GameObject> objects = new List<GameObject>();
+
+        int spawnTimer = 0;
+
+        public bool pause = false;
+        public bool simulationEnd = false;
 
         public int SectorSize {
             get
@@ -53,29 +59,22 @@ namespace Gymnasiearbete
             return output;
         }
 
-        public void Update(GameWindow window, Random random)
+        public void Update(GameWindow window, Random random, GameTime gameTime)
         {
+            if (pause || simulationEnd)
+            {
+                return;
+            }
+
+            civilazationTime += gameTime.ElapsedGameTime.TotalSeconds;
+
+            int foodCount = 0;
+            int cellCount = 0;
+
             //Clearar sectorer
             foreach (KeyValuePair<string, List<GameObject>> s in sectors)
             {
                 s.Value.Clear();
-            }
-
-            if (random.Next(0, 100) <= 1)
-            {
-                AddObjects(
-                    new GameObject[1]
-                    {
-                        new Food
-                        (
-                            new Vector2
-                            (
-                                random.Next(0, window.ClientBounds.Width), 
-                                random.Next(0, window.ClientBounds.Height)
-                            )
-                        )
-                    }
-                    );
             }
 
             //Ofixerad Updatering
@@ -115,6 +114,7 @@ namespace Gymnasiearbete
             {
                 if (g.GetType() == typeof(Cell))
                 {
+                    cellCount++;
                     Cell c = (Cell)g;
                     List<GameObject> detectionCheck = new List<GameObject>();
 
@@ -139,6 +139,33 @@ namespace Gymnasiearbete
                     c.Update(detectionCheck, window, random);
                 }
             }
+
+            foodCount = objects.Count - cellCount;
+
+            //MatSpawn
+            spawnTimer++;
+            if (spawnTimer > 60)
+            {
+                spawnTimer = 0;
+                AddObjects(
+                    new GameObject[1]
+                    {
+                        new Food
+                        (
+                            new Vector2
+                            (
+                                random.Next(0, window.ClientBounds.Width),
+                                random.Next(0, window.ClientBounds.Height)
+                            )
+                        )
+                    }
+                    );
+            }
+
+            if (cellCount < 0)
+            {
+                simulationEnd = true;
+            }
         }
 
         public void Draw(GraphicsDevice graphicsDevice, Camera camera)
@@ -146,21 +173,24 @@ namespace Gymnasiearbete
             foreach (GameObject g in objects)
             {
                 Color clr = Color.White;
+                Circle.UnitCircle uc = Circle.UnitCircle.Point8;
 
                 if (g.GetType() == typeof(Cell))
                 {
                     Cell c = (Cell)g;
 
                     clr = new Color((int) c.size * 10, (int) c.speed * 10, (int) c.perception * 10);
-                    new Circle(Circle.UnitCircle.Point16, graphicsDevice, new Color(0.1f, 0.1f, 0.1f, 0.1f), (float)c.Detectionrange, g.position - camera.Position).Render(graphicsDevice);
+                    uc = Circle.UnitCircle.Point16;
+                    new Circle(Circle.UnitCircle.Point8, graphicsDevice, new Color(0.1f, 0.1f, 0.1f, 0.1f), (float)c.Detectionrange, g.position - camera.Position).Render(graphicsDevice);
                 }
 
                 if (g.GetType() == typeof(Food))
                 {
                     clr = Color.Green;
+                    uc = Circle.UnitCircle.Point8;
                 }
 
-                new Circle(Circle.UnitCircle.Point16, graphicsDevice, clr, (float)g.size, g.position - camera.Position).Render(graphicsDevice);
+                new Circle(uc, graphicsDevice, clr, (float)g.size, g.position - camera.Position).Render(graphicsDevice);
             }
         }
     }
