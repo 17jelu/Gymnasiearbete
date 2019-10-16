@@ -15,7 +15,7 @@ namespace Gymnasiearbete
         public Vector2 position = Vector2.Zero;
         readonly double rotation = 0;
         public float size = 0;
-        public float speed = 1;
+        public float speed = 0;
 
         public bool isMarkedForDelete = false;
 
@@ -61,6 +61,7 @@ namespace Gymnasiearbete
         }
     }
 
+    //MAT
     class Food : GameObject
     {
         float energy = 300;
@@ -78,9 +79,7 @@ namespace Gymnasiearbete
         }
     }
 
-    /// <summary>
-    /// Grund Cell klassen
-    /// </summary>
+    //CELL
     class Cell : GameObject
     {
         static CellManager CM;
@@ -95,7 +94,9 @@ namespace Gymnasiearbete
         public float energy = 0;
         float energyRequirement = 1000;
 
-        Vector2 idleDirection = new Vector2(1, 1);
+        double consumeScale = 1.2;
+
+        Vector2 idleDirection = new Vector2(0.7071f, 0.7071f);
 
         public bool isMarkForReproduce = false;
 
@@ -132,15 +133,18 @@ namespace Gymnasiearbete
 
         public Cell Reproduce(GameWindow window, Random random)
         {
-            Cell cchild = new Cell(CM, new Vector2(this.position.X - this.Detectionrange, this.position.Y - this.Detectionrange), this.size, this.speed, this.perception);
+            Cell cchild = new Cell(CM, Vector2.Zero, this.size, this.speed, this.perception);
             
+
             if (random.Next(0, 100) <= 50)
             {
-                cchild.size = Math.Max(1, cchild.size + random.Next(-1, 2) * 2);
-                cchild.speed = Math.Max(1, cchild.speed + random.Next(-1, 2) * 1);
-                cchild.perception = Math.Max(1, cchild.perception + random.Next(-1, 2) * 5);
+                cchild.size = Math.Max(1, cchild.size + random.Next(-5, 5+1));
+                cchild.speed = Math.Max(0.5f, cchild.speed + random.Next(-10, 10+1) * 0.1f);
+                cchild.perception = Math.Max(1, cchild.perception + random.Next(-5, 5+1));
             }
 
+            cchild.idleDirection = -this.idleDirection;
+            cchild.position = this.position + cchild.idleDirection * this.Detectionrange + cchild.idleDirection * cchild.Detectionrange + cchild.idleDirection * cchild.size;
             return cchild;
         }
         
@@ -203,45 +207,54 @@ namespace Gymnasiearbete
         {
             if (intresst == null)
             {
-                idleDirection.Normalize();
-                Move(idleDirection);
+                Actions("0", idleDirection);
             }
             else
             if (intresst.GetType() == typeof(Cell))
             {
-                if (intresst.size > 1.2 * this.size)
+                if (intresst.size > consumeScale * this.size)
                 {
-                    Vector2 direction = -new Vector2(intresst.position.X - this.position.X, intresst.position.Y - this.position.Y);
-                    if (direction != Vector2.Zero)
-                    {
-                        direction.Normalize();
-                        Move(direction);
-                    }
+                    Vector2 direction = intresst.position - this.position;
+                    Actions("2", direction);
                 }
                 else
-                if (this.size > 1.2 * intresst.size && this.speed > intresst.speed)
+                if (this.size > consumeScale * intresst.size && this.speed > intresst.speed)
                 {
-                    Vector2 direction = new Vector2(intresst.position.X - this.position.X, intresst.position.Y - this.position.Y);
-                    if (direction != Vector2.Zero)
-                    {
-                        direction.Normalize();
-                        Move(direction);
-                    }
+                    Vector2 direction = intresst.position - this.position;
+                    Actions("1", direction);
                 }
                 else
                 {
-                    idleDirection.Normalize();
-                    Move(idleDirection);
+                    Actions("0", idleDirection);
                 }
             }
             else
             if (intresst.GetType() == typeof(Food))
             {
-                Vector2 direction = new Vector2(intresst.position.X - this.position.X, intresst.position.Y - this.position.Y);
-                if (direction != Vector2.Zero)
+                Vector2 direction = intresst.position - this.position;
+                Actions("1", direction);
+            }
+        }
+
+        void Actions(string decision, Vector2 direction)
+        {
+            if (direction != Vector2.Zero)
+            {
+                direction.Normalize();
+
+                switch (decision)
                 {
-                    direction.Normalize();
-                    Move(direction);
+                    case "0":
+                        Move(idleDirection);
+                        break;
+
+                    case "1":
+                        Move(direction);
+                        break;
+
+                    case "2":
+                        Move(-direction);
+                        break;
                 }
             }
         }
@@ -253,24 +266,24 @@ namespace Gymnasiearbete
             ReproduceCheck();
             EnergyManagement();
 
-            if (this.position.X >= window.ClientBounds.Width)
+            if (this.position.X + this.size / 2 >= window.ClientBounds.Width)
             {
-                idleDirection.X = -1;
+                idleDirection.X = -0.7071f;
             }
 
-            if (this.position.X <= 0)
+            if (this.position.X - this.size / 2 <= 0)
             {
-                idleDirection.X = 1;
+                idleDirection.X = 0.7071f;
             }
 
-            if (this.position.Y >= window.ClientBounds.Height)
+            if (this.position.Y + this.size / 2 >= window.ClientBounds.Height)
             {
-                idleDirection.Y = -1;
+                idleDirection.Y = -0.7071f;
             }
 
-            if (this.position.Y <= 0)
+            if (this.position.Y - this.size / 2 <= 0)
             {
-                idleDirection.Y = 1;
+                idleDirection.Y = 0.7071f;
             }
         }
 
@@ -284,7 +297,7 @@ namespace Gymnasiearbete
             if (g.GetType() == typeof(Cell))
             {
                 Cell c = (Cell)g;
-                if(1.2 * g.size < this.size)
+                if(consumeScale * g.size < this.size)
                 {
                     g.isMarkedForDelete = true;
                     this.energy += c.energy;
