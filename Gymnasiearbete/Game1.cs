@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -21,9 +22,17 @@ namespace Gymnasiearbete
 
         BasicEffect effect;
 
-        Grid grid;
         Circle circle;
         Circle cirkel;
+        
+        SpriteFont spriteFont;
+
+        Grid grid;
+
+        CellManager CM;
+        string debugMessage = "";
+
+        Random random;
 
         public Game1()
         {
@@ -39,6 +48,7 @@ namespace Gymnasiearbete
         /// </summary>
         protected override void Initialize()
         {
+            // TODO: Add your initialization logic here
             IsMouseVisible = true;
 
             // TODO: Add your initialization logic here
@@ -58,6 +68,28 @@ namespace Gymnasiearbete
 
             circle = new Circle(Circle.UnitCircle.Point16, GraphicsDevice, Color.Red, 50, new Vector2(200, 150));
             cirkel = new Circle(Circle.UnitCircle.Point16, GraphicsDevice, Color.Purple, 100, new Vector2(250, 250));
+            random = new Random();
+
+            CM = new CellManager();
+            CM.AddObjects
+                (
+                    new GameObject[2]
+                    {
+                        new Cell(CM, new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 20, 1, 50),
+                        new Cell(CM, new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 40, 0.5f, 10),
+                    }
+                );
+
+            for (int i = 0; i < 6; i++)
+            {
+                CM.AddObjects
+                    (
+                        new GameObject[1]
+                        {
+                            new Food(new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)))
+                        }
+                    );
+            }
 
             base.Initialize();
         }
@@ -70,6 +102,7 @@ namespace Gymnasiearbete
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            spriteFont = Content.Load<SpriteFont>("FontDefault");
 
             // TODO: use this.Content to load your game content here
             grid.LoadContent(GraphicsDevice);
@@ -94,17 +127,21 @@ namespace Gymnasiearbete
         protected override void Update(GameTime gameTime)
         {
             // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
                 this.Exit();
+            }
 
-            // TODO: Add your update logic here
+            CM.Update(Window, random);
 
-            tick = tick >= 360 ? tick - 360 : tick + 0.005f;
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            {
+                Debug.Print(CM.DebugSector(Mouse.GetState().X, Mouse.GetState().Y));
+                debugMessage = CM.DebugSector(Mouse.GetState().X, Mouse.GetState().Y);
+            }
 
             camera.X = (float)Math.Sin(tick) * 100;
             camera.Y = (float)Math.Cos(tick) * 100;
-
-            //circle.Update();
 
             base.Update(gameTime);
         }
@@ -134,6 +171,13 @@ namespace Gymnasiearbete
             
             circle.Render(GraphicsDevice, camera);
             cirkel.Render(GraphicsDevice, camera);
+
+            CM.Draw(GraphicsDevice, camera);
+
+            spriteBatch.Begin();
+            spriteBatch.DrawString(spriteFont, debugMessage, new Vector2(10, 10), Color.Gold);
+            spriteBatch.End();
+            base.Draw(gameTime);
         }
     }
 }

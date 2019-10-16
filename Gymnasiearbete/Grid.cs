@@ -11,7 +11,7 @@ namespace Gymnasiearbete
         GraphicRectangle verticalR;
 
         // Constants
-        const int tileWidth = 500;
+        const int tileWidth = 100;
         const int lineWidth = 2;
 
         // Colors
