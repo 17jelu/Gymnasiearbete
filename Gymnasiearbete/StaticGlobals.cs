@@ -30,5 +30,13 @@ namespace Gymnasiearbete
         {
             effect.CurrentTechnique.Passes[0].Apply();
         }
+
+        public static void Resize(GraphicsDevice GraphicsDevice)
+        {
+            effect.Projection = Matrix.CreateOrthographicOffCenter
+                (0, GraphicsDevice.Viewport.Width,     // left, right
+                GraphicsDevice.Viewport.Height, 0,    // bottom, top
+                0, 1);
+        }
     }
 }

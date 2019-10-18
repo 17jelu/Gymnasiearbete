@@ -208,6 +208,7 @@ namespace Gymnasiearbete
         void OnResize(Object sender, EventArgs e)
         {
             Console.WriteLine(sender.ToString());
+            SGBasicEffect.Resize(GraphicsDevice);
         }
     }
 }
