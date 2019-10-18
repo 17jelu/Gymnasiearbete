@@ -60,15 +60,9 @@ namespace Gymnasiearbete
             Window.ClientSizeChanged += new EventHandler<EventArgs>(OnResize);
 
             // Load BasicEffect
-            effect = new BasicEffect(GraphicsDevice);
-            effect.VertexColorEnabled = true;
-            effect.Projection = Matrix.CreateOrthographicOffCenter
-                (0, GraphicsDevice.Viewport.Width,     // left, right
-                GraphicsDevice.Viewport.Height, 0,    // bottom, top
-                0, 1);
-            effect.CurrentTechnique.Passes[0].Apply();
+            SGBasicEffect.Initialize(GraphicsDevice);
 
-            grid = new Grid(effect, GraphicsDevice, Window.ClientBounds);
+            grid = new Grid(SGBasicEffect.Effect, GraphicsDevice, Window.ClientBounds);
 
             circle = new Circle(Circle.UnitCircle.Point16, Color.Red, 50, new Vector2(200, 150));
             cirkel = new Circle(Circle.UnitCircle.Point16, Color.Purple, 100, new Vector2(250, 250));
@@ -190,7 +184,8 @@ namespace Gymnasiearbete
             //spriteBatch.End();
             base.Draw(gameTime);
 
-            effect.CurrentTechnique.Passes[0].Apply();
+            SGBasicEffect.ApplyCurrentTechnique();
+            //effect.CurrentTechnique.Passes[0].Apply();
 
             grid.Draw(GraphicsDevice, camera);
             
