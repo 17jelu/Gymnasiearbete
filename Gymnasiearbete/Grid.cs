@@ -20,8 +20,8 @@ namespace Gymnasiearbete
 
         public Grid(BasicEffect effect, GraphicsDevice GraphicsDevice, Rectangle clientBounds)
         {
-            horizontalR = new GraphicRectangle(effect, GraphicsDevice, LINE_COLOR, 0, 0, clientBounds.Width, lineWidth);
-            verticalR = new GraphicRectangle(effect, GraphicsDevice, LINE_COLOR,0, 0, lineWidth, clientBounds.Height);
+            horizontalR = new GraphicRectangle(effect, LINE_COLOR, 0, 0, clientBounds.Width, lineWidth);
+            verticalR = new GraphicRectangle(effect, LINE_COLOR,0, 0, lineWidth, clientBounds.Height);
         }
 
         /// <summary>

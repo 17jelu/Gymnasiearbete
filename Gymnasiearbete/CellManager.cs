@@ -168,8 +168,22 @@ namespace Gymnasiearbete
             }
         }
 
+        // bluegh
         public void Draw(GraphicsDevice graphicsDevice, Camera camera)
         {
+            foreach (GameObject gameObj in objects)
+            {
+                if (gameObj.GetType() == typeof(Cell))
+                {
+                    ((Cell)gameObj).Draw(graphicsDevice, camera);
+                }
+                if (gameObj.GetType() == typeof(Food))
+                {
+                    ((Food)gameObj).Draw(graphicsDevice, camera);
+                }
+            }
+
+            /*
             foreach (GameObject g in objects)
             {
                 Color clr = Color.White;
@@ -192,6 +206,7 @@ namespace Gymnasiearbete
 
                 new Circle(uc, graphicsDevice, clr, (float)g.size, g.position - camera.Position).Render(graphicsDevice);
             }
+            //*/
         }
     }
 }

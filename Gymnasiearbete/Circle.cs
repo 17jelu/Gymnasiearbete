@@ -17,12 +17,24 @@ namespace Gymnasiearbete
         Vector2 pos;
         Vector2[] preCalc;
 
+        public Vector2 Position
+        {
+            get
+            {
+                return pos;
+            }
+            set
+            {
+                pos = value;
+            }
+        }
+
         /// <summary>
         /// Used in Render() to tell how many triangles shall be rendered.
         /// </summary>
         int triangles;
 
-        public Circle(UnitCircle type, GraphicsDevice graphicsDevice, Color color, float radius, Vector2 position)
+        public Circle(UnitCircle type, Color color, float radius, Vector2 position)
         {
             // Properties
             this.radius = radius;
@@ -144,7 +156,7 @@ namespace Gymnasiearbete
             set { rect.Height = value; UpdateVertices(); }
         }
 
-        public GraphicRectangle(BasicEffect effect, GraphicsDevice GraphicsDevice, Color color, int x, int y, int width, int height)
+        public GraphicRectangle(BasicEffect effect, Color color, int x, int y, int width, int height)
         {
             // Load BasicEffect
             this.effect = effect;

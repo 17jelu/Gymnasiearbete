@@ -57,6 +57,8 @@ namespace Gymnasiearbete
 
             Window.AllowUserResizing = true;
 
+            Window.ClientSizeChanged += new EventHandler<EventArgs>(OnResize);
+
             // Load BasicEffect
             effect = new BasicEffect(GraphicsDevice);
             effect.VertexColorEnabled = true;
@@ -68,8 +70,8 @@ namespace Gymnasiearbete
 
             grid = new Grid(effect, GraphicsDevice, Window.ClientBounds);
 
-            circle = new Circle(Circle.UnitCircle.Point16, GraphicsDevice, Color.Red, 50, new Vector2(200, 150));
-            cirkel = new Circle(Circle.UnitCircle.Point16, GraphicsDevice, Color.Purple, 100, new Vector2(250, 250));
+            circle = new Circle(Circle.UnitCircle.Point16, Color.Red, 50, new Vector2(200, 150));
+            cirkel = new Circle(Circle.UnitCircle.Point16, Color.Purple, 100, new Vector2(250, 250));
             random = new Random();
 
             CM = new CellManager();
@@ -78,7 +80,7 @@ namespace Gymnasiearbete
                     new GameObject[2]
                     {
                         new Cell(CM, new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 10, 1, 10),
-                        new Cell(CM, new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 10, 2, 10)
+                        new Cell(CM, new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 5, 3, 15)
                     }
                 );
 
@@ -145,8 +147,8 @@ namespace Gymnasiearbete
                 restart = false;
             }
 
-            camera.X = (float)Math.Sin(tick) * 100;
-            camera.Y = (float)Math.Cos(tick) * 100;
+            //camera.X = (float)Math.Sin(tick) * 100;
+            //camera.Y = (float)Math.Cos(tick) * 100;
 
             int h = (int)(Math.Floor((CM.civilazationTime) / 60) / 60);
             int m = (int)(Math.Floor(CM.civilazationTime) / 60) - (60 * h);
@@ -201,6 +203,11 @@ namespace Gymnasiearbete
             spriteBatch.DrawString(spriteFont, debugMessage, new Vector2(4, 10), Color.Gold);
             spriteBatch.End();
             base.Draw(gameTime);
+        }
+
+        void OnResize(Object sender, EventArgs e)
+        {
+            Console.WriteLine(sender.ToString());
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Gymnasiearbete
 {
@@ -64,6 +65,8 @@ namespace Gymnasiearbete
     //MAT
     class Food : GameObject
     {
+        Circle circle; // Jesper
+
         float energy = 300;
         public float Energy
         {
@@ -75,13 +78,22 @@ namespace Gymnasiearbete
 
         public Food(Vector2 startPosition, float energySet = 300) : base(startPosition)
         {
+            circle = new Circle(Circle.UnitCircle.Point8, Color.LawnGreen, size, position);
+
             energy = energySet;
+        }
+
+        public void Draw(GraphicsDevice graphicsDevice, Camera camera)
+        {
+            circle.Render(graphicsDevice, camera);
         }
     }
 
     //CELL
     class Cell : GameObject
     {
+        Circle circle; // Jesper
+
         static CellManager CM;
 
         //int curiosity = 0;
@@ -110,6 +122,8 @@ namespace Gymnasiearbete
 
         public Cell(CellManager setCellManager, Vector2 startPosition, float dnaSize, float dnaSpeed, float dnaPerception) : base(startPosition)
         {
+            circle = new Circle(Circle.UnitCircle.Point16, Color.White, dnaSize, startPosition); // Jesper
+
             CM = setCellManager;
             size = dnaSize;
             speed = dnaSpeed;
@@ -117,6 +131,18 @@ namespace Gymnasiearbete
 
 
             energy = energyRequirement;
+        }
+
+        // Jesper
+        public void Draw(GraphicsDevice graphicsDevice, Camera camera)
+        {
+            // TODO (Jesper): fixa
+            new Circle(Circle.UnitCircle.Point16,
+                new Color(3 * this.Detectionrange * this.speed / 255f, this.size * 2, 127f / 255f, 0.2f),
+                this.Detectionrange, this.position).Render(graphicsDevice, camera);
+
+            circle.Position = position;
+            circle.Render(graphicsDevice, camera);
         }
 
         void ReproduceCheck()
