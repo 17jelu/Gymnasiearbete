@@ -205,6 +205,11 @@ namespace Gymnasiearbete
             base.Draw(gameTime);
         }
 
+        /// <summary>
+        /// grejsimojs som sker när en användare resizar skärmen
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void OnResize(Object sender, EventArgs e)
         {
             Console.WriteLine(sender.ToString());
