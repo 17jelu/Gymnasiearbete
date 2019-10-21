@@ -72,10 +72,12 @@
     <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AI_Types.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Cell.cs" />
     <Compile Include="CellManager.cs" />
     <Compile Include="Circle.cs" />
+    <Compile Include="GameObject.cs" />
     <Compile Include="Grid.cs" />
     <Compile Include="PreCalc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

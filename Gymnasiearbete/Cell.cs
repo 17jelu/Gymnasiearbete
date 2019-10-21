@@ -8,62 +8,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Gymnasiearbete
 {
-    /// <summary>
-    /// Grundklass för alla spelplansobjekt
-    /// </summary>
-    class GameObject
-    {
-        public Vector2 position = Vector2.Zero;
-        readonly double rotation = 0;
-        public float size = 0;
-        public float speed = 0;
-
-        public bool isMarkedForDelete = false;
-
-        public GameObject(Vector2 startPosition)
-        {
-            position = startPosition;
-            size = 10;
-        }
-
-        Vector2 Forward()
-        {
-            return new Vector2((float)Math.Cos(rotation), (float)Math.Sin(rotation));
-        }
-
-        public void CollisionCheck(List<GameObject> gs)
-        {
-            foreach (GameObject g in gs)
-            {
-                if (
-                    Math.Pow(g.position.X - this.position.X, 2) + Math.Pow(g.position.Y - this.position.Y, 2) <=
-                    Math.Pow(g.size + this.size, 2)
-                    )
-                {
-                    Collision(g);
-                }
-            }
-        }
-
-        public virtual void Collision(GameObject g)
-        {
-
-        }
-
-        public void Move(Vector2 direction)
-        {
-            //direction.Normalize();
-            position += direction * speed;
-        }
-
-        public virtual void Update()
-        {
-
-        }
-    }
-
     //MAT
-    class Food : GameObject
+    class Food : Entity
     {
         Circle circle; // Jesper
 
@@ -90,25 +36,18 @@ namespace Gymnasiearbete
     }
 
     //CELL
-    class Cell : GameObject
+    class Cell : Entity
     {
         Circle circle; // Jesper
+        protected static CellManager CM;
+        protected static float energyRequirement = 333; //1000;
+        public static double consumeScale = 1.2;
 
-        static CellManager CM;
+        protected float perception = 0;
 
-        //int curiosity = 0;
-        //int speed = 0;
-        //int size = 0;
-        public float perception = 0;
+        protected AI ai;
 
-        int preformancepoints = 0;
-        
-        public float energy = 0;
-        float energyRequirement = 1000;
-
-        double consumeScale = 1.2;
-
-        Vector2 idleDirection = new Vector2(0.7071f, 0.7071f);
+        protected Vector2 idleDirection = new Vector2(1f, 1f);
 
         public bool isMarkForReproduce = false;
 
@@ -120,11 +59,12 @@ namespace Gymnasiearbete
             }
         }
 
-        public Cell(CellManager setCellManager, Vector2 startPosition, float dnaSize, float dnaSpeed, float dnaPerception) : base(startPosition)
+        public Cell(CellManager setCellManager, AI aiSet, Vector2 startPosition, float dnaSize, float dnaSpeed, float dnaPerception) : base(startPosition)
         {
             circle = new Circle(Circle.UnitCircle.Point16, Color.White, dnaSize, startPosition); // Jesper
 
             CM = setCellManager;
+            ai = aiSet;
             size = dnaSize;
             speed = dnaSpeed;
             perception = dnaPerception;
@@ -159,10 +99,12 @@ namespace Gymnasiearbete
 
         public Cell Reproduce(GameWindow window, Random random)
         {
-            Cell cchild = new Cell(CM, Vector2.Zero, this.size, this.speed, this.perception);
-            
+            ai.preformancepoints++;
+            ai.MemoryFileWrite();
+            Cell cchild = new Cell(CM, new AI_ClosestTargetingLearn(new Random(), ai.family), Vector2.Zero, this.size, this.speed, this.perception);
 
-            if (random.Next(0, 100) <= 50)
+            int mutationChance = 50;
+            if (random.Next(100) < mutationChance)
             {
                 cchild.size = Math.Max(1, cchild.size + random.Next(-5, 5+1));
                 cchild.speed = Math.Max(0.5f, cchild.speed + random.Next(-10, 10+1) * 0.1f);
@@ -195,8 +137,8 @@ namespace Gymnasiearbete
                 {
                     //PERCEPTION
                     if (
-                        Math.Pow(g.position.X - this.position.X, 2) + Math.Pow(g.position.Y - this.position.Y, 2) <= 
-                        Math.Pow(this.Detectionrange, 2) + Math.Pow(g.size, 2)
+                        Math.Pow(g.Position.X - this.position.X, 2) + Math.Pow(g.Position.Y - this.position.Y, 2) <= 
+                        Math.Pow(this.Detectionrange, 2) + Math.Pow(g.Size, 2)
                         )
                     {
                         percivableObjects.Add(g);
@@ -204,85 +146,28 @@ namespace Gymnasiearbete
                 }
             }
 
-            Intresst(percivableObjects);
+            Actions(ai.AIR(this, percivableObjects));
         }
 
-        void Intresst(List<GameObject> percivableObjects)
+        protected virtual void Actions(int[] decision)
         {
-            GameObject intresst = null;
-            if (percivableObjects.Count > 0)
+            Vector2 direction = new Vector2(decision[1], decision[2]);
+            switch (decision[0])
             {
-                intresst = percivableObjects[0];
+                case 0:
+                    Move(idleDirection);
+                    break;
 
-                foreach (GameObject g in percivableObjects)
-                {
-                    if (
-                        Math.Pow(g.position.X - this.position.X, 2) + Math.Pow(g.position.Y - this.position.Y, 2) <=
-                        Math.Pow(intresst.position.X - this.position.X, 2) + Math.Pow(intresst.position.Y - this.position.Y, 2)
-                        )
-                    {
-                        intresst = g;
-                    }
-                }
+                case 1:
+                    Move(direction);
+                    break;
+
+                case -1:
+                    Move(-direction);
+                    break;
+
             }
-
-            Decision(intresst);
-        }
-
-        void Decision(GameObject intresst)
-        {
-            if (intresst == null)
-            {
-                Actions("0", idleDirection);
-            }
-            else
-            if (intresst.GetType() == typeof(Cell))
-            {
-                if (intresst.size > consumeScale * this.size)
-                {
-                    Vector2 direction = intresst.position - this.position;
-                    Actions("2", direction);
-                }
-                else
-                if (this.size > consumeScale * intresst.size && this.speed > intresst.speed)
-                {
-                    Vector2 direction = intresst.position - this.position;
-                    Actions("1", direction);
-                }
-                else
-                {
-                    Actions("0", idleDirection);
-                }
-            }
-            else
-            if (intresst.GetType() == typeof(Food))
-            {
-                Vector2 direction = intresst.position - this.position;
-                Actions("1", direction);
-            }
-        }
-
-        void Actions(string decision, Vector2 direction)
-        {
-            if (direction != Vector2.Zero)
-            {
-                direction.Normalize();
-
-                switch (decision)
-                {
-                    case "0":
-                        Move(idleDirection);
-                        break;
-
-                    case "1":
-                        Move(direction);
-                        break;
-
-                    case "2":
-                        Move(-direction);
-                        break;
-                }
-            }
+            
         }
 
         public void Update(List<GameObject> detectionCheck, GameWindow window, Random random)
@@ -313,17 +198,17 @@ namespace Gymnasiearbete
             }
         }
 
-        public override void Collision(GameObject g)
+        protected override void Collision(GameObject g)
         {
             if (g == null)
             {
-
+                return;
             }
-            else
+            
             if (g.GetType() == typeof(Cell))
             {
                 Cell c = (Cell)g;
-                if(consumeScale * g.size < this.size)
+                if(consumeScale * g.Size < this.size)
                 {
                     g.isMarkedForDelete = true;
                     this.energy += c.energy;
@@ -336,6 +221,11 @@ namespace Gymnasiearbete
                 g.isMarkedForDelete = true;
                 this.energy += f.Energy;
             }
+        }
+
+        public string Debug_Cell()
+        {
+            return "{SZ[" + this.Size + "] SP[" + this.Speed + "] DR[" + this.Detectionrange + "] EG[" + this.energy + "]}" + ai.Debug_AI();
         }
     }
 }
