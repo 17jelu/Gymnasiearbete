@@ -57,10 +57,13 @@ namespace Gymnasiearbete
             CM = new CellManager();
             CM.AddObjects
                 (
-                    new GameObject[2]
+                    new GameObject[]
                     {
-                        new Cell(CM, new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 10, 1, 10),
-                        new Cell(CM, new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 10, 2, 10)
+                        new Cell(CM, new AI_ClosestTargetingLearn(random, "1"), new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 10, 2, 30),
+                        new Cell(CM, new AI_ClosestTargetingLearn(random, "2"), new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 10, 2, 30),
+                        new Cell(CM, new AI_ClosestTargetingLearn(random, "3"), new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 10, 2, 30),
+                        new Cell(CM, new AI_ClosestTargetingLearn(random, "4"), new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 10, 2, 30),
+                        new Cell(CM, new AI_ClosestTargetingLearn(random, "5"), new Vector2(random.Next(0, Window.ClientBounds.Width), random.Next(0, Window.ClientBounds.Height)), 10, 2, 30)
                     }
                 );
 
