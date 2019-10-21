@@ -52,8 +52,9 @@ namespace Gymnasiearbete
                 if (g.GetType() == typeof(Cell))
                 {
                     Cell c = (Cell)g;
+
+                    output += "{LI[" + objects.IndexOf(c) + "]}" + c.Debug_Cell() + " \n";
                     
-                    output += "---" + objects.IndexOf(g) + "| SZ:" + c.size + "| SP:" + c.speed + "| PC:" + c.perception + "| E:" + c.energy + "\n";
                 }
             }
 
@@ -99,8 +100,8 @@ namespace Gymnasiearbete
                 }
                 else
                 {
-                    int px = (int)Math.Floor(g.position.X / SectorSize);
-                    int py = (int)Math.Floor(g.position.Y / SectorSize);
+                    int px = (int)Math.Floor(g.Position.X / SectorSize);
+                    int py = (int)Math.Floor(g.Position.Y / SectorSize);
 
                     if (!sectors.ContainsKey(new Point(px, py)))
                     {
@@ -129,10 +130,10 @@ namespace Gymnasiearbete
                     Cell c = (Cell)g;
                     List<GameObject> detectionCheck = new List<GameObject>();
 
-                    int xMax = (int)Math.Floor((c.position.X + c.Detectionrange) / SectorSize);
-                    int xMin = (int)Math.Floor((c.position.X - c.Detectionrange) / SectorSize);
-                    int yMax = (int)Math.Floor((c.position.Y + c.Detectionrange) / SectorSize);
-                    int yMin = (int)Math.Floor((c.position.Y - c.Detectionrange) / SectorSize);
+                    int xMax = (int)Math.Floor((c.Position.X + c.Detectionrange) / SectorSize);
+                    int xMin = (int)Math.Floor((c.Position.X - c.Detectionrange) / SectorSize);
+                    int yMax = (int)Math.Floor((c.Position.Y + c.Detectionrange) / SectorSize);
+                    int yMin = (int)Math.Floor((c.Position.Y - c.Detectionrange) / SectorSize);
 
                     for (int x = xMin; x <= xMax; x++)
                     {
@@ -190,9 +191,9 @@ namespace Gymnasiearbete
                 {
                     Cell c = (Cell)g;
 
-                    clr = new Color((int) c.size * 10, (int) c.speed * 10, (int) c.perception * 10);
+                    clr = new Color((int) c.Size * 10, (int) c.Speed * 10, (int) c.Detectionrange * 10);
                     uc = Circle.UnitCircle.Point16;
-                    new Circle(Circle.UnitCircle.Point8, graphicsDevice, new Color(0.1f, 0.1f, 0.1f, 0.1f), (float)c.Detectionrange, g.position - camera.Position).Render(graphicsDevice);
+                    new Circle(Circle.UnitCircle.Point8, graphicsDevice, new Color(0.1f, 0.1f, 0.1f, 0.1f), (float)c.Detectionrange, g.Position - camera.Position).Render(graphicsDevice);
                 }
 
                 if (g.GetType() == typeof(Food))
@@ -201,7 +202,7 @@ namespace Gymnasiearbete
                     uc = Circle.UnitCircle.Point8;
                 }
 
-                new Circle(uc, graphicsDevice, clr, (float)g.size, g.position - camera.Position).Render(graphicsDevice);
+                new Circle(uc, graphicsDevice, clr, (float)g.Size, g.Position - camera.Position).Render(graphicsDevice);
             }
         }
     }

@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using System.Diagnostics;
-
 
 namespace Gymnasiearbete
 {
+    /// <summary>
+    /// Grundklass för all AI
+    /// </summary>
     class AI
     {
         public string family;
@@ -30,6 +28,9 @@ namespace Gymnasiearbete
             MemoryFileLoad();
         }
 
+        /// <summary>
+        /// Kollar om rätt .memory fil finns
+        /// </summary>
         public void MemoryFileExsist()
         {
             dataPath = this.GetType().ToString().Split('.')[1] + "_" + family + ".memory";
@@ -40,6 +41,9 @@ namespace Gymnasiearbete
             }
         }
 
+        /// <summary>
+        /// Laddar .memory fil till minne
+        /// </summary>
         public void MemoryFileLoad()
         {
             MemoryFileExsist();
@@ -49,6 +53,9 @@ namespace Gymnasiearbete
             }
         }
 
+        /// <summary>
+        /// skriver till .memory fil från minne
+        /// </summary>
         public void MemoryFileWrite()
         {
             MemoryFileExsist();
@@ -150,6 +157,12 @@ namespace Gymnasiearbete
             return Intresst(cell, percivableObjects);
         }
 
+        /// <summary>
+        /// Väljer vad som är intressant för AI
+        /// </summary>
+        /// <param name="cell"></param>
+        /// <param name="percivableObjects"></param>
+        /// <returns></returns>
         protected virtual int[] Intresst(Cell cell, List<GameObject> percivableObjects)
         {
             GameObject intresst = null;
@@ -157,9 +170,20 @@ namespace Gymnasiearbete
             return Decision(cell, intresst);
         }
 
+        /// <summary>
+        /// Väljer val utifrån intresse
+        /// </summary>
+        /// <param name="cell"></param>
+        /// <param name="intresst"></param>
+        /// <returns></returns>
         protected virtual int[] Decision(Cell cell, GameObject intresst)
         {
             return new int[3] { 0, 0, 0 };
+        }
+
+        public string Debug_AI()
+        {
+            return "{TP[" + this.GetType().ToString().Split('.')[1] + "] FA[" + family + "]}";
         }
     }
 
@@ -188,8 +212,8 @@ namespace Gymnasiearbete
                 foreach (GameObject g in percivableObjects)
                 {
                     if (
-                        Math.Pow(g.position.X - cell.position.X, 2) + Math.Pow(g.position.Y - cell.position.Y, 2) <=
-                        Math.Pow(intresst.position.X - cell.position.X, 2) + Math.Pow(intresst.position.Y - cell.position.Y, 2)
+                        Math.Pow(g.Position.X - cell.Position.X, 2) + Math.Pow(g.Position.Y - cell.Position.Y, 2) <=
+                        Math.Pow(intresst.Position.X - cell.Position.X, 2) + Math.Pow(intresst.Position.Y - cell.Position.Y, 2)
                         )
                     {
                         intresst = g;
@@ -209,15 +233,15 @@ namespace Gymnasiearbete
             else
             if (intresst.GetType() == typeof(Cell))
             {
-                if (intresst.size > Cell.consumeScale * cell.size)
+                if (intresst.Size > Cell.consumeScale * cell.Size)
                 {
-                    Vector2 direction = intresst.position - cell.position;
+                    Vector2 direction = intresst.Position - cell.Position;
                     return new int[3] { -1, (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) };
                 }
                 else
-                if (cell.size > Cell.consumeScale * intresst.size && cell.speed > intresst.speed)
+                if (cell.Size > Cell.consumeScale * intresst.Size && cell.Speed > intresst.Speed)
                 {
-                    Vector2 direction = intresst.position - cell.position;
+                    Vector2 direction = intresst.Position - cell.Position;
                     return new int[3] { 1, (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) };
                 }
                 else
@@ -228,7 +252,7 @@ namespace Gymnasiearbete
             else
             if (intresst.GetType() == typeof(Food))
             {
-                Vector2 direction = intresst.position - cell.position;
+                Vector2 direction = intresst.Position - cell.Position;
                 return new int[3] { 1, (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) };
             }
 
@@ -253,8 +277,8 @@ namespace Gymnasiearbete
                 foreach (GameObject g in percivableObjects)
                 {
                     if (
-                        Math.Pow(g.position.X - cell.position.X, 2) + Math.Pow(g.position.Y - cell.position.Y, 2) <=
-                        Math.Pow(intresst.position.X - cell.position.X, 2) + Math.Pow(intresst.position.Y - cell.position.Y, 2)
+                        Math.Pow(g.Position.X - cell.Position.X, 2) + Math.Pow(g.Position.Y - cell.Position.Y, 2) <=
+                        Math.Pow(intresst.Position.X - cell.Position.X, 2) + Math.Pow(intresst.Position.Y - cell.Position.Y, 2)
                         )
                     {
                         intresst = g;
@@ -274,15 +298,15 @@ namespace Gymnasiearbete
             else
             if (intresst.GetType() == typeof(Cell))
             {
-                if (intresst.size > Cell.consumeScale * cell.size)
+                if (intresst.Size > Cell.consumeScale * cell.Size)
                 {
-                    Vector2 direction = intresst.position - cell.position;
+                    Vector2 direction = intresst.Position - cell.Position;
                     return new int[3] { MemoryChoice(1, 1), (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) };
                 }
                 else
-                if (cell.size > Cell.consumeScale * intresst.size && cell.speed > intresst.speed)
+                if (cell.Size > Cell.consumeScale * intresst.Size && cell.Speed > intresst.Speed)
                 {
-                    Vector2 direction = intresst.position - cell.position;
+                    Vector2 direction = intresst.Position - cell.Position;
                     return new int[3] { MemoryChoice(1, -1), (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) };
                 }
                 else
@@ -293,7 +317,7 @@ namespace Gymnasiearbete
             else
             if (intresst.GetType() == typeof(Food))
             {
-                Vector2 direction = intresst.position - cell.position;
+                Vector2 direction = intresst.Position - cell.Position;
                 return new int[3] { MemoryChoice(0, 0), (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) };
             }
 

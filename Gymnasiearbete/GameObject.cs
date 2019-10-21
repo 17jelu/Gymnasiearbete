@@ -11,9 +11,31 @@ namespace Gymnasiearbete
     /// </summary>
     class GameObject
     {
-        public Vector2 position = Vector2.Zero;
-        public float size = 0;
-        public float speed = 0;
+        protected Vector2 position = Vector2.Zero;
+        public Vector2 Position
+        {
+            get
+            {
+                return position;
+            }
+        }
+
+        protected float size = 0;
+        public float Size
+        {
+            get
+            {
+                return size;
+            }
+        }
+        protected float speed = 0;
+        public float Speed
+        {
+            get
+            {
+                return speed;
+            }
+        }
 
         public bool isMarkedForDelete = false;
 
@@ -23,7 +45,7 @@ namespace Gymnasiearbete
             size = 10;
         }
 
-        public void CollisionCheck(List<GameObject> gs)
+        protected void CollisionCheck(List<GameObject> gs)
         {
             foreach (GameObject g in gs)
             {
@@ -37,7 +59,7 @@ namespace Gymnasiearbete
             }
         }
 
-        public virtual void Collision(GameObject g)
+        protected virtual void Collision(GameObject g)
         {
 
         }
@@ -55,14 +77,14 @@ namespace Gymnasiearbete
     /// </summary>
     class Entity : GameObject
     {
-        public float energy = 0;
+        protected float energy = 0;
 
         public Entity(Vector2 startPosition) : base(startPosition)
         {
 
         }
 
-        public void Move(Vector2 direction)
+        protected void Move(Vector2 direction)
         {
             if (direction != Vector2.Zero)
             {

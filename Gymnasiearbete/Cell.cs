@@ -27,15 +27,15 @@ namespace Gymnasiearbete
     //CELL
     class Cell : Entity
     {
-        public static CellManager CM;
-        public static float energyRequirement = 333; //1000;
+        protected static CellManager CM;
+        protected static float energyRequirement = 333; //1000;
         public static double consumeScale = 1.2;
 
-        public float perception = 0;
+        protected float perception = 0;
 
-        public AI ai;
+        protected AI ai;
 
-        public Vector2 idleDirection = new Vector2(0.7071f, 0.7071f);
+        protected Vector2 idleDirection = new Vector2(1f, 1f);
 
         public bool isMarkForReproduce = false;
 
@@ -75,7 +75,7 @@ namespace Gymnasiearbete
         {
             ai.preformancepoints++;
             ai.MemoryFileWrite();
-            Cell cchild = new Cell(CM, ai, Vector2.Zero, this.size, this.speed, this.perception);
+            Cell cchild = new Cell(CM, new AI_ClosestTargetingLearn(new Random(), ai.family), Vector2.Zero, this.size, this.speed, this.perception);
 
             int mutationChance = 50;
             if (random.Next(100) < mutationChance)
@@ -111,8 +111,8 @@ namespace Gymnasiearbete
                 {
                     //PERCEPTION
                     if (
-                        Math.Pow(g.position.X - this.position.X, 2) + Math.Pow(g.position.Y - this.position.Y, 2) <= 
-                        Math.Pow(this.Detectionrange, 2) + Math.Pow(g.size, 2)
+                        Math.Pow(g.Position.X - this.position.X, 2) + Math.Pow(g.Position.Y - this.position.Y, 2) <= 
+                        Math.Pow(this.Detectionrange, 2) + Math.Pow(g.Size, 2)
                         )
                     {
                         percivableObjects.Add(g);
@@ -123,7 +123,7 @@ namespace Gymnasiearbete
             Actions(ai.AIR(this, percivableObjects));
         }
 
-        public virtual void Actions(int[] decision)
+        protected virtual void Actions(int[] decision)
         {
             Vector2 direction = new Vector2(decision[1], decision[2]);
             switch (decision[0])
@@ -172,7 +172,7 @@ namespace Gymnasiearbete
             }
         }
 
-        public override void Collision(GameObject g)
+        protected override void Collision(GameObject g)
         {
             if (g == null)
             {
@@ -182,7 +182,7 @@ namespace Gymnasiearbete
             if (g.GetType() == typeof(Cell))
             {
                 Cell c = (Cell)g;
-                if(consumeScale * g.size < this.size)
+                if(consumeScale * g.Size < this.size)
                 {
                     g.isMarkedForDelete = true;
                     this.energy += c.energy;
@@ -195,6 +195,11 @@ namespace Gymnasiearbete
                 g.isMarkedForDelete = true;
                 this.energy += f.Energy;
             }
+        }
+
+        public string Debug_Cell()
+        {
+            return "{SZ[" + this.Size + "] SP[" + this.Speed + "] DR[" + this.Detectionrange + "] EG[" + this.energy + "]}" + ai.Debug_AI();
         }
     }
 }
