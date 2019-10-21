@@ -141,7 +141,20 @@ namespace Gymnasiearbete
             if (Mouse.GetState().LeftButton == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Space))
             {
                 CM.pause = true;
-                debugMessage = CM.DebugSector(Mouse.GetState().X, Mouse.GetState().Y);
+                int debugType = 0;
+                if (Keyboard.GetState().IsKeyDown(Keys.D1))
+                {
+                    debugType = 1;
+                }
+                if (Keyboard.GetState().IsKeyDown(Keys.D2))
+                {
+                    debugType = 2;
+                }
+                if (Keyboard.GetState().IsKeyDown(Keys.D3))
+                {
+                    debugType = 3;
+                }
+                debugMessage = CM.DebugSector(Mouse.GetState().X, Mouse.GetState().Y, debugType);
             } else
             {
                 CM.pause = false;
