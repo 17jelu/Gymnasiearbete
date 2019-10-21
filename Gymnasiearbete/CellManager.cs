@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Content;
 
 namespace Gymnasiearbete
 {
@@ -28,7 +29,7 @@ namespace Gymnasiearbete
             }
         }
 
-        Dictionary<string, List<GameObject>> sectors = new Dictionary<string, List<GameObject>>();
+        Dictionary<Point, List<GameObject>> sectors = new Dictionary<Point, List<GameObject>>();
 
         public void AddObjects(GameObject[] gs)
         {
@@ -41,12 +42,12 @@ namespace Gymnasiearbete
             int x = (int)Math.Floor(Xposition / SectorSize);
             int y = (int)Math.Floor(Yposition / SectorSize);
 
-            if (!sectors.ContainsKey(new Vector2(x, y).ToString()))
+            if (!sectors.ContainsKey(new Point(x, y)))
             {
-                sectors.Add(new Vector2(x, y).ToString(), new List<GameObject>());
+                sectors.Add(new Point(x, y), new List<GameObject>());
             }
 
-            foreach (GameObject g in sectors[new Vector2(x, y).ToString()])
+            foreach (GameObject g in sectors[new Point(x, y)])
             {
                 if (g.GetType() == typeof(Cell))
                 {
@@ -57,6 +58,16 @@ namespace Gymnasiearbete
             }
 
             return output;
+        }
+
+        public bool IsCell(GameObject g)
+        {
+            if (g.GetType() == typeof(Cell))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public void Update(GameWindow window, Random random, GameTime gameTime)
@@ -72,7 +83,7 @@ namespace Gymnasiearbete
             int cellCount = 0;
 
             //Clearar sectorer
-            foreach (KeyValuePair<string, List<GameObject>> s in sectors)
+            foreach (KeyValuePair<Point, List<GameObject>> s in sectors)
             {
                 s.Value.Clear();
             }
@@ -91,13 +102,13 @@ namespace Gymnasiearbete
                     int px = (int)Math.Floor(g.position.X / SectorSize);
                     int py = (int)Math.Floor(g.position.Y / SectorSize);
 
-                    if (!sectors.ContainsKey(new Vector2(px, py).ToString()))
+                    if (!sectors.ContainsKey(new Point(px, py)))
                     {
-                        sectors.Add(new Vector2(px, py).ToString(), new List<GameObject>());
+                        sectors.Add(new Point(px, py), new List<GameObject>());
                     }
-                    sectors[new Vector2(px, py).ToString()].Add(g);
+                    sectors[new Point(px, py)].Add(g);
 
-                    if (g.GetType() == typeof(Cell))
+                    if (IsCell(g))
                     {
                         Cell c = (Cell)g;
 
@@ -112,7 +123,7 @@ namespace Gymnasiearbete
             //FixeradUpdatering
             foreach (GameObject g in objects)
             {
-                if (g.GetType() == typeof(Cell))
+                if (IsCell(g))
                 {
                     cellCount++;
                     Cell c = (Cell)g;
@@ -127,11 +138,11 @@ namespace Gymnasiearbete
                     {
                         for (int y = yMin; y <= yMax; y++)
                         {
-                            if (!sectors.ContainsKey(new Vector2(x, y).ToString()))
+                            if (!sectors.ContainsKey(new Point(x, y)))
                             {
-                                sectors.Add(new Vector2(x, y).ToString(), new List<GameObject>());
+                                sectors.Add(new Point(x, y), new List<GameObject>());
                             }
-                            detectionCheck.AddRange(sectors[new Vector2(x, y).ToString()]);
+                            detectionCheck.AddRange(sectors[new Point(x, y)]);
                             
                         }
                     }
@@ -162,7 +173,7 @@ namespace Gymnasiearbete
                     );
             }
 
-            if (cellCount < 0)
+            if (cellCount <= 0)
             {
                 simulationEnd = true;
             }
