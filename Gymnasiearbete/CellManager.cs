@@ -115,15 +115,23 @@ namespace Gymnasiearbete
                 }
                 else
                 {
-                    int px = (int)Math.Floor(g.Position.X / SectorSize);
-                    int py = (int)Math.Floor(g.Position.Y / SectorSize);
+                    int xMax = (int)Math.Floor((g.Position.X + g.Size) / SectorSize);
+                    int yMax = (int)Math.Floor((g.Position.Y + g.Size) / SectorSize);
+                    int xMin = (int)Math.Floor((g.Position.X - g.Size) / SectorSize);
+                    int yMin = (int)Math.Floor((g.Position.Y - g.Size) / SectorSize);
 
-                    if (!sectors.ContainsKey(new Point(px, py)))
+                    for (int x = xMin; x <= xMax; x++)
                     {
-                        sectors.Add(new Point(px, py), new List<GameObject>());
+                        for (int y = yMin; y <= yMax; y++)
+                        {
+                            if (!sectors.ContainsKey(new Point(x, y)))
+                            {
+                                sectors.Add(new Point(x, y), new List<GameObject>());
+                            }
+                            sectors[new Point(x, y)].Add(g);
+                        }
                     }
-                    sectors[new Point(px, py)].Add(g);
-
+                    
                     if (IsCell(g))
                     {
                         Cell c = (Cell)g;
@@ -158,8 +166,14 @@ namespace Gymnasiearbete
                             {
                                 sectors.Add(new Point(x, y), new List<GameObject>());
                             }
-                            detectionCheck.AddRange(sectors[new Point(x, y)]);
-                            
+
+                            for (int i = 0; i < sectors[new Point(x, y)].Count; i++)
+                            {
+                                if (!detectionCheck.Contains(sectors[new Point(x, y)][i]))
+                                {
+                                    detectionCheck.Add(sectors[new Point(x, y)][i]);
+                                }
+                            }
                         }
                     }
 
