@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Xna.Framework;
+using System.Diagnostics;
 
 namespace Gymnasiearbete
 {
@@ -69,9 +70,9 @@ namespace Gymnasiearbete
                 {
                     if (newMemory[i].Split(z)[0] == memory[j][0])
                     {
+                        replace = true;
                         if (int.Parse(newMemory[i].Split(z)[1]) < int.Parse(memory[j][1]) && int.Parse(memory[j][1]) > 0)
                         {
-                            replace = true;
                             newMemory[i] = memory[j][0] + z + memory[j][1] + z + memory[j][2];
                         }
                     }
@@ -94,62 +95,75 @@ namespace Gymnasiearbete
         /// <returns></returns>
         protected int MemoryChoice(int type, int consume)
         {
-            while (true)
+            int breakLoopTimer = 10;
+            while (breakLoopTimer > 0)
             {
+                breakLoopTimer--;
                 List<string[]> memoryImportant = new List<string[]>();
-                foreach (string[] s in memory)
+                foreach (string[] mem in memory)
                 {
-                    if (s[0] == type + "" + consume)
+                    if (mem[0] == type + "" + consume)
                     {
-                        memoryImportant.Add(s);
+                        memoryImportant.Add(mem);
                     }
                 }
 
                 List<string[]> memoryChoice = new List<string[]>();
-                r = new Random();
-                int curiosity = 33;
-                if (memoryImportant.Count > 0 || r.Next(100) < curiosity)
+                if (memoryImportant.Count > 0)
                 {
-                    foreach (string[] s in memoryImportant)
+                    double curiosity = 0.5;
+                    if (r.Next(100) < 100 - curiosity)
                     {
-                        if (memoryChoice.Count < 1)
+                        foreach (string[] s in memoryImportant)
                         {
-                            memoryChoice.Add(s);
-                        }
-
-                        if (int.Parse(memoryChoice[0][1]) > Math.Max(0, int.Parse(s[1])))
-                        {
-                            memoryChoice = new List<string[]>();
-                            memoryChoice.Add(s);
-                        }
-                        else
-                        if (int.Parse(memoryChoice[0][1]) == int.Parse(s[1]))
-                        {
-                            memoryChoice.Add(s);
-                        }
-                        else
-                        {
-                            memory.Add(new string[3] { type + "" + consume, preformancepoints.ToString(), r.Next(choises.Length).ToString() });
-                        }
-
-                        int memoryChoiseIndex = r.Next(memoryChoice.Count);
-                        
-                        foreach(string[] sp in memory)
-                        {
-                            if (sp[0] == memoryChoice[memoryChoiseIndex][0])
+                            if (memoryChoice.Count < 1)
                             {
-                                sp[1] = preformancepoints.ToString();
+                                memoryChoice.Add(s);
+                            }
+
+                            if (int.Parse(memoryChoice[0][1]) < Math.Max(0, int.Parse(s[1])))
+                            {
+                                memoryChoice = new List<string[]>();
+                                memoryChoice.Add(s);
+                            }
+                            else
+                            if (int.Parse(memoryChoice[0][1]) == int.Parse(s[1]))
+                            {
+                                memoryChoice.Add(s);
+                            }
+
+                            int memoryChoiseIndex = r.Next(memoryChoice.Count);
+                            foreach (string[] sp in memory)
+                            {
+                                if (sp[0] == memoryChoice[memoryChoiseIndex][0])
+                                {
+                                    sp[1] = preformancepoints.ToString();
+                                }
+                            }
+
+                            return int.Parse(memoryChoice[memoryChoiseIndex][2]);
+                        }
+                    }
+                    else
+                    {
+                        string[] str = new string[3] { type + "" + consume, preformancepoints.ToString(), r.Next(choises.Length).ToString() };
+                        for (int i = 0; i < memory.Count; i++)
+                        {
+                            if (memory[i][0] == str[0])
+                            {
+                                memory[i][2] = str[2];
                             }
                         }
-
-                        return int.Parse(memoryChoice[memoryChoiseIndex][2]);
                     }
                 }
                 else
                 {
-                    memory.Add(new string[3] { type + "" + consume, preformancepoints.ToString(), r.Next(choises.Length).ToString() });
+                    string[] str = new string[3] { type + "" + consume, preformancepoints.ToString(), r.Next(choises.Length).ToString() };
+                    memory.Add(str);
                 }
             }
+
+            return -100;
         }
 
         public int[] AIR(Cell cell, List<GameObject> percivableObjects)

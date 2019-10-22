@@ -46,6 +46,13 @@ namespace Gymnasiearbete
         protected float perception = 0;
 
         protected AI ai;
+        public AI AI
+        {
+            get
+            {
+                return ai;
+            }
+        }
 
         protected Vector2 idleDirection = new Vector2(1f, 1f);
 
@@ -225,7 +232,7 @@ namespace Gymnasiearbete
 
         public string Debug_Cell()
         {
-            return "{SZ[" + this.Size + "] SP[" + this.Speed + "] DR[" + this.Detectionrange + "] EG[" + this.energy + "]}" + ai.Debug_AI();
+            return "{SZ[" + this.Size + "] SP[" + this.Speed + "] DR[" + this.Detectionrange + "] EG[" + this.energy + "]}";
         }
     }
 }

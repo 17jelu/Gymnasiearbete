@@ -36,7 +36,7 @@ namespace Gymnasiearbete
             objects.AddRange(gs);
         }
 
-        public string DebugSector(float Xposition, float Yposition)
+        public string DebugSector(float Xposition, float Yposition, int debugType = 0)
         {
             string output = "";
             int x = (int)Math.Floor(Xposition / SectorSize);
@@ -52,9 +52,24 @@ namespace Gymnasiearbete
                 if (g.GetType() == typeof(Cell))
                 {
                     Cell c = (Cell)g;
-
-                    output += "{LI[" + objects.IndexOf(c) + "]}" + c.Debug_Cell() + " \n";
-                    
+                    string debug_Object = "{LI[" + objects.IndexOf(c) + "]}";
+                    if (debugType == 0)
+                    {
+                        output += debug_Object + c.Debug_Cell() + c.AI.Debug_AI();
+                    }
+                    if (debugType == 1)
+                    {
+                        output += debug_Object;
+                    }
+                    if (debugType == 2)
+                    {
+                        output += c.Debug_Cell();
+                    }
+                    if (debugType == 3)
+                    {
+                        output += c.AI.Debug_AI();
+                    }
+                    output += "\n";
                 }
             }
 
