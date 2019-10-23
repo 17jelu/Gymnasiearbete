@@ -14,17 +14,22 @@ namespace Gymnasiearbete
         public string family;
         string dataPath;
         List<string[]> memory = new List<string[]>();
-        protected int[] choises = new int[0];
+        protected string[] choises = new string[0];
 
         public int preformancepoints = 0;
 
-        char z = '|';
+        public Vector2 idleDirection;
+
+        readonly static char z = '|';
 
         Random r;
 
         public AI(Random random, string familySet)
         {
             r = random;
+
+            int[] iDir = new int[] { -1, 1 };
+            idleDirection = new Vector2(iDir[r.Next(iDir.Length)], iDir[r.Next(iDir.Length)]);
             family = familySet;
             MemoryFileLoad();
         }
@@ -71,6 +76,9 @@ namespace Gymnasiearbete
                     if (newMemory[i].Split(z)[0] == memory[j][0])
                     {
                         replace = true;
+                        memory[j][0].ToString();
+                        //memory[j][1].ToString();
+                        memory[j][2].ToString();
                         if (int.Parse(newMemory[i].Split(z)[1]) < int.Parse(memory[j][1]) && int.Parse(memory[j][1]) > 0)
                         {
                             newMemory[i] = memory[j][0] + z + memory[j][1] + z + memory[j][2];
@@ -93,7 +101,7 @@ namespace Gymnasiearbete
         /// <param name="type"></param>
         /// <param name="consume"></param>
         /// <returns></returns>
-        protected int MemoryChoice(int type, int consume)
+        protected string MemoryChoice(string situation)
         {
             int breakLoopTimer = 10;
             while (breakLoopTimer > 0)
@@ -102,7 +110,7 @@ namespace Gymnasiearbete
                 List<string[]> memoryImportant = new List<string[]>();
                 foreach (string[] mem in memory)
                 {
-                    if (mem[0] == type + "" + consume)
+                    if (mem[0] == situation)
                     {
                         memoryImportant.Add(mem);
                     }
@@ -141,12 +149,12 @@ namespace Gymnasiearbete
                                 }
                             }
 
-                            return int.Parse(memoryChoice[memoryChoiseIndex][2]);
+                            return memoryChoice[memoryChoiseIndex][2];
                         }
                     }
                     else
                     {
-                        string[] str = new string[3] { type + "" + consume, preformancepoints.ToString(), r.Next(choises.Length).ToString() };
+                        string[] str = new string[3] { situation, preformancepoints.ToString(), choises[r.Next(choises.Length)] };
                         for (int i = 0; i < memory.Count; i++)
                         {
                             if (memory[i][0] == str[0])
@@ -158,17 +166,28 @@ namespace Gymnasiearbete
                 }
                 else
                 {
-                    string[] str = new string[3] { type + "" + consume, preformancepoints.ToString(), r.Next(choises.Length).ToString() };
+                    string[] str = new string[3] { situation, preformancepoints.ToString(), choises[r.Next(choises.Length)] };
                     memory.Add(str);
                 }
             }
 
-            return -100;
+            return "";
         }
 
-        public int[] AIR(Cell cell, List<GameObject> percivableObjects)
+        public string DEBIÙG()
         {
-            return Intresst(cell, percivableObjects);
+            string result = "";
+            result += "[" + family + "]";
+            foreach (string[] s in memory)
+            {
+                result += "[" + s[0] + z + s[1] + z + s[2] + "]";
+            }
+            return "{" + result + "}";
+        }
+
+        public void AIR(Cell cell, List<GameObject> percivableObjects)
+        {
+            Intresst(cell, percivableObjects);
         }
 
         /// <summary>
@@ -177,11 +196,11 @@ namespace Gymnasiearbete
         /// <param name="cell"></param>
         /// <param name="percivableObjects"></param>
         /// <returns></returns>
-        protected virtual int[] Intresst(Cell cell, List<GameObject> percivableObjects)
+        protected virtual void Intresst(Cell cell, List<GameObject> percivableObjects)
         {
             GameObject intresst = null;
 
-            return Decision(cell, intresst);
+            Decision(cell, intresst);
         }
 
         /// <summary>
@@ -190,14 +209,20 @@ namespace Gymnasiearbete
         /// <param name="cell"></param>
         /// <param name="intresst"></param>
         /// <returns></returns>
-        protected virtual int[] Decision(Cell cell, GameObject intresst)
+        protected virtual void Decision(Cell cell, GameObject intresst)
         {
-            return new int[3] { 0, 0, 0 };
+            Actions(cell, "DEFAULT", new int[2] { 0, 0 });
         }
 
-        public string Debug_AI()
+        /// <summary>
+        /// definerar vad valen innebär
+        /// </summary>
+        /// <param name="cell"></param>
+        /// <param name="decision"></param>
+        protected virtual void Actions(Cell cell, string decision, int[] parameters)
         {
-            return "{TP[" + this.GetType().ToString().Split('.')[1] + "] FA[" + family + "]}";
+            Vector2 direction = new Vector2(parameters[0], parameters[1]);
+            cell.Move(direction);
         }
     }
 
@@ -205,7 +230,7 @@ namespace Gymnasiearbete
     {
         public AI_NoBrain(Random random, string familySet) : base(random, familySet)
         {
-            choises = new int[] { 0 };
+            choises = new string[0];
         }
     }
 
@@ -213,10 +238,10 @@ namespace Gymnasiearbete
     {
         public AI_ClosestTargeting(Random random, string familySet) : base(random, familySet)
         {
-
+            choises = new string[3] { "IDLE", "MOVETO", "MOVEFROM" };
         }
 
-        protected override int[] Intresst(Cell cell, List<GameObject> percivableObjects)
+        protected override void Intresst(Cell cell, List<GameObject> percivableObjects)
         {
             GameObject intresst = null;
             if (percivableObjects.Count > 0)
@@ -235,14 +260,15 @@ namespace Gymnasiearbete
                 }
             }
 
-            return Decision(cell, intresst);
+            Decision(cell, intresst);
         }
 
-        protected override int[] Decision(Cell cell, GameObject intresst)
+        protected override void Decision(Cell cell, GameObject intresst)
         {
             if (intresst == null)
             {
-                return new int[3] { 0, 0, 0 };
+                Actions(cell, choises[0], new int[2] { 0, 0 });
+                return;
             }
             else
             if (intresst.GetType() == typeof(Cell))
@@ -250,27 +276,51 @@ namespace Gymnasiearbete
                 if (intresst.Size > Cell.consumeScale * cell.Size)
                 {
                     Vector2 direction = intresst.Position - cell.Position;
-                    return new int[3] { -1, (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) };
+                    Actions(cell, choises[2], new int[2] { (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) });
+                    return;
                 }
                 else
                 if (cell.Size > Cell.consumeScale * intresst.Size && cell.Speed > intresst.Speed)
                 {
                     Vector2 direction = intresst.Position - cell.Position;
-                    return new int[3] { 1, (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) };
+                    Actions(cell, choises[1], new int[2] { (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) });
+                    return;
                 }
                 else
                 {
-                    return new int[3] { 0, 0, 0 };
+                    Actions(cell, choises[0], new int[2] { 0, 0 });
+                    return;
                 }
             }
             else
             if (intresst.GetType() == typeof(Food))
             {
                 Vector2 direction = intresst.Position - cell.Position;
-                return new int[3] { 1, (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) };
+                Actions(cell, choises[1], new int[2] { (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) });
+                return;
             }
 
-            return new int[3] { 0, 0, 0 };
+            Actions(cell, choises[0], new int[2] { 0, 0 });
+        }
+
+        protected override void Actions(Cell cell, string decision, int[] parameters)
+        {
+            Vector2 direction = new Vector2(parameters[0], parameters[1]);
+            switch (decision)
+            {
+                case "IDLE":
+                    cell.Move(idleDirection);
+                    break;
+
+                case "MOVETO":
+                    cell.Move(direction);
+                    break;
+
+                case "MOVEFROM":
+                    cell.Move(-direction);
+                    break;
+
+            }
         }
     }
 
@@ -278,10 +328,10 @@ namespace Gymnasiearbete
     {
         public AI_ClosestTargetingLearn(Random random, string familySet) : base(random, familySet)
         {
-            choises = new int[3] { 0, 1, -1 };
+            choises = new string[3] { "IDLE", "MOVETO", "MOVEFROM" };
         }
 
-        protected override int[] Intresst(Cell cell, List<GameObject> percivableObjects)
+        protected override void Intresst(Cell cell, List<GameObject> percivableObjects)
         {
             GameObject intresst = null;
             if (percivableObjects.Count > 0)
@@ -300,14 +350,15 @@ namespace Gymnasiearbete
                 }
             }
 
-            return Decision(cell, intresst);
+            Decision(cell, intresst);
         }
 
-        protected override int[] Decision(Cell cell, GameObject intresst)
+        protected override void Decision(Cell cell, GameObject intresst)
         {
             if (intresst == null)
             {
-                return new int[3] { MemoryChoice(-1, 0), 0, 0 };
+                Actions(cell, MemoryChoice("NULL"), new int[2] { (int)Math.Floor(idleDirection.X), (int)Math.Floor(idleDirection.Y) });
+                return;
             }
             else
             if (intresst.GetType() == typeof(Cell))
@@ -315,27 +366,68 @@ namespace Gymnasiearbete
                 if (intresst.Size > Cell.consumeScale * cell.Size)
                 {
                     Vector2 direction = intresst.Position - cell.Position;
-                    return new int[3] { MemoryChoice(1, 1), (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) };
+                    Actions(cell, MemoryChoice("CELL" + "BIG"), new int[2] { (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) });
+                    return;
                 }
                 else
                 if (cell.Size > Cell.consumeScale * intresst.Size && cell.Speed > intresst.Speed)
                 {
                     Vector2 direction = intresst.Position - cell.Position;
-                    return new int[3] { MemoryChoice(1, -1), (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) };
+                    Actions(cell, MemoryChoice("CELL" + "SMALLSLOW"), new int[2] { (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) });
+                    return;
                 }
                 else
                 {
-                    return new int[3] { MemoryChoice(1, 0), 0, 0 };
+                    Vector2 direction = intresst.Position - cell.Position;
+                    Actions(cell, MemoryChoice("CELL"), new int[2] { (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) });
+                    return;
                 }
             }
             else
             if (intresst.GetType() == typeof(Food))
             {
                 Vector2 direction = intresst.Position - cell.Position;
-                return new int[3] { MemoryChoice(0, 0), (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) };
+                Actions(cell, MemoryChoice("FOOD"), new int[2] { (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) });
+                return;
             }
+        }
 
-            return new int[0];
+        protected override void Actions(Cell cell, string decision, int[] parameters)
+        {
+            Vector2 direction = new Vector2(parameters[0], parameters[1]);
+            switch (decision)
+            {
+                case "IDLE":
+                    if (cell.Position.X + cell.Detectionrange / 2 >= CellManager.simulationArea.X + CellManager.simulationArea.Width)
+                    {
+                        this.idleDirection.X = -1;
+                    }
+
+                    if (cell.Position.X - cell.Detectionrange / 2 <= CellManager.simulationArea.X)
+                    {
+                        this.idleDirection.X = 1;
+                    }
+
+                    if (cell.Position.Y + cell.Detectionrange / 2 >= CellManager.simulationArea.Y + CellManager.simulationArea.Height)
+                    {
+                        this.idleDirection.Y = -1;
+                    }
+
+                    if (cell.Position.Y - cell.Detectionrange / 2 <= CellManager.simulationArea.Y)
+                    {
+                        this.idleDirection.Y = 1;
+                    }
+                    cell.Move(idleDirection);
+                    break;
+
+                case "MOVETO":
+                    cell.Move(direction);
+                    break;
+
+                case "MOVEFROM":
+                    cell.Move(-direction);
+                    break;
+            }
         }
     }
 }

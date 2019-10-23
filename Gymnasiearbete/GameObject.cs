@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using System.Diagnostics;
 
 namespace Gymnasiearbete
 {
@@ -70,6 +71,13 @@ namespace Gymnasiearbete
         {
 
         }
+
+        public virtual string DEBUG()
+        {
+            string result = "";
+            result += "[" + Math.Floor(Position.X) + ":" + Math.Floor(Position.Y) + "]";
+            return "{" + result + "}";
+        }
     }
 
     /// <summary>
@@ -84,7 +92,7 @@ namespace Gymnasiearbete
 
         }
 
-        protected void Move(Vector2 direction)
+        public void Move(Vector2 direction)
         {
             if (direction != Vector2.Zero)
             {

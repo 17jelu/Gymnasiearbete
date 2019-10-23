@@ -27,10 +27,10 @@ namespace Gymnasiearbete
     //CELL
     class Cell : Entity
     {
-        protected static CellManager CM;
+        protected CellManager CM;
         protected static float energyRequirement = 333; //1000;
         public static double consumeScale = 1.2;
-
+        
         protected float perception = 0;
 
         protected AI ai;
@@ -41,8 +41,6 @@ namespace Gymnasiearbete
                 return ai;
             }
         }
-
-        protected Vector2 idleDirection = new Vector2(1f, 1f);
 
         public bool isMarkForReproduce = false;
 
@@ -78,7 +76,7 @@ namespace Gymnasiearbete
             }
         }
 
-        public Cell Reproduce(GameWindow window, Random random)
+        public Cell Reproduce(Random random)
         {
             ai.preformancepoints++;
             ai.MemoryFileWrite();
@@ -92,8 +90,8 @@ namespace Gymnasiearbete
                 cchild.perception = Math.Max(1, cchild.perception + random.Next(-5, 5+1));
             }
 
-            cchild.idleDirection = -this.idleDirection;
-            cchild.position = this.position + cchild.idleDirection * this.Detectionrange + cchild.idleDirection * cchild.Detectionrange + cchild.idleDirection * cchild.size;
+            cchild.ai.idleDirection = -this.ai.idleDirection;
+            cchild.position = this.position + cchild.ai.idleDirection * this.Detectionrange + cchild.ai.idleDirection * cchild.Detectionrange + cchild.ai.idleDirection * cchild.size;
             return cchild;
         }
         
@@ -127,56 +125,15 @@ namespace Gymnasiearbete
                 }
             }
 
-            Actions(ai.AIR(this, percivableObjects));
+            ai.AIR(this, percivableObjects);
         }
 
-        protected virtual void Actions(int[] decision)
-        {
-            Vector2 direction = new Vector2(decision[1], decision[2]);
-            switch (decision[0])
-            {
-                case 0:
-                    Move(idleDirection);
-                    break;
-
-                case 1:
-                    Move(direction);
-                    break;
-
-                case -1:
-                    Move(-direction);
-                    break;
-
-            }
-            
-        }
-
-        public void Update(List<GameObject> detectionCheck, GameWindow window, Random random)
+        public void Update(List<GameObject> detectionCheck, Random random)
         {
             PerceptionCheck(detectionCheck);
             CollisionCheck(detectionCheck);
             ReproduceCheck();
             EnergyManagement();
-
-            if (this.position.X + this.size / 2 >= window.ClientBounds.Width)
-            {
-                idleDirection.X = -0.7071f;
-            }
-
-            if (this.position.X - this.size / 2 <= 0)
-            {
-                idleDirection.X = 0.7071f;
-            }
-
-            if (this.position.Y + this.size / 2 >= window.ClientBounds.Height)
-            {
-                idleDirection.Y = -0.7071f;
-            }
-
-            if (this.position.Y - this.size / 2 <= 0)
-            {
-                idleDirection.Y = 0.7071f;
-            }
         }
 
         protected override void Collision(GameObject g)
@@ -204,9 +161,13 @@ namespace Gymnasiearbete
             }
         }
 
-        public string Debug_Cell()
+        public override string DEBUG()
         {
-            return "{SZ[" + this.Size + "] SP[" + this.Speed + "] DR[" + this.Detectionrange + "] EG[" + this.energy + "]}";
+            string result = "";
+            result += "[" + Math.Floor(Position.X) + ":" + Math.Floor(Position.Y) + "]";
+            result += "[" + Size + "; " + Speed + "; " + perception + "]";
+            result += "[" + energy + "]";
+            return "{" + result + "}";
         }
     }
 }

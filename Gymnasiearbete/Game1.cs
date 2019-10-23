@@ -25,7 +25,7 @@ namespace Gymnasiearbete
         Grid grid;
 
         CellManager CM;
-        string debugMessage = "";
+        public static string debugMessage = "";
 
         Random random;
 
@@ -155,11 +155,13 @@ namespace Gymnasiearbete
                     debugType = 3;
                 }
                 debugMessage = CM.DebugSector(Mouse.GetState().X, Mouse.GetState().Y, debugType);
-            } else
+            }
+            else 
             {
                 CM.pause = false;
             }
-            CM.Update(Window, random, gameTime);
+            CM.Update(random, gameTime);
+            
 
             base.Update(gameTime);
         }
