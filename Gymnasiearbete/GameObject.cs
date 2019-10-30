@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 
 namespace Gymnasiearbete
@@ -72,6 +73,11 @@ namespace Gymnasiearbete
 
         }
 
+        public void SetPosition(Vector2 newPosition)
+        {
+            position = newPosition;
+        }
+
         public virtual string DEBUG()
         {
             string result = "";
@@ -99,6 +105,17 @@ namespace Gymnasiearbete
                 direction.Normalize();
                 position += direction * speed;
             }
+        }
+    }
+
+    /// <summary>
+    /// Tomt GameObject vilken endast markerar en punkt och har kort namn
+    /// </summary>
+    class P : GameObject
+    {
+        public P(Vector2 startPosition) : base(startPosition)
+        {
+
         }
     }
 }

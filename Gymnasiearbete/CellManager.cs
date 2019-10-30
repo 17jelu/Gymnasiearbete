@@ -66,7 +66,7 @@ namespace Gymnasiearbete
                         if (g.GetType() == typeof(Cell))
                         {
                             Cell c = (Cell)g;
-                            output += c.AI.DEBIÙG();
+                            output += c.AI.DEBIUG();
                         }
                     }
                     output += "\n";
