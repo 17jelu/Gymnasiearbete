@@ -54,7 +54,7 @@ namespace Gymnasiearbete
 
             Window.AllowUserResizing = true;
 
-            CM = new CellManager();
+            CM = new CellManager(new Rectangle(0, 0, 8, 5));
             CM.AddObjects
                 (
                     new GameObject[]

@@ -33,9 +33,9 @@ namespace Gymnasiearbete
 
         Dictionary<Point, List<GameObject>> sectors = new Dictionary<Point, List<GameObject>>();
 
-        public CellManager()
+        public CellManager(Rectangle simulationAreaSet)
         {
-            simulationArea = new Rectangle(0 * SectorSize, 0 * SectorSize, 8 * SectorSize, 5 * SectorSize);
+            simulationArea = new Rectangle(simulationAreaSet.X * SectorSize, simulationAreaSet.Y * SectorSize, simulationAreaSet.Width * SectorSize, simulationAreaSet.Height * SectorSize);
         }
 
         public void AddObjects(GameObject[] gs)
