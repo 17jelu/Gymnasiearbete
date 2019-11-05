@@ -212,6 +212,34 @@ namespace Gymnasiearbete
         // bluegh
         public void Draw(GraphicsDevice graphicsDevice, Camera camera)
         {
+            for (int x = 0; x < 4; x++)
+            {
+                for (int y = 0; y < 4; y++)
+                {
+                    Point p = new Point(x, y);
+                    if(sectors.ContainsKey(p))
+                    {
+                        foreach (GameObject gameObj in sectors[p])
+                        {
+                            if (gameObj.GetType() == typeof(Cell))
+                            {
+                                Cell cell = (Cell)gameObj;
+                                if (!cell.BeenDrawn)
+                                {
+                                    cell.Draw(graphicsDevice, camera);
+                                    cell.BeenDrawn = true;
+                                }
+                            }
+                            if (gameObj.GetType() == typeof(Food))
+                            {
+                                ((Food)gameObj).Draw(graphicsDevice, camera);
+                            }
+                        }
+                    }
+                }
+            }
+
+            /*
             foreach (GameObject gameObj in objects)
             {
                 if (gameObj.GetType() == typeof(Cell))
@@ -223,6 +251,7 @@ namespace Gymnasiearbete
                     ((Food)gameObj).Draw(graphicsDevice, camera);
                 }
             }
+            */
 
             /*
             foreach (GameObject g in objects)

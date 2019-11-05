@@ -12,6 +12,12 @@ namespace Gymnasiearbete
     class Food : Entity
     {
         Circle circle; // Jesper
+        bool hasBeenDrawn; // Jesper
+        public bool BeenDrawn // Jesper
+        {
+            get { return hasBeenDrawn; }
+            set { hasBeenDrawn = value; }
+        }
 
         float energy = 300;
         public float Energy
@@ -32,6 +38,8 @@ namespace Gymnasiearbete
         public void Draw(GraphicsDevice graphicsDevice, Camera camera)
         {
             circle.Render(graphicsDevice, camera);
+
+            hasBeenDrawn = false;
         }
     }
 
@@ -39,6 +47,12 @@ namespace Gymnasiearbete
     class Cell : Entity
     {
         Circle circle; // Jesper
+        bool hasBeenDrawn = false; // Jesper
+        public bool BeenDrawn // Jesper
+        {
+            get { return hasBeenDrawn; }
+            set { hasBeenDrawn = value; }
+        }
         protected static CellManager CM;
         protected static float energyRequirement = 333; //1000;
         public static double consumeScale = 1.2;
@@ -90,6 +104,8 @@ namespace Gymnasiearbete
 
             circle.Position = position;
             circle.Render(graphicsDevice, camera);
+
+            hasBeenDrawn = false;
         }
 
         void ReproduceCheck()
