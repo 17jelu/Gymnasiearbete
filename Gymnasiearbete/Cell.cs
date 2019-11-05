@@ -30,7 +30,7 @@ namespace Gymnasiearbete
         protected CellManager CM;
         protected static float energyRequirement = 333; //1000;
         public static double consumeScale = 1.2;
-        
+
         protected float perception = 0;
 
         protected AI ai;
@@ -78,8 +78,8 @@ namespace Gymnasiearbete
 
         public Cell Reproduce(Random random)
         {
-            ai.preformancepoints++;
-            ai.MemoryFileWrite();
+            //ai.preformancepoints++;
+            AI.MemoryFileWrite();
             Cell cchild = new Cell(CM, new AI_ClosestTargetingLearn(new Random(), ai.family), Vector2.Zero, this.size, this.speed, this.perception);
 
             int mutationChance = 50;
@@ -90,16 +90,16 @@ namespace Gymnasiearbete
                 cchild.perception = Math.Max(1, cchild.perception + random.Next(-5, 5+1));
             }
 
-            cchild.ai.idleDirection = -this.ai.idleDirection;
-            cchild.position = this.position + cchild.ai.idleDirection * this.Detectionrange + cchild.ai.idleDirection * cchild.Detectionrange + cchild.ai.idleDirection * cchild.size;
+            Vector2 reverseDirection = -this.ai.Direction;
+            reverseDirection.Normalize();
+            cchild.ai.Direction = reverseDirection;
+            cchild.position = this.position + cchild.ai.Direction * this.Detectionrange + cchild.ai.Direction * cchild.Detectionrange;
             return cchild;
         }
         
         void EnergyManagement()
         {
-            energy--;
-            //energy -= Math.Max(0.05f, 1 * this.size/20 * this.speed/1 * this.perception/50);
-            //energy -= Math.Max(0.05f, this.size / 20 - this.speed / 1 - this.perception / 50);
+            energy -= (this.size/10 + this.speed/2 + this.perception/30)/3;
             if (energy <= 0)
             {
                 this.isMarkedForDelete = true;
@@ -114,7 +114,6 @@ namespace Gymnasiearbete
             {
                 if (g != this)
                 {
-                    //PERCEPTION
                     if (
                         Math.Pow(g.Position.X - this.position.X, 2) + Math.Pow(g.Position.Y - this.position.Y, 2) <= 
                         Math.Pow(this.Detectionrange, 2) + Math.Pow(g.Size, 2)
@@ -146,10 +145,11 @@ namespace Gymnasiearbete
             if (g.GetType() == typeof(Cell))
             {
                 Cell c = (Cell)g;
-                if(consumeScale * g.Size < this.size)
+                if(g.Size * consumeScale < this.size)
                 {
-                    g.isMarkedForDelete = true;
+                    ai.MemoryReward(3);
                     this.energy += c.energy;
+                    g.isMarkedForDelete = true;
                 }
             }
             else
@@ -158,6 +158,7 @@ namespace Gymnasiearbete
                 Food f = (Food)g;
                 g.isMarkedForDelete = true;
                 this.energy += f.Energy;
+                ai.MemoryReward(3);
             }
         }
 

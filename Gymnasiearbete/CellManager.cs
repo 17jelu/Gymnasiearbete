@@ -113,6 +113,13 @@ namespace Gymnasiearbete
 
                 if (g.isMarkedForDelete)
                 {
+                    if (g.GetType() == typeof(Cell))
+                    {
+                        Cell c = (Cell)g;
+                        c.AI.MemoryReward(-2, false);
+                        c.AI.MemoryFileWrite();
+                    }
+
                     objects.Remove(g);
                 }
                 else
