@@ -17,12 +17,14 @@ namespace Gymnasiearbete
         public double civilazationTime = 0;
         List<GameObject> objects = new List<GameObject>();
 
+        public static Rectangle simulationArea;
+
         int spawnTimer = 0;
 
         public bool pause = false;
         public bool simulationEnd = false;
 
-        public int SectorSize {
+        public static int SectorSize {
             get
             {
                 return 100;
@@ -30,6 +32,11 @@ namespace Gymnasiearbete
         }
 
         Dictionary<Point, List<GameObject>> sectors = new Dictionary<Point, List<GameObject>>();
+
+        public CellManager(Rectangle simulationAreaSet)
+        {
+            simulationArea = new Rectangle(simulationAreaSet.X * SectorSize, simulationAreaSet.Y * SectorSize, simulationAreaSet.Width * SectorSize, simulationAreaSet.Height * SectorSize);
+        }
 
         public void AddObjects(GameObject[] gs)
         {
@@ -42,38 +49,33 @@ namespace Gymnasiearbete
             int x = (int)Math.Floor(Xposition / SectorSize);
             int y = (int)Math.Floor(Yposition / SectorSize);
 
-            if (!sectors.ContainsKey(new Point(x, y)))
+            if (sectors.ContainsKey(new Point(x, y)))
             {
-                sectors.Add(new Point(x, y), new List<GameObject>());
-            }
-
-            foreach (GameObject g in sectors[new Point(x, y)])
-            {
-                if (g.GetType() == typeof(Cell))
+                foreach (GameObject g in sectors[new Point(x, y)])
                 {
-                    Cell c = (Cell)g;
-                    string debug_Object = "{LI[" + objects.IndexOf(c) + "]}";
-                    if (debugType == 0)
+                    if (debugType == 1 || debugType == 0)
                     {
-                        output += debug_Object + c.Debug_Cell() + c.AI.Debug_AI();
+                        output += "{" + objects.IndexOf(g) + "-" + g.GetType().ToString().Split('.')[1] + "}";
                     }
-                    if (debugType == 1)
+                    if (debugType == 2 || debugType == 0)
                     {
-                        output += debug_Object;
+                        output += g.DEBUG();
                     }
-                    if (debugType == 2)
+                    if (debugType == 3 || debugType == 0)
                     {
-                        output += c.Debug_Cell();
-                    }
-                    if (debugType == 3)
-                    {
-                        output += c.AI.Debug_AI();
+                        if (g.GetType() == typeof(Cell))
+                        {
+                            Cell c = (Cell)g;
+                            output += c.AI.DEBIUG();
+                        }
                     }
                     output += "\n";
                 }
+
+                return output;
             }
 
-            return output;
+            return "-";
         }
 
         public bool IsCell(GameObject g)
@@ -86,7 +88,7 @@ namespace Gymnasiearbete
             return false;
         }
 
-        public void Update(GameWindow window, Random random, GameTime gameTime)
+        public void Update(Random random, GameTime gameTime)
         {
             if (pause || simulationEnd)
             {
@@ -111,6 +113,13 @@ namespace Gymnasiearbete
 
                 if (g.isMarkedForDelete)
                 {
+                    if (g.GetType() == typeof(Cell))
+                    {
+                        Cell c = (Cell)g;
+                        c.AI.MemoryReward(-2, false);
+                        c.AI.MemoryFileWrite();
+                    }
+
                     objects.Remove(g);
                 }
                 else
@@ -138,7 +147,7 @@ namespace Gymnasiearbete
 
                         if (c.isMarkForReproduce)
                         {
-                            this.AddObjects(new GameObject[1] { c.Reproduce(window, random) });
+                            this.AddObjects(new GameObject[1] { c.Reproduce(random) });
                         }
                     }
                 }
@@ -177,7 +186,7 @@ namespace Gymnasiearbete
                         }
                     }
 
-                    c.Update(detectionCheck, window, random);
+                    c.Update(detectionCheck, random);
                 }
             }
 
@@ -195,8 +204,8 @@ namespace Gymnasiearbete
                         (
                             new Vector2
                             (
-                                random.Next(0, window.ClientBounds.Width),
-                                random.Next(0, window.ClientBounds.Height)
+                                random.Next(simulationArea.X, simulationArea.X + simulationArea.Width),
+                                random.Next(simulationArea.Y, simulationArea.Y + simulationArea.Height)
                             )
                         )
                     }

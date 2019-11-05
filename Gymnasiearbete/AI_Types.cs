@@ -13,18 +13,41 @@ namespace Gymnasiearbete
     {
         public string family;
         string dataPath;
-        List<string[]> memory = new List<string[]>();
-        protected int[] choises = new int[0];
+        List<Memory> memory = new List<Memory>();
+        public Memory lastMemory;
+        protected string[] choises = new string[0];
 
-        public int preformancepoints = 0;
+        //public int preformancepoints = 0;
 
-        char z = '|';
+        protected Vector2 direction;
+        public Vector2 Direction
+        {
+            get
+            {
+                return direction;
+            }
+            set
+            {
+                direction = value;
+            }
+        }
 
-        Random r;
+        protected P idleDestination;
+
+        readonly static char z = '|';
+
+        protected Random r;
 
         public AI(Random random, string familySet)
         {
             r = random;
+
+            
+            idleDestination = new P(
+                new Vector2(
+                    r.Next(CellManager.simulationArea.X, CellManager.simulationArea.X + CellManager.simulationArea.Width),
+                    r.Next(CellManager.simulationArea.Y, CellManager.simulationArea.Y + CellManager.simulationArea.Height)
+                    ));
             family = familySet;
             MemoryFileLoad();
         }
@@ -50,7 +73,7 @@ namespace Gymnasiearbete
             MemoryFileExsist();
             foreach (string line in File.ReadAllLines(dataPath))
             {
-                memory.Add(line.Split(z));
+                memory.Add(new Memory(line.Split(z)[0], line.Split(z)[1], line.Split(z)[2]));
             }
         }
 
@@ -60,31 +83,44 @@ namespace Gymnasiearbete
         public void MemoryFileWrite()
         {
             MemoryFileExsist();
-            List<string> newMemory = new List<string>();
-            newMemory.AddRange(File.ReadAllLines(dataPath));
+            List<Memory> newMemory = new List<Memory>();
+            List<string> temp = new List<string>();
+            temp.AddRange(File.ReadAllLines(dataPath));
+
+            foreach (string s in temp)
+            {
+                newMemory.Add(new Memory(s.Split(z)[0], s.Split(z)[1], s.Split(z)[2]));
+            }
+            
 
             for (int j = 0; j < memory.Count; j++)
             {
-                bool replace = false;
+                bool exsists = false;
                 for (int i = 0; i < newMemory.Count; i++)
                 {
-                    if (newMemory[i].Split(z)[0] == memory[j][0])
+                    if (newMemory[i].Situation == memory[j].Situation)
                     {
-                        replace = true;
-                        if (int.Parse(newMemory[i].Split(z)[1]) < int.Parse(memory[j][1]) && int.Parse(memory[j][1]) > 0)
+                        if (newMemory[i].Desicion == memory[j].Desicion)
                         {
-                            newMemory[i] = memory[j][0] + z + memory[j][1] + z + memory[j][2];
+                            exsists = true;
+                            newMemory[i].Points = Math.Max(newMemory[i].Points, memory[j].Points);
                         }
                     }
                 }
 
-                if (!replace)
+                if (!exsists)
                 {
-                    newMemory.Add(memory[j][0] + z + memory[j][1] + z + memory[j][2]);
+                    newMemory.Add(memory[j]);
                 }
             }
 
-            File.WriteAllLines(dataPath, newMemory);
+            temp = new List<string>();
+            for (int i = 0; i < newMemory.Count; i++)
+            {
+                temp.Add(newMemory[i].ToString());
+            }
+            temp.Sort();
+            File.WriteAllLines(dataPath, temp);
         }
 
         /// <summary>
@@ -93,82 +129,115 @@ namespace Gymnasiearbete
         /// <param name="type"></param>
         /// <param name="consume"></param>
         /// <returns></returns>
-        protected int MemoryChoice(int type, int consume)
+        protected string MemoryChoice(string situation)
         {
-            int breakLoopTimer = 10;
-            while (breakLoopTimer > 0)
+            while (true)
             {
-                breakLoopTimer--;
-                List<string[]> memoryImportant = new List<string[]>();
-                foreach (string[] mem in memory)
+                List<Memory> memoryImportant = new List<Memory>();
+                foreach (Memory m in memory)
                 {
-                    if (mem[0] == type + "" + consume)
+                    if (m.Situation == situation)
                     {
-                        memoryImportant.Add(mem);
+                        memoryImportant.Add(m);
                     }
                 }
 
-                List<string[]> memoryChoice = new List<string[]>();
+                List<Memory> memoryChoice = new List<Memory>();
                 if (memoryImportant.Count > 0)
                 {
-                    double curiosity = 0.5;
+                    double curiosity = 1;
                     if (r.Next(100) < 100 - curiosity)
                     {
-                        foreach (string[] s in memoryImportant)
+                        foreach (Memory m in memoryImportant)
                         {
                             if (memoryChoice.Count < 1)
                             {
-                                memoryChoice.Add(s);
+                                memoryChoice.Add(m);
                             }
 
-                            if (int.Parse(memoryChoice[0][1]) < Math.Max(0, int.Parse(s[1])))
+                            if (memoryChoice[0].Points < m.Points)
                             {
-                                memoryChoice = new List<string[]>();
-                                memoryChoice.Add(s);
+                                memoryChoice = new List<Memory>();
+                                memoryChoice.Add(m);
                             }
                             else
-                            if (int.Parse(memoryChoice[0][1]) == int.Parse(s[1]))
+                            if (memoryChoice[0].Points == m.Points)
                             {
-                                memoryChoice.Add(s);
+                                memoryChoice.Add(m);
                             }
 
                             int memoryChoiseIndex = r.Next(memoryChoice.Count);
-                            foreach (string[] sp in memory)
-                            {
-                                if (sp[0] == memoryChoice[memoryChoiseIndex][0])
-                                {
-                                    sp[1] = preformancepoints.ToString();
-                                }
-                            }
 
-                            return int.Parse(memoryChoice[memoryChoiseIndex][2]);
+                            lastMemory = memoryChoice[memoryChoiseIndex];
+                            return lastMemory.Desicion;
                         }
                     }
                     else
                     {
-                        string[] str = new string[3] { type + "" + consume, preformancepoints.ToString(), r.Next(choises.Length).ToString() };
+                        Memory mem = new Memory(situation, 0.ToString(), choises[r.Next(choises.Length)]);
                         for (int i = 0; i < memory.Count; i++)
                         {
-                            if (memory[i][0] == str[0])
+                            if (memory[i].Situation == mem.Situation)
                             {
-                                memory[i][2] = str[2];
+                                if (memory[i].Desicion == mem.Desicion)
+                                {
+                                    lastMemory = mem;
+                                    return lastMemory.Desicion;
+                                }   
                             }
+                        }
+                        memory.Add(mem);
+                        lastMemory = mem;
+                        return lastMemory.Desicion;
+                    }
+                }
+                else
+                {
+                    Memory mem = new Memory(situation, 0.ToString(), choises[r.Next(choises.Length)]);
+                    memory.Add(mem);
+                    lastMemory = mem;
+                    return lastMemory.Desicion;
+                }
+            }
+        }
+
+        //TILDELA POÄNG FÖR VAL
+        public void MemoryReward(int reward, bool lastT_allF = true)
+        {
+            foreach (Memory m in memory)
+            {
+                if (lastT_allF)
+                {
+                    if (m.Situation == lastMemory.Situation)
+                    {
+                        if (m.Desicion == lastMemory.Desicion)
+                        {
+                            m.Points += reward;
                         }
                     }
                 }
                 else
                 {
-                    string[] str = new string[3] { type + "" + consume, preformancepoints.ToString(), r.Next(choises.Length).ToString() };
-                    memory.Add(str);
+                    m.Points += reward;
                 }
             }
-
-            return -100;
         }
 
-        public int[] AIR(Cell cell, List<GameObject> percivableObjects)
+        public string DEBIUG()
         {
-            return Intresst(cell, percivableObjects);
+            string result = "";
+            result += "[" + family + "]";
+            result += "[" + lastMemory.ToString() + "]";
+            foreach (Memory m in memory)
+            {
+                result += "[" + m.ToString() + "]";
+            }
+            return "{" + result + "}";
+        }
+
+        public void AIR(Cell cell, List<GameObject> percivableObjects)
+        {
+            Intresst(cell, percivableObjects);
         }
 
         /// <summary>
@@ -177,11 +246,11 @@ namespace Gymnasiearbete
         /// <param name="cell"></param>
         /// <param name="percivableObjects"></param>
         /// <returns></returns>
-        protected virtual int[] Intresst(Cell cell, List<GameObject> percivableObjects)
+        protected virtual void Intresst(Cell cell, List<GameObject> percivableObjects)
         {
             GameObject intresst = null;
 
-            return Decision(cell, intresst);
+            Decision(cell, intresst);
         }
 
         /// <summary>
@@ -190,14 +259,20 @@ namespace Gymnasiearbete
         /// <param name="cell"></param>
         /// <param name="intresst"></param>
         /// <returns></returns>
-        protected virtual int[] Decision(Cell cell, GameObject intresst)
+        protected virtual void Decision(Cell cell, GameObject intresst)
         {
-            return new int[3] { 0, 0, 0 };
+            Actions(cell, "DEFAULT", new int[2] { 0, 0 });
         }
 
-        public string Debug_AI()
+        /// <summary>
+        /// definerar vad valen innebär
+        /// </summary>
+        /// <param name="cell"></param>
+        /// <param name="decision"></param>
+        protected virtual void Actions(Cell cell, string decision, int[] parameters)
         {
-            return "{TP[" + this.GetType().ToString().Split('.')[1] + "] FA[" + family + "]}";
+            direction = new Vector2(parameters[0], parameters[1]);
+            cell.Move(direction);
         }
     }
 
@@ -205,7 +280,7 @@ namespace Gymnasiearbete
     {
         public AI_NoBrain(Random random, string familySet) : base(random, familySet)
         {
-            choises = new int[] { 0 };
+            choises = new string[0];
         }
     }
 
@@ -213,10 +288,10 @@ namespace Gymnasiearbete
     {
         public AI_ClosestTargeting(Random random, string familySet) : base(random, familySet)
         {
-
+            choises = new string[3] { "IDLE", "MOVETO", "MOVEFROM" };
         }
 
-        protected override int[] Intresst(Cell cell, List<GameObject> percivableObjects)
+        protected override void Intresst(Cell cell, List<GameObject> percivableObjects)
         {
             GameObject intresst = null;
             if (percivableObjects.Count > 0)
@@ -235,14 +310,15 @@ namespace Gymnasiearbete
                 }
             }
 
-            return Decision(cell, intresst);
+            Decision(cell, intresst);
         }
 
-        protected override int[] Decision(Cell cell, GameObject intresst)
+        protected override void Decision(Cell cell, GameObject intresst)
         {
             if (intresst == null)
             {
-                return new int[3] { 0, 0, 0 };
+                Actions(cell, choises[0], new int[2] { 0, 0 });
+                return;
             }
             else
             if (intresst.GetType() == typeof(Cell))
@@ -250,27 +326,51 @@ namespace Gymnasiearbete
                 if (intresst.Size > Cell.consumeScale * cell.Size)
                 {
                     Vector2 direction = intresst.Position - cell.Position;
-                    return new int[3] { -1, (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) };
+                    Actions(cell, choises[2], new int[2] { (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) });
+                    return;
                 }
                 else
                 if (cell.Size > Cell.consumeScale * intresst.Size && cell.Speed > intresst.Speed)
                 {
                     Vector2 direction = intresst.Position - cell.Position;
-                    return new int[3] { 1, (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) };
+                    Actions(cell, choises[1], new int[2] { (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) });
+                    return;
                 }
                 else
                 {
-                    return new int[3] { 0, 0, 0 };
+                    Actions(cell, choises[0], new int[2] { 0, 0 });
+                    return;
                 }
             }
             else
             if (intresst.GetType() == typeof(Food))
             {
                 Vector2 direction = intresst.Position - cell.Position;
-                return new int[3] { 1, (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) };
+                Actions(cell, choises[1], new int[2] { (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) });
+                return;
             }
 
-            return new int[3] { 0, 0, 0 };
+            Actions(cell, choises[0], new int[2] { 0, 0 });
+        }
+
+        protected override void Actions(Cell cell, string decision, int[] parameters)
+        {
+            Vector2 direction = new Vector2(parameters[0], parameters[1]);
+            switch (decision)
+            {
+                case "IDLE":
+                    //cell.Move(idleDirection);
+                    break;
+
+                case "MOVETO":
+                    cell.Move(direction);
+                    break;
+
+                case "MOVEFROM":
+                    cell.Move(-direction);
+                    break;
+
+            }
         }
     }
 
@@ -278,10 +378,10 @@ namespace Gymnasiearbete
     {
         public AI_ClosestTargetingLearn(Random random, string familySet) : base(random, familySet)
         {
-            choises = new int[3] { 0, 1, -1 };
+            choises = new string[] { "MOVETO", "MOVEFROM", "IDLE"};
         }
 
-        protected override int[] Intresst(Cell cell, List<GameObject> percivableObjects)
+        protected override void Intresst(Cell cell, List<GameObject> percivableObjects)
         {
             GameObject intresst = null;
             if (percivableObjects.Count > 0)
@@ -300,42 +400,70 @@ namespace Gymnasiearbete
                 }
             }
 
-            return Decision(cell, intresst);
+            Decision(cell, intresst);
         }
 
-        protected override int[] Decision(Cell cell, GameObject intresst)
+        protected override void Decision(Cell cell, GameObject intresst)
         {
+            string data = "NULL";
             if (intresst == null)
             {
-                return new int[3] { MemoryChoice(-1, 0), 0, 0 };
-            }
-            else
-            if (intresst.GetType() == typeof(Cell))
-            {
-                if (intresst.Size > Cell.consumeScale * cell.Size)
-                {
-                    Vector2 direction = intresst.Position - cell.Position;
-                    return new int[3] { MemoryChoice(1, 1), (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) };
-                }
-                else
-                if (cell.Size > Cell.consumeScale * intresst.Size && cell.Speed > intresst.Speed)
-                {
-                    Vector2 direction = intresst.Position - cell.Position;
-                    return new int[3] { MemoryChoice(1, -1), (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) };
-                }
-                else
-                {
-                    return new int[3] { MemoryChoice(1, 0), 0, 0 };
-                }
-            }
-            else
-            if (intresst.GetType() == typeof(Food))
-            {
-                Vector2 direction = intresst.Position - cell.Position;
-                return new int[3] { MemoryChoice(0, 0), (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) };
+                intresst = idleDestination;
             }
 
-            return new int[0];
+            if (intresst != null)
+            {
+                data = intresst.GetType().ToString().ToUpper().Split('.')[1];
+                direction = intresst.Position - cell.Position;
+
+                if (intresst.GetType() == typeof(Cell))
+                {
+                    Cell c = (Cell)intresst;
+                    if (c.Size * Cell.consumeScale < cell.Size)
+                    {
+                        data += "<";
+                    }
+
+                    if (cell.Size * Cell.consumeScale < c.Size)
+                    {
+                        data += ">";
+                    }
+
+                    if (cell.Speed > c.Speed)
+                    {
+                        data += "*";
+                    }
+                }
+            }
+
+            if (Math.Pow(idleDestination.Position.X - cell.Position.X, 2) + Math.Pow(idleDestination.Position.Y - cell.Position.Y, 2) < 5)
+            {
+                idleDestination.SetPosition(new Vector2(
+                    r.Next(CellManager.simulationArea.X, CellManager.simulationArea.X + CellManager.simulationArea.Width),
+                    r.Next(CellManager.simulationArea.Y, CellManager.simulationArea.Y + CellManager.simulationArea.Height)
+                    ));
+            }
+
+            Actions(cell, MemoryChoice(data), new int[2] { (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) });
+        }
+
+        protected override void Actions(Cell cell, string decision, int[] parameters)
+        {
+            Vector2 moveDirection = new Vector2(parameters[0], parameters[1]);
+            switch (decision)
+            {
+                case "IDLE":
+                    cell.Move(idleDestination.Position - cell.Position);
+                    break;
+
+                case "MOVETO":
+                    cell.Move(moveDirection);
+                    break;
+
+                case "MOVEFROM":
+                    cell.Move(-moveDirection);
+                    break;
+            }
         }
     }
 }
