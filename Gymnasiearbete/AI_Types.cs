@@ -11,6 +11,8 @@ namespace Gymnasiearbete
     /// </summary>
     class AI
     {
+        public bool DEBUGNOMEMORYSAVE = true;
+
         public string family;
         string dataPath;
         List<Memory> memory = new List<Memory>();
@@ -43,14 +45,17 @@ namespace Gymnasiearbete
         {
             r = random;
 
-            
             idleDestination = new P(
                 new Vector2(
                     r.Next(CellManager.simulationArea.X, CellManager.simulationArea.X + CellManager.simulationArea.Width),
                     r.Next(CellManager.simulationArea.Y, CellManager.simulationArea.Y + CellManager.simulationArea.Height)
                     ));
             family = familySet;
-            MemoryFileLoad();
+
+            if (!DEBUGNOMEMORYSAVE)
+            {
+                MemoryFileLoad();
+            }
         }
 
         /// <summary>
@@ -83,6 +88,11 @@ namespace Gymnasiearbete
         /// </summary>
         public void MemoryFileWrite()
         {
+            if (DEBUGNOMEMORYSAVE)
+            {
+                return;
+            }
+
             MemoryFileExsist();
             List<Memory> newMemory = new List<Memory>();
             List<string> temp = new List<string>();
