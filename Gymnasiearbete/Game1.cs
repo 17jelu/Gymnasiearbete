@@ -27,7 +27,10 @@ namespace Gymnasiearbete
         CellManager CM;
         public static string debugMessage = "";
 
-        Random random;
+        public Random random;
+
+        public static bool DEBUGMUTERENDER = false;
+        public static bool DEBUGMUTEAI = false;
 
         bool restart = false;
 
@@ -52,31 +55,9 @@ namespace Gymnasiearbete
             
             grid = new Grid(Window.ClientBounds);
 
+            CM = new CellManager(new Rectangle(0, 0, 8, 5), random);
+
             Window.AllowUserResizing = true;
-
-            CM = new CellManager(new Rectangle(0, 0, 8, 5));
-            CM.AddObjects
-                (
-                    new GameObject[]
-                    {
-                        new Cell(CM, new AI_ClosestTargetingLearn(random, "1"), new Vector2(random.Next(CellManager.simulationArea.X, CellManager.simulationArea.X + CellManager.simulationArea.Width), random.Next(CellManager.simulationArea.Y, CellManager.simulationArea.Y + CellManager.simulationArea.Height)), 10, 2, 30),
-                        new Cell(CM, new AI_ClosestTargetingLearn(random, "2"), new Vector2(random.Next(CellManager.simulationArea.X, CellManager.simulationArea.X + CellManager.simulationArea.Width), random.Next(CellManager.simulationArea.Y, CellManager.simulationArea.Y + CellManager.simulationArea.Height)), 10, 2, 30),
-                        new Cell(CM, new AI_ClosestTargetingLearn(random, "3"), new Vector2(random.Next(CellManager.simulationArea.X, CellManager.simulationArea.X + CellManager.simulationArea.Width), random.Next(CellManager.simulationArea.Y, CellManager.simulationArea.Y + CellManager.simulationArea.Height)), 10, 2, 30),
-                        new Cell(CM, new AI_ClosestTargetingLearn(random, "4"), new Vector2(random.Next(CellManager.simulationArea.X, CellManager.simulationArea.X + CellManager.simulationArea.Width), random.Next(CellManager.simulationArea.Y, CellManager.simulationArea.Y + CellManager.simulationArea.Height)), 10, 2, 30),
-                        new Cell(CM, new AI_ClosestTargetingLearn(random, "5"), new Vector2(random.Next(CellManager.simulationArea.X, CellManager.simulationArea.X + CellManager.simulationArea.Width), random.Next(CellManager.simulationArea.Y, CellManager.simulationArea.Y + CellManager.simulationArea.Height)), 10, 2, 30)
-                    }
-                );
-
-            for (int i = 0; i < 10; i++)
-            {
-                CM.AddObjects
-                    (
-                        new GameObject[1]
-                        {
-                            new Food(new Vector2(random.Next(CellManager.simulationArea.X, CellManager.simulationArea.X + CellManager.simulationArea.Width), random.Next(CellManager.simulationArea.Y, CellManager.simulationArea.Y + CellManager.simulationArea.Height)))
-                        }
-                    );
-            }
 
             base.Initialize();
         }
