@@ -15,7 +15,7 @@ namespace Gymnasiearbete
     class CellManager
     {
         public double civilazationTime = 0;
-        List<GameObject> objects = new List<GameObject>();
+        Sectorcontent objects = new Sectorcontent();
 
         public static Rectangle simulationArea;
 
@@ -31,11 +31,34 @@ namespace Gymnasiearbete
             }
         }
 
-        Dictionary<Point, List<GameObject>> sectors = new Dictionary<Point, List<GameObject>>();
+        Dictionary<Point, Sectorcontent> sectors = new Dictionary<Point, Sectorcontent>();
 
-        public CellManager(Rectangle simulationAreaSet)
+        public CellManager(Rectangle simulationAreaSet, Random random)
         {
             simulationArea = new Rectangle(simulationAreaSet.X * SectorSize, simulationAreaSet.Y * SectorSize, simulationAreaSet.Width * SectorSize, simulationAreaSet.Height * SectorSize);
+
+            AddObjects
+                (
+                    new GameObject[]
+                    {
+                        new Cell(this, new AI_ClosestTargetingLearn(random, "1"), new Vector2(random.Next(simulationArea.X, simulationArea.X + simulationArea.Width), random.Next(simulationArea.Y, simulationArea.Y + simulationArea.Height)), 10, 2, 30),
+                        new Cell(this, new AI_ClosestTargetingLearn(random, "2"), new Vector2(random.Next(simulationArea.X, simulationArea.X + simulationArea.Width), random.Next(simulationArea.Y, simulationArea.Y + simulationArea.Height)), 10, 2, 30),
+                        new Cell(this, new AI_ClosestTargetingLearn(random, "3"), new Vector2(random.Next(simulationArea.X, simulationArea.X + simulationArea.Width), random.Next(simulationArea.Y, simulationArea.Y + simulationArea.Height)), 10, 2, 30),
+                        new Cell(this, new AI_ClosestTargetingLearn(random, "4"), new Vector2(random.Next(simulationArea.X, simulationArea.X + simulationArea.Width), random.Next(simulationArea.Y, simulationArea.Y + simulationArea.Height)), 10, 2, 30),
+                        new Cell(this, new AI_ClosestTargetingLearn(random, "5"), new Vector2(random.Next(simulationArea.X, simulationArea.X + simulationArea.Width), random.Next(simulationArea.Y, simulationArea.Y + simulationArea.Height)), 10, 2, 30)
+                    }
+                );
+
+            for (int i = 0; i < 10; i++)
+            {
+                AddObjects
+                    (
+                        new GameObject[1]
+                        {
+                            new Food(new Vector2(random.Next(CellManager.simulationArea.X, CellManager.simulationArea.X + CellManager.simulationArea.Width), random.Next(CellManager.simulationArea.Y, CellManager.simulationArea.Y + CellManager.simulationArea.Height)))
+                        }
+                    );
+            }
         }
 
         public void AddObjects(GameObject[] gs)
@@ -51,11 +74,11 @@ namespace Gymnasiearbete
 
             if (sectors.ContainsKey(new Point(x, y)))
             {
-                foreach (GameObject g in sectors[new Point(x, y)])
+                foreach (GameObject g in sectors[new Point(x, y)].Content())
                 {
                     if (debugType == 1 || debugType == 0)
                     {
-                        output += "{" + objects.IndexOf(g) + "-" + g.GetType().ToString().Split('.')[1] + "}";
+                        output += "{" + objects.Content().IndexOf(g) + "-" + g.GetType().ToString().Split('.')[1] + "}";
                     }
                     if (debugType == 2 || debugType == 0)
                     {
@@ -97,19 +120,16 @@ namespace Gymnasiearbete
 
             civilazationTime += gameTime.ElapsedGameTime.TotalSeconds;
 
-            int foodCount = 0;
-            int cellCount = 0;
-
             //Clearar sectorer
-            foreach (KeyValuePair<Point, List<GameObject>> s in sectors)
+            foreach (KeyValuePair<Point, Sectorcontent> s in sectors)
             {
                 s.Value.Clear();
             }
 
             //Ofixerad Updatering
-            for (int i = 0; i < objects.Count; i++)
+            for (int i = 0; i < objects.Content().Count; i++)
             {
-                GameObject g = objects[i];
+                GameObject g = objects.Content()[i];
 
                 if (g.isMarkedForDelete)
                 {
@@ -135,7 +155,7 @@ namespace Gymnasiearbete
                         {
                             if (!sectors.ContainsKey(new Point(x, y)))
                             {
-                                sectors.Add(new Point(x, y), new List<GameObject>());
+                                sectors.Add(new Point(x, y), new Sectorcontent());
                             }
                             sectors[new Point(x, y)].Add(g);
                         }
@@ -154,11 +174,10 @@ namespace Gymnasiearbete
             }
 
             //FixeradUpdatering
-            foreach (GameObject g in objects)
+            foreach (GameObject g in objects.Content())
             {
                 if (IsCell(g))
                 {
-                    cellCount++;
                     Cell c = (Cell)g;
                     List<GameObject> detectionCheck = new List<GameObject>();
 
@@ -173,14 +192,14 @@ namespace Gymnasiearbete
                         {
                             if (!sectors.ContainsKey(new Point(x, y)))
                             {
-                                sectors.Add(new Point(x, y), new List<GameObject>());
+                                sectors.Add(new Point(x, y), new Sectorcontent());
                             }
 
-                            for (int i = 0; i < sectors[new Point(x, y)].Count; i++)
+                            for (int i = 0; i < sectors[new Point(x, y)].Content().Count; i++)
                             {
-                                if (!detectionCheck.Contains(sectors[new Point(x, y)][i]))
+                                if (!detectionCheck.Contains(sectors[new Point(x, y)].Content()[i]))
                                 {
-                                    detectionCheck.Add(sectors[new Point(x, y)][i]);
+                                    detectionCheck.Add(sectors[new Point(x, y)].Content()[i]);
                                 }
                             }
                         }
@@ -189,8 +208,6 @@ namespace Gymnasiearbete
                     c.Update(detectionCheck, random);
                 }
             }
-
-            foodCount = objects.Count - cellCount;
 
             //MatSpawn
             spawnTimer++;
@@ -212,7 +229,7 @@ namespace Gymnasiearbete
                     );
             }
 
-            if (cellCount <= 0)
+            if (objects.Cells().Count() <= 0)
             {
                 simulationEnd = true;
             }
@@ -220,7 +237,7 @@ namespace Gymnasiearbete
 
         public void Draw(GraphicsDevice graphicsDevice, Camera camera)
         {
-            foreach (GameObject g in objects)
+            foreach (GameObject g in objects.Content())
             {
                 Color clr = Color.White;
                 Circle.UnitCircle uc = Circle.UnitCircle.Point8;

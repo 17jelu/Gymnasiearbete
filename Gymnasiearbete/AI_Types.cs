@@ -15,6 +15,7 @@ namespace Gymnasiearbete
         string dataPath;
         List<Memory> memory = new List<Memory>();
         public Memory lastMemory;
+        public GameObject lastIntresst;
         protected string[] choises = new string[0];
 
         //public int preformancepoints = 0;
@@ -250,6 +251,7 @@ namespace Gymnasiearbete
         {
             GameObject intresst = null;
 
+            lastIntresst = intresst;
             Decision(cell, intresst);
         }
 
@@ -400,6 +402,7 @@ namespace Gymnasiearbete
                 }
             }
 
+            lastIntresst = intresst;
             Decision(cell, intresst);
         }
 
