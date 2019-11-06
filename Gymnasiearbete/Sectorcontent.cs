@@ -12,12 +12,13 @@ namespace Gymnasiearbete
         List<Cell> cell = new List<Cell>();
         List<GameObject> other = new List<GameObject>();
 
-        public List<GameObject> Content()
+        public List<GameObject> All()
         {
             List<GameObject> content = new List<GameObject>();
 
             content.AddRange(food);
             content.AddRange(cell);
+            content.AddRange(other);
 
             return content;
         }
@@ -37,7 +38,7 @@ namespace Gymnasiearbete
             return other;
         }
 
-        public Dictionary<Cell, Vector2> cellDestination()
+        public Dictionary<Cell, Vector2> CellDestination()
         {
             Dictionary<Cell, Vector2> destination = new Dictionary<Cell, Vector2>();
             foreach (Cell c in cell)

@@ -15,7 +15,14 @@ namespace Gymnasiearbete
     class CellManager
     {
         public double civilazationTime = 0;
-        Sectorcontent objects = new Sectorcontent();
+        Sectorcontent content = new Sectorcontent();
+        public Sectorcontent Content
+        {
+            get
+            {
+                return content;
+            }
+        }
 
         public static Rectangle simulationArea;
 
@@ -37,7 +44,7 @@ namespace Gymnasiearbete
         {
             simulationArea = new Rectangle(simulationAreaSet.X * SectorSize, simulationAreaSet.Y * SectorSize, simulationAreaSet.Width * SectorSize, simulationAreaSet.Height * SectorSize);
 
-            AddObjects
+            Content.AddRange
                 (
                     new GameObject[]
                     {
@@ -51,7 +58,7 @@ namespace Gymnasiearbete
 
             for (int i = 0; i < 10; i++)
             {
-                AddObjects
+                Content.AddRange
                     (
                         new GameObject[1]
                         {
@@ -59,11 +66,6 @@ namespace Gymnasiearbete
                         }
                     );
             }
-        }
-
-        public void AddObjects(GameObject[] gs)
-        {
-            objects.AddRange(gs);
         }
 
         public string DebugSector(float Xposition, float Yposition, int debugType = 0)
@@ -74,11 +76,11 @@ namespace Gymnasiearbete
 
             if (sectors.ContainsKey(new Point(x, y)))
             {
-                foreach (GameObject g in sectors[new Point(x, y)].Content())
+                foreach (GameObject g in sectors[new Point(x, y)].All())
                 {
                     if (debugType == 1 || debugType == 0)
                     {
-                        output += "{" + objects.Content().IndexOf(g) + "-" + g.GetType().ToString().Split('.')[1] + "}";
+                        output += "{" + Content.All().IndexOf(g) + "-" + g.GetType().ToString().Split('.')[1] + "}";
                     }
                     if (debugType == 2 || debugType == 0)
                     {
@@ -127,9 +129,9 @@ namespace Gymnasiearbete
             }
 
             //Ofixerad Updatering
-            for (int i = 0; i < objects.Content().Count; i++)
+            for (int i = 0; i < Content.All().Count; i++)
             {
-                GameObject g = objects.Content()[i];
+                GameObject g = Content.All()[i];
 
                 if (g.isMarkedForDelete)
                 {
@@ -140,7 +142,7 @@ namespace Gymnasiearbete
                         c.AI.MemoryFileWrite();
                     }
 
-                    objects.Remove(g);
+                    Content.Remove(g);
                 }
                 else
                 {
@@ -167,14 +169,14 @@ namespace Gymnasiearbete
 
                         if (c.isMarkForReproduce)
                         {
-                            this.AddObjects(new GameObject[1] { c.Reproduce(random) });
+                            Content.AddRange(new GameObject[1] { c.Reproduce(random) });
                         }
                     }
                 }
             }
 
             //FixeradUpdatering
-            foreach (GameObject g in objects.Content())
+            foreach (GameObject g in Content.All())
             {
                 if (IsCell(g))
                 {
@@ -195,11 +197,11 @@ namespace Gymnasiearbete
                                 sectors.Add(new Point(x, y), new Sectorcontent());
                             }
 
-                            for (int i = 0; i < sectors[new Point(x, y)].Content().Count; i++)
+                            for (int i = 0; i < sectors[new Point(x, y)].All().Count; i++)
                             {
-                                if (!detectionCheck.Contains(sectors[new Point(x, y)].Content()[i]))
+                                if (!detectionCheck.Contains(sectors[new Point(x, y)].All()[i]))
                                 {
-                                    detectionCheck.Add(sectors[new Point(x, y)].Content()[i]);
+                                    detectionCheck.Add(sectors[new Point(x, y)].All()[i]);
                                 }
                             }
                         }
@@ -214,7 +216,7 @@ namespace Gymnasiearbete
             if (spawnTimer > 60)
             {
                 spawnTimer = 0;
-                AddObjects(
+                Content.AddRange(
                     new GameObject[1]
                     {
                         new Food
@@ -229,7 +231,7 @@ namespace Gymnasiearbete
                     );
             }
 
-            if (objects.Cells().Count() <= 0)
+            if (content.Cells().Count() <= 0)
             {
                 simulationEnd = true;
             }
@@ -237,7 +239,7 @@ namespace Gymnasiearbete
 
         public void Draw(GraphicsDevice graphicsDevice, Camera camera)
         {
-            foreach (GameObject g in objects.Content())
+            foreach (GameObject g in Content.All())
             {
                 Color clr = Color.White;
                 Circle.UnitCircle uc = Circle.UnitCircle.Point8;
