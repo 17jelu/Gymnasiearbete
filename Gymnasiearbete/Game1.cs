@@ -56,6 +56,7 @@ namespace Gymnasiearbete
 
             // Jesper
             SGBasicEffect.Initialize(GraphicsDevice);
+            SGScreen.Initialize(Window.ClientBounds);
             grid = new Grid();
             camera = new Camera(Vector2.Zero);
 
@@ -161,6 +162,29 @@ namespace Gymnasiearbete
             base.Draw(gameTime);
 
             SGBasicEffect.ApplyCurrentTechnique();
+
+            for (int y = 0; y < 10; y++)
+            {
+                for (int x = 0; x < 10; x++)
+                {
+                    Point p = new Point(x, y);
+                    if (CM.Sectors.ContainsKey(p))
+                    {
+                        SectorContent sector = CM.Sectors[p];
+                        // draw code ...
+                        for (int i = 0; i < sector.Cells.Count; i++)
+                        {
+                            new Circle(
+                                Circle.UnitCircle.Point8,
+                                GraphicsDevice,
+                                Color.Red,
+                                sector.Cells[i].Size,
+                                sector.Cells[i].Position
+                            ).Render(GraphicsDevice);
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
