@@ -3,7 +3,21 @@ using Microsoft.Xna.Framework;
 
 namespace Gymnasiearbete
 {
-    class SGBasicEffect
+    static class SGScreen
+    {
+        static Rectangle area;
+        public static Rectangle Area
+        {
+            get { return area; }
+            set { area = value; }
+        }
+
+        public static void Initialize(Rectangle ClientBounds)
+        {
+            area = ClientBounds;
+        }
+    }
+    static class SGBasicEffect
     {
         static BasicEffect effect;
         public static BasicEffect Effect
