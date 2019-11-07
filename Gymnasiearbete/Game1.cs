@@ -100,7 +100,7 @@ namespace Gymnasiearbete
                 this.Exit();
             }
 
-            if (Keyboard.GetState().IsKeyDown(Keys.R) && restart == false)
+            if (Keyboard.GetState().IsKeyDown(Keys.R) && restart == false || CM.simulationEnd)
             {
                 Initialize();
                 restart = true;
