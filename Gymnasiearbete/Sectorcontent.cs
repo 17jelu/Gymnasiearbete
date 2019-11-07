@@ -23,19 +23,19 @@ namespace Gymnasiearbete
             return content;
         }
 
-        public List<Food> Foods()
+        public List<Food> Foods
         {
-            return food;
+            get { return food; }
         }
 
-        public List<Cell> Cells()
+        public List<Cell> Cells
         {
-            return cell;
+            get { return cell; }
         }
 
-        public List<GameObject> Others()
+        public List<GameObject> Others
         {
-            return other;
+            get { return other; }
         }
 
         public Dictionary<Cell, Vector2> CellDestination()
