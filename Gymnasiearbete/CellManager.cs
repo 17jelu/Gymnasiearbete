@@ -39,6 +39,13 @@ namespace Gymnasiearbete
         }
 
         Dictionary<Point, SectorContent> sectors = new Dictionary<Point, SectorContent>();
+        public Dictionary<Point, SectorContent> Sectors
+        {
+            get
+            {
+                return sectors;
+            }
+        }
 
         public CellManager(Rectangle simulationAreaSet, Random random)
         {
