@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -19,7 +20,16 @@ namespace Gymnasiearbete
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        SpriteFont spriteFont;
+
         Grid grid;
+
+        CellManager CM;
+        public static string debugMessage = "";
+
+        public Random random;
+
+        bool restart = false;
 
         public Game1()
         {
@@ -35,10 +45,19 @@ namespace Gymnasiearbete
         /// </summary>
         protected override void Initialize()
         {
-            IsMouseVisible = true;
-
             // TODO: Add your initialization logic here
-            grid = new Grid();
+            IsMouseVisible = true;
+            Window.AllowUserResizing = true;
+            if (!graphics.IsFullScreen)
+            {
+                graphics.ToggleFullScreen();
+            }
+
+            random = new Random();
+
+            CM = new CellManager(new Rectangle(3, 1, 7, 5), random);
+
+            grid = new Grid(CellManager.simulationArea);
 
             base.Initialize();
         }
@@ -51,6 +70,7 @@ namespace Gymnasiearbete
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            spriteFont = Content.Load<SpriteFont>("FontDefault");
 
             // TODO: use this.Content to load your game content here
             grid.LoadContent(GraphicsDevice);
@@ -65,6 +85,8 @@ namespace Gymnasiearbete
             // TODO: Unload any non ContentManager content here
         }
 
+        float tick = 0;
+
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -73,10 +95,55 @@ namespace Gymnasiearbete
         protected override void Update(GameTime gameTime)
         {
             // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
                 this.Exit();
+            }
 
-            // TODO: Add your update logic here
+            if (Keyboard.GetState().IsKeyDown(Keys.R) && restart == false || CM.simulationEnd)
+            {
+                Initialize();
+                restart = true;
+            }
+
+            if (Keyboard.GetState().IsKeyUp(Keys.R) && restart == true)
+            {
+                restart = false;
+            }
+
+            int h = (int)(Math.Floor((CM.civilazationTime) / 60) / 60);
+            int m = (int)(Math.Floor(CM.civilazationTime) / 60) - (60 * h);
+            int s = (int)Math.Floor(CM.civilazationTime) - (60 * m);
+            debugMessage = "";
+            if (h > 0){debugMessage += " h:" + h;}
+            if (m > 0){debugMessage += " m:" + m;}
+            debugMessage += " s:" + s;
+
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Space))
+            {
+                CM.pause = true;
+                int debugType = 0;
+                if (Keyboard.GetState().IsKeyDown(Keys.D1))
+                {
+                    debugType = 1;
+                }
+                if (Keyboard.GetState().IsKeyDown(Keys.D2))
+                {
+                    debugType = 2;
+                }
+                if (Keyboard.GetState().IsKeyDown(Keys.D3))
+                {
+                    debugType = 3;
+                }
+                debugMessage = CM.DebugSector(Mouse.GetState().X, Mouse.GetState().Y, debugType);
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Q))
+            {
+                CM.pause = false;
+            }
+            CM.Update(random, gameTime);
+            
 
             base.Update(gameTime);
         }
@@ -93,11 +160,14 @@ namespace Gymnasiearbete
         protected override void Draw(GameTime gameTime)
         {
             // TODO: Add your drawing code here
+            spriteBatch.Begin();
+            grid.Draw(GraphicsDevice, spriteBatch, camera);
 
-            grid.Draw(GraphicsDevice, spriteBatch, camera.X, camera.Y);
-            camera.X += 0.010f;
-            camera.Y += 0.0025f;
-            
+            CM.Draw(GraphicsDevice, camera);
+
+            spriteBatch.DrawString(spriteFont, debugMessage, new Vector2(4, 10), Color.Gold);
+
+            spriteBatch.End();
             base.Draw(gameTime);
         }
     }
