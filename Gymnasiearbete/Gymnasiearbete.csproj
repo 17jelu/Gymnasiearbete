@@ -84,6 +84,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Game1.cs" />
+    <Compile Include="Render.cs" />
     <Compile Include="Sectorcontent.cs" />
     <Compile Include="StaticGlobals.cs" />
   </ItemGroup>
