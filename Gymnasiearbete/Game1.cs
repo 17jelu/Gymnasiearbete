@@ -164,9 +164,9 @@ namespace Gymnasiearbete
             SGBasicEffect.ApplyCurrentTechnique();
 
             if (CM.Content.Cells.Count > 0)
-                camera.Position = CM.Content.Cells[0].Position - new Vector2(
-                    SGScreen.Area.Width / 2,
-                    SGScreen.Area.Height / 2);
+                camera.Position = (CM.Content.Cells[0].Position - new Vector2(
+                    SGScreen.Area.Width / (2 * camera.Zoom),
+                    SGScreen.Area.Height / (2 * camera.Zoom)));
 
             for (int y = 0; y < 10; y++)
             {
@@ -192,7 +192,7 @@ namespace Gymnasiearbete
                         for (int i = 0; i < sector.Cells.Count; i++)
                         {
                             new Circle(
-                                Circle.UnitCircle.Point8,
+                                Circle.UnitCircle.Point16,
                                 GraphicsDevice,
                                 Color.Red,
                                 sector.Cells[i].Size * camera.Zoom,
