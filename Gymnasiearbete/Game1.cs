@@ -29,9 +29,6 @@ namespace Gymnasiearbete
 
         public Random random;
 
-        public static bool DEBUGMUTERENDER = false;
-        public static bool DEBUGMUTEAI = false;
-
         bool restart = false;
 
         public Game1()
@@ -50,14 +47,17 @@ namespace Gymnasiearbete
         {
             // TODO: Add your initialization logic here
             IsMouseVisible = true;
+            Window.AllowUserResizing = true;
+            if (!graphics.IsFullScreen)
+            {
+                graphics.ToggleFullScreen();
+            }
 
             random = new Random();
-            
-            grid = new Grid(Window.ClientBounds);
 
-            CM = new CellManager(new Rectangle(0, 0, 8, 5), random);
+            CM = new CellManager(new Rectangle(3, 1, 7, 5), random);
 
-            Window.AllowUserResizing = true;
+            grid = new Grid(CellManager.simulationArea);
 
             base.Initialize();
         }
