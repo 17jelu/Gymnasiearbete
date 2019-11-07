@@ -18,18 +18,18 @@ namespace Gymnasiearbete
     public class Game1 : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
-
+        
+        // Martin
         SpriteFont spriteFont;
-
-        Grid grid;
-
         CellManager CM;
         public static string debugMessage = "";
-
         public Random random;
-
         bool restart = false;
+
+        // Jesper
+        SpriteBatch spriteBatch;
+        Grid grid;
+        Camera camera;
 
         public Game1()
         {
@@ -48,16 +48,16 @@ namespace Gymnasiearbete
             // TODO: Add your initialization logic here
             IsMouseVisible = true;
             Window.AllowUserResizing = true;
-            if (!graphics.IsFullScreen)
-            {
-                graphics.ToggleFullScreen();
-            }
+            Window.ClientSizeChanged += new EventHandler<EventArgs>(OnResize);
 
+            // Martin
             random = new Random();
-
             CM = new CellManager(new Rectangle(3, 1, 7, 5), random);
 
-            grid = new Grid(CellManager.simulationArea);
+            // Jesper
+            SGBasicEffect.Initialize(GraphicsDevice);
+            grid = new Grid();
+            camera = new Camera(Vector2.Zero);
 
             base.Initialize();
         }
@@ -73,7 +73,7 @@ namespace Gymnasiearbete
             spriteFont = Content.Load<SpriteFont>("FontDefault");
 
             // TODO: use this.Content to load your game content here
-            grid.LoadContent(GraphicsDevice);
+            // grid.LoadContent(GraphicsDevice);
         }
 
         /// <summary>
@@ -84,8 +84,6 @@ namespace Gymnasiearbete
         {
             // TODO: Unload any non ContentManager content here
         }
-
-        float tick = 0;
 
         /// <summary>
         /// Allows the game to run logic such as updating the world,
@@ -148,11 +146,6 @@ namespace Gymnasiearbete
             base.Update(gameTime);
         }
 
-        #region TEMPORARY - USED FOR DEBUGGING
-        // Comment created 2019-10-01 14:33
-        Camera camera = new Camera(Vector2.Zero);
-        #endregion
-
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
@@ -161,14 +154,24 @@ namespace Gymnasiearbete
         {
             // TODO: Add your drawing code here
             spriteBatch.Begin();
-            grid.Draw(GraphicsDevice, spriteBatch, camera);
-
-            CM.Draw(GraphicsDevice, camera);
 
             spriteBatch.DrawString(spriteFont, debugMessage, new Vector2(4, 10), Color.Gold);
 
             spriteBatch.End();
             base.Draw(gameTime);
+
+            SGBasicEffect.ApplyCurrentTechnique();
+        }
+
+        /// <summary>
+        /// Thingy thingy that happens when a user resizes the screen
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void OnResize(Object sender, EventArgs e)
+        {
+            Console.WriteLine(sender.ToString());
+            SGBasicEffect.Resize(GraphicsDevice);
         }
     }
 }
