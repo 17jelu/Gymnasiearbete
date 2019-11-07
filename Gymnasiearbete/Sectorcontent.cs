@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace Gymnasiearbete
 {
-    class Sectorcontent
+    class SectorContent
     {
         List<Food> food = new List<Food>();
         List<Cell> cell = new List<Cell>();
