@@ -238,7 +238,7 @@ namespace Gymnasiearbete
                     );
             }
 
-            if (content.Cells().Count() <= 0)
+            if (content.Cells.Count() <= 0)
             {
                 simulationEnd = true;
             }
