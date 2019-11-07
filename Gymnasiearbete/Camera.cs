@@ -21,6 +21,7 @@ namespace Gymnasiearbete
         public Camera(Vector2 position) // Temporary? | +2019-10-01 14:33
         {
             pos = position;
+            zoom = 1f;
         }
     }
 }

@@ -163,6 +163,11 @@ namespace Gymnasiearbete
 
             SGBasicEffect.ApplyCurrentTechnique();
 
+            if (CM.Content.Cells.Count > 0)
+                camera.Position = CM.Content.Cells[0].Position - new Vector2(
+                    SGScreen.Area.Width / 2,
+                    SGScreen.Area.Height / 2);
+
             for (int y = 0; y < 10; y++)
             {
                 for (int x = 0; x < 10; x++)
@@ -172,14 +177,26 @@ namespace Gymnasiearbete
                     {
                         SectorContent sector = CM.Sectors[p];
                         // draw code ...
+                        // Draw Food
+                        for (int i = 0; i < sector.Foods.Count; i++)
+                        {
+                            new Circle(
+                                Circle.UnitCircle.Point8,
+                                GraphicsDevice,
+                                Color.LawnGreen,
+                                sector.Foods[i].Size * camera.Zoom,
+                                (sector.Foods[i].Position - camera.Position) * camera.Zoom
+                            ).Render(GraphicsDevice);
+                        }
+                        // Draw Cells
                         for (int i = 0; i < sector.Cells.Count; i++)
                         {
                             new Circle(
                                 Circle.UnitCircle.Point8,
                                 GraphicsDevice,
                                 Color.Red,
-                                sector.Cells[i].Size,
-                                sector.Cells[i].Position
+                                sector.Cells[i].Size * camera.Zoom,
+                                (sector.Cells[i].Position - camera.Position) * camera.Zoom
                             ).Render(GraphicsDevice);
                         }
                     }
