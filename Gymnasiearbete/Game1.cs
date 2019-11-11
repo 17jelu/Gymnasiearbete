@@ -27,7 +27,7 @@ namespace Gymnasiearbete
         CellManager CM;
         public static string debugMessage = "";
 
-        public Random random;
+        public static Random random;
 
         bool restart = false;
 
@@ -50,14 +50,14 @@ namespace Gymnasiearbete
             Window.AllowUserResizing = true;
             if (!graphics.IsFullScreen)
             {
-                graphics.ToggleFullScreen();
+                //graphics.ToggleFullScreen();
             }
 
             random = new Random();
 
             CM = new CellManager(new Rectangle(3, 1, 7, 5), random);
 
-            grid = new Grid(CellManager.simulationArea);
+            grid = new Grid(Window.ClientBounds);
 
             base.Initialize();
         }

@@ -41,17 +41,17 @@ namespace Gymnasiearbete
 
         protected Random r;
 
-        public AI(Random random, string familySet)
+        public AI(Cell parent, Cell cell)
         {
-            r = random;
+            r = Game1.random;
+            if (parent != null && cell != null)
+            {
+                idleDestination = new P(cell.Position);
+                direction = -parent.AI.Direction;
+                family = parent.AI.family;
+            }
 
-            idleDestination = new P(
-                new Vector2(
-                    r.Next(CellManager.simulationArea.X, CellManager.simulationArea.X + CellManager.simulationArea.Width),
-                    r.Next(CellManager.simulationArea.Y, CellManager.simulationArea.Y + CellManager.simulationArea.Height)
-                    ));
-            family = familySet;
-
+            
             if (!DEBUGNOMEMORYSAVE)
             {
                 MemoryFileLoad();
@@ -246,6 +246,28 @@ namespace Gymnasiearbete
             return "{" + result + "}";
         }
 
+        public static AI GetAI(AIType type, Cell parent, Cell cell)
+        {
+            switch (type)
+            {
+                case AIType.NoBrain:
+                default:
+                    //NoBrain
+                    break;
+
+                case AIType.CloseTargeting:
+                    return new AI_ClosestTargetingLearn(parent, cell);
+                    break;
+            }
+            return new AI_NoBrain();
+        }
+
+        public enum AIType
+        {
+            NoBrain,
+            CloseTargeting
+        }
+
         public void AIR(Cell cell, List<GameObject> percivableObjects)
         {
             Intresst(cell, percivableObjects);
@@ -290,105 +312,15 @@ namespace Gymnasiearbete
 
     class AI_NoBrain : AI
     {
-        public AI_NoBrain(Random random, string familySet) : base(random, familySet)
+        public AI_NoBrain() : base(null, null)
         {
             choises = new string[0];
         }
     }
 
-    class AI_ClosestTargeting : AI
-    {
-        public AI_ClosestTargeting(Random random, string familySet) : base(random, familySet)
-        {
-            choises = new string[3] { "IDLE", "MOVETO", "MOVEFROM" };
-        }
-
-        protected override void Intresst(Cell cell, List<GameObject> percivableObjects)
-        {
-            GameObject intresst = null;
-            if (percivableObjects.Count > 0)
-            {
-                intresst = percivableObjects[0];
-
-                foreach (GameObject g in percivableObjects)
-                {
-                    if (
-                        Math.Pow(g.Position.X - cell.Position.X, 2) + Math.Pow(g.Position.Y - cell.Position.Y, 2) <=
-                        Math.Pow(intresst.Position.X - cell.Position.X, 2) + Math.Pow(intresst.Position.Y - cell.Position.Y, 2)
-                        )
-                    {
-                        intresst = g;
-                    }
-                }
-            }
-
-            Decision(cell, intresst);
-        }
-
-        protected override void Decision(Cell cell, GameObject intresst)
-        {
-            if (intresst == null)
-            {
-                Actions(cell, choises[0], new int[2] { 0, 0 });
-                return;
-            }
-            else
-            if (intresst.GetType() == typeof(Cell))
-            {
-                if (intresst.Size > Cell.consumeScale * cell.Size)
-                {
-                    Vector2 direction = intresst.Position - cell.Position;
-                    Actions(cell, choises[2], new int[2] { (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) });
-                    return;
-                }
-                else
-                if (cell.Size > Cell.consumeScale * intresst.Size && cell.Speed > intresst.Speed)
-                {
-                    Vector2 direction = intresst.Position - cell.Position;
-                    Actions(cell, choises[1], new int[2] { (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) });
-                    return;
-                }
-                else
-                {
-                    Actions(cell, choises[0], new int[2] { 0, 0 });
-                    return;
-                }
-            }
-            else
-            if (intresst.GetType() == typeof(Food))
-            {
-                Vector2 direction = intresst.Position - cell.Position;
-                Actions(cell, choises[1], new int[2] { (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) });
-                return;
-            }
-
-            Actions(cell, choises[0], new int[2] { 0, 0 });
-        }
-
-        protected override void Actions(Cell cell, string decision, int[] parameters)
-        {
-            Vector2 direction = new Vector2(parameters[0], parameters[1]);
-            switch (decision)
-            {
-                case "IDLE":
-                    //cell.Move(idleDirection);
-                    break;
-
-                case "MOVETO":
-                    cell.Move(direction);
-                    break;
-
-                case "MOVEFROM":
-                    cell.Move(-direction);
-                    break;
-
-            }
-        }
-    }
-
     class AI_ClosestTargetingLearn : AI
     {
-        public AI_ClosestTargetingLearn(Random random, string familySet) : base(random, familySet)
+        public AI_ClosestTargetingLearn(Cell parent, Cell cell) : base(parent, cell)
         {
             choises = new string[] { "MOVETO", "MOVEFROM", "IDLE"};
         }
@@ -452,8 +384,8 @@ namespace Gymnasiearbete
             if (Math.Pow(idleDestination.Position.X - cell.Position.X, 2) + Math.Pow(idleDestination.Position.Y - cell.Position.Y, 2) < 5)
             {
                 idleDestination.SetPosition(new Vector2(
-                    r.Next(CellManager.simulationArea.X, CellManager.simulationArea.X + CellManager.simulationArea.Width),
-                    r.Next(CellManager.simulationArea.Y, CellManager.simulationArea.Y + CellManager.simulationArea.Height)
+                    r.Next((int)Math.Floor(cell.Position.X - cell.Detectionrange), (int)Math.Floor(cell.Position.X + cell.Detectionrange)),
+                    r.Next((int)Math.Floor(cell.Position.Y - cell.Detectionrange), (int)Math.Floor(cell.Position.Y + cell.Detectionrange))
                     ));
             }
 

@@ -46,16 +46,14 @@ namespace Gymnasiearbete
         {
             graphicsDevice.Clear(BACKGROUND_COLOR);
 
-            horizontalR.X = CellManager.simulationArea.X;
-            horizontalR.Y = CellManager.simulationArea.Y + (horizontalR.Height - (int)camera.Y % tileWidth);
+            horizontalR.Y = (horizontalR.Height - (int)camera.Y % tileWidth);
             for (int i = 0; i < (verticalR.Height / tileWidth) + 2; i++)
             {
                 spriteBatch.Draw(texture, horizontalR, LINE_COLOR);
                 horizontalR.Y += tileWidth;
             }
 
-            verticalR.X = CellManager.simulationArea.X + (verticalR.Width - (int)camera.X % tileWidth);
-            verticalR.Y = CellManager.simulationArea.Y;
+            verticalR.X = (verticalR.Width - (int)camera.X % tileWidth);
             for (int i = 0; i < (horizontalR.Width / tileWidth) + 2; i++)
             {
                 spriteBatch.Draw(texture, verticalR, LINE_COLOR);

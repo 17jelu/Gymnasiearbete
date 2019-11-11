@@ -52,14 +52,13 @@ namespace Gymnasiearbete
             }
         }
 
-        public Cell(CellManager setCellManager, AI aiSet, Vector2 startPosition, float dnaSize, float dnaSpeed, float dnaPerception) : base(startPosition)
+        public Cell(CellManager setCellManager, Cell parent, AI.AIType aiType, Vector2 startPosition, float dnaSize, float dnaSpeed, float dnaPerception) : base(startPosition)
         {
             CM = setCellManager;
-            ai = aiSet;
+            ai = AI.GetAI(aiType, parent, this);
             size = dnaSize;
             speed = dnaSpeed;
             perception = dnaPerception;
-
 
             energy = energyRequirement;
         }
@@ -80,7 +79,7 @@ namespace Gymnasiearbete
         {
             //ai.preformancepoints++;
             AI.MemoryFileWrite();
-            Cell cchild = new Cell(CM, new AI_ClosestTargetingLearn(new Random(), ai.family), Vector2.Zero, this.size, this.speed, this.perception);
+            Cell cchild = new Cell(CM, this, AI.AIType.CloseTargeting, Vector2.Zero, this.size, this.speed, this.perception);
 
             int mutationChance = 50;
             if (random.Next(100) < mutationChance)
@@ -90,9 +89,6 @@ namespace Gymnasiearbete
                 cchild.perception = Math.Max(1, cchild.perception + random.Next(-5, 5+1));
             }
 
-            Vector2 reverseDirection = -this.ai.Direction;
-            reverseDirection.Normalize();
-            cchild.ai.Direction = reverseDirection;
             cchild.position = this.position + cchild.ai.Direction * this.Detectionrange + cchild.ai.Direction * cchild.Detectionrange;
             return cchild;
         }
