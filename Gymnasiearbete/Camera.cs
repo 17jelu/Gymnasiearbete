@@ -11,20 +11,17 @@ namespace Gymnasiearbete
             set { pos = value; }
         }
 
-        public float X // Temporary? | +2019-10-01 14:54
+        private float zoom;
+        public float Zoom
         {
-            get { return pos.X; }
-            set { pos.X = value; }
-        }
-        public float Y // Temporary? | +2019-10-01 14:54
-        {
-            get { return pos.Y; }
-            set { pos.Y = value; }
+            get { return zoom; }
+            set { zoom = value; }
         }
 
         public Camera(Vector2 position) // Temporary? | +2019-10-01 14:33
         {
             pos = position;
+            zoom = 1f;
         }
     }
 }

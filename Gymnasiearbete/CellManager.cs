@@ -15,8 +15,8 @@ namespace Gymnasiearbete
     class CellManager
     {
         public double civilazationTime = 0;
-        Sectorcontent content = new Sectorcontent();
-        public Sectorcontent Content
+        SectorContent content = new SectorContent();
+        public SectorContent Content
         {
             get
             {
@@ -36,7 +36,14 @@ namespace Gymnasiearbete
             }
         }
 
-        Dictionary<Point, Sectorcontent> sectors = new Dictionary<Point, Sectorcontent>();
+        Dictionary<Point, SectorContent> sectors = new Dictionary<Point, SectorContent>();
+        public Dictionary<Point, SectorContent> Sectors
+        {
+            get
+            {
+                return sectors;
+            }
+        }
 
         public CellManager(Rectangle simulationAreaSet, Random random)
         {
@@ -141,7 +148,7 @@ namespace Gymnasiearbete
             civilazationTime += gameTime.ElapsedGameTime.TotalSeconds;
 
             //Clearar sectorer
-            foreach (KeyValuePair<Point, Sectorcontent> s in sectors)
+            foreach (KeyValuePair<Point, SectorContent> s in sectors)
             {
                 s.Value.Clear();
             }
@@ -175,7 +182,7 @@ namespace Gymnasiearbete
                         {
                             if (!sectors.ContainsKey(new Point(x, y)))
                             {
-                                sectors.Add(new Point(x, y), new Sectorcontent());
+                                sectors.Add(new Point(x, y), new SectorContent());
                             }
                             sectors[new Point(x, y)].Add(g);
                         }
@@ -212,7 +219,7 @@ namespace Gymnasiearbete
                         {
                             if (!sectors.ContainsKey(new Point(x, y)))
                             {
-                                sectors.Add(new Point(x, y), new Sectorcontent());
+                                sectors.Add(new Point(x, y), new SectorContent());
                             }
 
                             for (int i = 0; i < sectors[new Point(x, y)].All().Count; i++)
@@ -249,7 +256,7 @@ namespace Gymnasiearbete
                 }
             }
 
-            if (content.Cells().Count() <= 0)
+            if (content.Cells.Count() <= 0)
             {
                 simulationEnd = true;
             }
