@@ -3,7 +3,25 @@ using Microsoft.Xna.Framework;
 
 namespace Gymnasiearbete
 {
-    class Circle
+    class DrawObject
+    {
+        protected VertexPositionColor[] vertices;
+        /// <summary>
+        /// Used in Render() to tell how many triangles shall be rendered.
+        /// </summary>
+        protected int triangles;
+
+        public void Render(GraphicsDevice GraphicsDevice)
+        {
+            GraphicsDevice.DrawUserPrimitives<VertexPositionColor>(
+                PrimitiveType.TriangleStrip,
+                vertices,
+                0,
+                triangles);
+        }
+    }
+
+    class Circle : DrawObject
     {
         public enum UnitCircle
         {
@@ -11,33 +29,40 @@ namespace Gymnasiearbete
             Point16
         }
 
-        BasicEffect effect;
-        VertexPositionColor[] vertices;
-
         float radius;
         Vector2 pos;
+        Vector2[] preCalc;
 
-        /// <summary>
-        /// Used in Render() to tell how many triangles shall be rendered.
-        /// </summary>
-        int triangles;
-
-        public Circle(UnitCircle type, GraphicsDevice graphicsDevice, Color color, float radius, Vector2 position)
+        public Vector2 Position
         {
-            // Load BasicEffect
-            effect = new BasicEffect(graphicsDevice);
-            effect.VertexColorEnabled = true;
-            effect.Projection = Matrix.CreateOrthographicOffCenter
-                (0, graphicsDevice.Viewport.Width,     // left, right
-                graphicsDevice.Viewport.Height, 0,    // bottom, top
-                0, 1);
-            effect.CurrentTechnique.Passes[0].Apply();
+            get
+            {
+                return pos;
+            }
+            set
+            {
+                pos = value;
+            }
+        }
 
+        public float Radius
+        {
+            get { return radius; }
+            set { radius = value; }
+        }
+
+        public Color Color
+        {
+            get { return vertices[0].Color; }
+            set { UpdateColor(value); }
+        }
+
+        public Circle(UnitCircle type, Color color, float radius, Vector2 position)
+        {
             // Properties
             this.radius = radius;
             this.pos = position;
-
-            Vector2[] preCalc;
+            
             if (type == UnitCircle.Point16)
             {
                 vertices = new VertexPositionColor[16];
@@ -77,22 +102,108 @@ namespace Gymnasiearbete
             }
         }
 
-        public void Render(GraphicsDevice GraphicsDevice)
+        public void UpdateVertices()
         {
-            effect.CurrentTechnique.Passes[0].Apply();
-            GraphicsDevice.DrawUserPrimitives<VertexPositionColor>(
-                PrimitiveType.TriangleStrip,
-                vertices,
-                0,
-                triangles);
+            // Positionate each vertex
+            for (int i = 0, j = 0; i < vertices.Length; i++)
+            {
+                if (i == 0)
+                    vertices[0].Position = new Vector3(pos + preCalc[0] * radius, 0);
+                else
+                {
+                    if (i % 2 == 1)
+                    {
+                        j++;
+                        vertices[i].Position = new Vector3(pos + preCalc[j] * radius, 0);
+                    }
+                    else
+                    {
+                        vertices[i].Position = new Vector3(pos + preCalc[preCalc.Length - j] * radius, 0);
+                    }
+                }
+            }
+        }
+
+        private void UpdateColor(Color color)
+        {
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                vertices[i].Color = color;
+            }
         }
     }
 
-    class GraphicRectangle
+    /// <summary>
+    /// An abomination of a so called "line"
+    /// </summary>
+    class Line : DrawObject
     {
-        BasicEffect effect;
-        VertexPositionColor[] vertices;
+        public Color Color
+        {
+            get { return vertices[0].Color; }
+            set { UpdateColor(value); }
+        }
 
+        public Line()
+        {
+            triangles = 2;
+
+            vertices = new VertexPositionColor[4];
+            for (int i = 0; i < 4; i++)
+            {
+                vertices[i] = new VertexPositionColor(Vector3.Zero, Color.Black);
+            }
+        }
+
+        public void SetLine(Vector2 vector1, Vector2 vector2, Camera camera)
+        {
+            // 1 3 2 0
+            if (vector1.X < vector2.X)
+            {
+                vertices[1].Position.X = vector1.X;
+                vertices[1].Position.Y = vector1.Y - 1;
+                vertices[0].Position.X = vector1.X;
+                vertices[0].Position.Y = vector1.Y + 1;
+
+                vertices[3].Position.X = vector2.X;
+                vertices[3].Position.Y = vector2.Y - 1;
+                vertices[2].Position.X = vector2.X;
+                vertices[2].Position.Y = vector2.Y + 1;
+            }
+            else
+            {
+                vertices[3].Position.X = vector1.X;
+                vertices[3].Position.Y = vector1.Y - 1;
+                vertices[2].Position.X = vector1.X;
+                vertices[2].Position.Y = vector1.Y + 1;
+
+                vertices[1].Position.X = vector2.X;
+                vertices[1].Position.Y = vector2.Y - 1;
+                vertices[0].Position.X = vector2.X;
+                vertices[0].Position.Y = vector2.Y + 1;
+            }
+
+            // Align pos with Camera
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                vertices[i].Position.X -= camera.Position.X;
+                vertices[i].Position.X *= camera.Zoom;
+                vertices[i].Position.Y -= camera.Position.Y;
+                vertices[i].Position.Y *= camera.Zoom;
+            }
+        }
+
+        private void UpdateColor(Color color)
+        {
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                vertices[i].Color = color;
+            }
+        }
+    }
+
+    class GraphicRectangle : DrawObject
+    {
         Rect rect;
         private struct Rect
         {
@@ -128,12 +239,10 @@ namespace Gymnasiearbete
 
         public GraphicRectangle(BasicEffect effect, Color color, int x, int y, int width, int height)
         {
-            // Load BasicEffect
-            this.effect = effect;
-
             rect = new Rect(x, y, width, height);
 
             vertices = new VertexPositionColor[4];
+            triangles = 2;
 
             for (int i = 0; i < vertices.Length; i++)
             {
@@ -156,15 +265,6 @@ namespace Gymnasiearbete
 
             vertices[3].Position.X = rect.X + rect.Width;
             vertices[3].Position.Y = rect.Y;
-        }
-
-        public void Draw(GraphicsDevice GraphicsDevice)
-        {
-            GraphicsDevice.DrawUserPrimitives<VertexPositionColor>(
-                PrimitiveType.TriangleStrip,
-                vertices,
-                0,
-                2);
         }
     }
 }
