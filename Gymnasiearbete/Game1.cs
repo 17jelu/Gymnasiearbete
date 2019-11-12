@@ -57,6 +57,7 @@ namespace Gymnasiearbete
             // Jesper
             SGBasicEffect.Initialize(GraphicsDevice);
             SGScreen.Initialize(Window.ClientBounds);
+            Render.Initialize();
             grid = new Grid();
             camera = new Camera(Vector2.Zero);
 
@@ -142,7 +143,12 @@ namespace Gymnasiearbete
                 CM.pause = false;
             }
             CM.Update(random, gameTime);
-            
+
+            // Jesper
+            if (Keyboard.GetState().IsKeyDown(Keys.Up))
+                camera.Zoom += 0.005f;
+            if (Keyboard.GetState().IsKeyDown(Keys.Down))
+                camera.Zoom -= 0.005f;
 
             base.Update(gameTime);
         }
@@ -168,40 +174,7 @@ namespace Gymnasiearbete
                     SGScreen.Area.Width / (2 * camera.Zoom),
                     SGScreen.Area.Height / (2 * camera.Zoom)));
 
-            for (int y = 0; y < 10; y++)
-            {
-                for (int x = 0; x < 10; x++)
-                {
-                    Point p = new Point(x, y);
-                    if (CM.Sectors.ContainsKey(p))
-                    {
-                        SectorContent sector = CM.Sectors[p];
-                        // draw code ...
-                        // Draw Food
-                        for (int i = 0; i < sector.Foods.Count; i++)
-                        {
-                            new Circle(
-                                Circle.UnitCircle.Point8,
-                                GraphicsDevice,
-                                Color.LawnGreen,
-                                sector.Foods[i].Size * camera.Zoom,
-                                (sector.Foods[i].Position - camera.Position) * camera.Zoom
-                            ).Render(GraphicsDevice);
-                        }
-                        // Draw Cells
-                        for (int i = 0; i < sector.Cells.Count; i++)
-                        {
-                            new Circle(
-                                Circle.UnitCircle.Point16,
-                                GraphicsDevice,
-                                Color.Red,
-                                sector.Cells[i].Size * camera.Zoom,
-                                (sector.Cells[i].Position - camera.Position) * camera.Zoom
-                            ).Render(GraphicsDevice);
-                        }
-                    }
-                }
-            }
+            Render.Draw(CM, GraphicsDevice, camera);
         }
 
         /// <summary>
