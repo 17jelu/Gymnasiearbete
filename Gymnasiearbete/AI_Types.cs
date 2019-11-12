@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
 
 namespace Gymnasiearbete
@@ -257,7 +258,9 @@ namespace Gymnasiearbete
 
                 case AIType.CloseTargeting:
                     return new AI_ClosestTargetingLearn(parent, cell);
-                    break;
+
+                case AIType.Player:
+                    return new Player();
             }
             return new AI_NoBrain();
         }
@@ -265,7 +268,8 @@ namespace Gymnasiearbete
         public enum AIType
         {
             NoBrain,
-            CloseTargeting
+            CloseTargeting,
+            Player
         }
 
         public void AIR(Cell cell, List<GameObject> percivableObjects)
@@ -315,6 +319,60 @@ namespace Gymnasiearbete
         public AI_NoBrain() : base(null, null)
         {
             choises = new string[0];
+            lastMemory = new Memory("NULL", "0", "NULL");
+            lastIntresst = null;
+        }
+    }
+
+    class Player : AI
+    {
+        public Player() : base(null, null)
+        {
+            choises = new string[] { "W", "A", "S", "D", "WA", "WD", "SA", "SD" };
+            direction = new Vector2(1, 1);
+            lastMemory = new Memory("PLAYER", "0", "PLAYER");
+        }
+
+        protected override void Intresst(Cell cell, List<GameObject> percivableObjects)
+        {
+            Decision(cell, null);
+        }
+
+        protected override void Decision(Cell cell, GameObject intresst)
+        {
+            Vector2 dir = Vector2.Zero;
+
+            if (Keyboard.GetState().IsKeyDown(Keys.W))
+            {
+                dir += new Vector2(0, -1);
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.A))
+            {
+                dir += new Vector2(-1, 0);
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.D))
+            {
+                dir += new Vector2(1, 0);
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.S))
+            {
+                dir += new Vector2(0, 1);
+            }
+
+            if (dir != Vector2.Zero)
+            {
+                dir.Normalize();
+            }
+
+            Actions(cell, null, new int[] { (int)dir.X, (int)dir.Y });
+        }
+
+        protected override void Actions(Cell cell, string decision, int[] parameters)
+        {
+            cell.Move(new Vector2(parameters[0], parameters[1]));
         }
     }
 

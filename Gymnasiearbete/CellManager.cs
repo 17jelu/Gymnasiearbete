@@ -44,7 +44,7 @@ namespace Gymnasiearbete
 
             AI.AIType[] starterAI = new AI.AIType[starterCells]
             {
-                AI.AIType.CloseTargeting,
+                AI.AIType.Player,
                 AI.AIType.CloseTargeting,
                 AI.AIType.CloseTargeting,
                 AI.AIType.CloseTargeting,
