@@ -245,7 +245,7 @@ namespace Gymnasiearbete
         }
 
         public void Draw(GraphicsDevice graphicsDevice, Camera camera)
-        {
+        {/*
             foreach (GameObject g in Content.All())
             {
                 Color clr = Color.White;
@@ -268,6 +268,6 @@ namespace Gymnasiearbete
 
                 new Circle(uc, graphicsDevice, clr, (float)g.Size, g.Position - camera.Position).Render(graphicsDevice);
             }
-        }
+        */}
     }
 }
