@@ -146,50 +146,51 @@ namespace Gymnasiearbete
 
         public Line()
         {
-            triangles = 2;
-
-            vertices = new VertexPositionColor[4];
-            for (int i = 0; i < 4; i++)
+            vertices = new VertexPositionColor[2];
+            for (int i = 0; i < vertices.Length; i++)
             {
                 vertices[i] = new VertexPositionColor(Vector3.Zero, Color.Black);
             }
         }
 
-        public void SetLine(Vector2 vector1, Vector2 vector2, Camera camera)
+        public void SetLine(Vector2 vector1, Vector2 vector2)
         {
+            /*
             // 1 3 2 0
             if (vector1.X < vector2.X)
             {
                 vertices[1].Position.X = vector1.X;
-                vertices[1].Position.Y = vector1.Y - 1;
+                vertices[1].Position.Y = vector1.Y - GAP;
                 vertices[0].Position.X = vector1.X;
-                vertices[0].Position.Y = vector1.Y + 1;
+                vertices[0].Position.Y = vector1.Y + GAP;
 
                 vertices[3].Position.X = vector2.X;
-                vertices[3].Position.Y = vector2.Y - 1;
+                vertices[3].Position.Y = vector2.Y - GAP;
                 vertices[2].Position.X = vector2.X;
-                vertices[2].Position.Y = vector2.Y + 1;
+                vertices[2].Position.Y = vector2.Y + GAP;
             }
             else
             {
                 vertices[3].Position.X = vector1.X;
-                vertices[3].Position.Y = vector1.Y - 1;
+                vertices[3].Position.Y = vector1.Y - GAP;
                 vertices[2].Position.X = vector1.X;
-                vertices[2].Position.Y = vector1.Y + 1;
+                vertices[2].Position.Y = vector1.Y + GAP;
 
                 vertices[1].Position.X = vector2.X;
-                vertices[1].Position.Y = vector2.Y - 1;
+                vertices[1].Position.Y = vector2.Y - GAP;
                 vertices[0].Position.X = vector2.X;
-                vertices[0].Position.Y = vector2.Y + 1;
+                vertices[0].Position.Y = vector2.Y + GAP;
             }
+            /*/
+            vertices[0].Position.X = vector1.X;
+            vertices[0].Position.Y = vector1.Y;
+            vertices[1].Position.X = vector2.X;
+            vertices[1].Position.Y = vector2.Y;
 
             // Align pos with Camera
             for (int i = 0; i < vertices.Length; i++)
             {
-                vertices[i].Position.X -= camera.Position.X;
-                vertices[i].Position.X *= camera.Zoom;
-                vertices[i].Position.Y -= camera.Position.Y;
-                vertices[i].Position.Y *= camera.Zoom;
+                vertices[i].Position = Camera.GetRelativePosition(vertices[i].Position);
             }
         }
 
@@ -199,6 +200,15 @@ namespace Gymnasiearbete
             {
                 vertices[i].Color = color;
             }
+        }
+
+        new public void Render(GraphicsDevice GraphicsDevice)
+        {
+            GraphicsDevice.DrawUserPrimitives<VertexPositionColor>(
+                PrimitiveType.LineStrip,
+                vertices,
+                0,
+                1);
         }
     }
 
