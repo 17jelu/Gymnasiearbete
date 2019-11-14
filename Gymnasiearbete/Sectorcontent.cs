@@ -14,6 +14,7 @@ namespace Gymnasiearbete
 
         public List<GameObject> All()
         {
+            
             List<GameObject> content = new List<GameObject>();
 
             content.AddRange(food);

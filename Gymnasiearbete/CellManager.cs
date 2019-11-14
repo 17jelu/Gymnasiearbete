@@ -242,7 +242,7 @@ namespace Gymnasiearbete
             {
                 spawnTimer = 0;
 
-                foreach (Cell c in this.Content.Cells())
+                foreach (Cell c in this.Content.Cells)
                 {
                     int[] nORp = new int[] { -1, 1 };
                     Content.Add(

@@ -22,8 +22,8 @@ namespace Gymnasiearbete
         // Martin
         SpriteFont spriteFont;
         CellManager CM;
-        public static string debugMessage = "";
         public static Random random;
+        public static string debugMessage = "";
         bool restart = false;
 
         // Jesper

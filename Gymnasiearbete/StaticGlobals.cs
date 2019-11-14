@@ -1,10 +1,25 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace Gymnasiearbete
 {
     static class SGScreen
     {
+        /*
+        static Keyboard keyboard;
+        public static Keyboard Keyboard
+        {
+            get { return keyboard; }
+        }
+        */
+        static Random random = new Random();
+        public static Random Random
+        {
+            get { return random; }
+        }
+
         static Rectangle area;
         public static Rectangle Area
         {
