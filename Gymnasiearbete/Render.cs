@@ -37,7 +37,6 @@ namespace Gymnasiearbete
                         // Draw Cells
                         for (int i = 0; i < sector.Cells.Count; i++)
                         {
-                            circleCell.Color = Color.Red;
                             circleCell.Radius = sector.Cells[i].Size * Camera.Zoom;
                             circleCell.Position = Camera.GetRelativePosition(sector.Cells[i].Position);
                             circleCell.UpdateVertices();
