@@ -14,7 +14,7 @@ namespace Gymnasiearbete
             circleFood = new Circle(Circle.UnitCircle.Point8, Color.LawnGreen, 10f, Vector2.Zero);
             line = new Line();
         }
-        public static void Draw(CellManager CM, GraphicsDevice GraphicsDevice, Camera camera)
+        public static void Draw(CellManager CM, GraphicsDevice GraphicsDevice)
         {
             for (int y = 0; y < 10; y++)
             {
@@ -28,8 +28,8 @@ namespace Gymnasiearbete
                         // Draw Food
                         for (int i = 0; i < sector.Foods.Count; i++)
                         {
-                            circleFood.Radius = sector.Foods[i].Size * camera.Zoom;
-                            circleFood.Position = (sector.Foods[i].Position - camera.Position) * camera.Zoom;
+                            circleFood.Radius = sector.Foods[i].Size * Camera.Zoom;
+                            circleFood.Position = Camera.GetRelativePosition(sector.Foods[i].Position);
                             circleFood.UpdateVertices();
 
                             circleFood.Render(GraphicsDevice);
@@ -38,8 +38,8 @@ namespace Gymnasiearbete
                         for (int i = 0; i < sector.Cells.Count; i++)
                         {
                             circleCell.Color = Color.Red;
-                            circleCell.Radius = sector.Cells[i].Size * camera.Zoom;
-                            circleCell.Position = (sector.Cells[i].Position - camera.Position) * camera.Zoom;
+                            circleCell.Radius = sector.Cells[i].Size * Camera.Zoom;
+                            circleCell.Position = Camera.GetRelativePosition(sector.Cells[i].Position);
                             circleCell.UpdateVertices();
 
                             circleCell.Render(GraphicsDevice);
@@ -50,16 +50,16 @@ namespace Gymnasiearbete
                             if (true)//sector.Cells[i].AI.lastIntresst != null)
                             {
                                 circleCell.Color = Color.Black;
-                                circleCell.Radius = 2.5f * camera.Zoom;
-                                circleCell.Position = (sector.Cells[i].Position + (sector.Cells[i].AI.Direction) - camera.Position) * camera.Zoom;
+                                circleCell.Radius = 2.5f * Camera.Zoom;
+                                circleCell.Position = Camera.GetRelativePosition(sector.Cells[i].Position + sector.Cells[i].AI.Direction);
                                 circleCell.UpdateVertices();
                                 circleCell.Render(GraphicsDevice);
 
                                 line.Color = Color.Orange;
                                 line.SetLine(
                                     sector.Cells[i].Position,
-                                    sector.Cells[i].Position + (sector.Cells[i].AI.Direction),
-                                    camera);
+                                    sector.Cells[i].Position + (sector.Cells[i].AI.Direction)
+                                );
                                 line.Render(GraphicsDevice);
                             }
                         }

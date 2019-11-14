@@ -29,7 +29,6 @@ namespace Gymnasiearbete
         // Jesper
         SpriteBatch spriteBatch;
         Grid grid;
-        Camera camera;
 
         public Game1()
         {
@@ -59,7 +58,8 @@ namespace Gymnasiearbete
             SGScreen.Initialize(Window.ClientBounds);
             Render.Initialize();
             grid = new Grid();
-            camera = new Camera(Vector2.Zero);
+            Camera.Position = Vector2.Zero;
+            Camera.Zoom = 1f;
 
             base.Initialize();
         }
@@ -146,9 +146,9 @@ namespace Gymnasiearbete
 
             // Jesper
             if (Keyboard.GetState().IsKeyDown(Keys.Up))
-                camera.Zoom += 0.005f;
+                Camera.Zoom += 0.005f;
             if (Keyboard.GetState().IsKeyDown(Keys.Down))
-                camera.Zoom -= 0.005f;
+                Camera.Zoom -= 0.005f;
 
             base.Update(gameTime);
         }
@@ -170,11 +170,20 @@ namespace Gymnasiearbete
             SGBasicEffect.ApplyCurrentTechnique();
 
             if (CM.Content.Cells.Count > 0)
-                camera.Position = (CM.Content.Cells[0].Position - new Vector2(
-                    SGScreen.Area.Width / (2 * camera.Zoom),
-                    SGScreen.Area.Height / (2 * camera.Zoom)));
+            {
+                Camera.Position = Vector2.Lerp(Camera.Position, CM.Content.Cells[0].Position, 0.125f);
+                //Vector2.Lerp(
+                //    Camera.Position,
+                //    CM.Content.Cells[0].Position,
+                //    0.125f
+                //);
+                //Camera.Position -= new Vector2(
+                //    SGScreen.Area.Width / (2 * Camera.Zoom),
+                //    SGScreen.Area.Height / (2 * Camera.Zoom)
+                //);
+            }
 
-            Render.Draw(CM, GraphicsDevice, camera);
+            Render.Draw(CM, GraphicsDevice);
         }
 
         /// <summary>

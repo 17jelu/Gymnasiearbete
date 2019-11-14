@@ -2,26 +2,38 @@
 
 namespace Gymnasiearbete
 {
-    class Camera
+    struct Camera
     {
-        private Vector2 pos;
-        public Vector2 Position
+        private static Vector2 _pos;
+        public static Vector2 Position
         {
-            get { return pos; }
-            set { pos = value; }
+            get { return _pos; }
+            set { _pos = value; }
         }
 
-        private float zoom;
-        public float Zoom
+        private static float zoom;
+        public static float Zoom
         {
             get { return zoom; }
             set { zoom = value; }
         }
 
-        public Camera(Vector2 position) // Temporary? | +2019-10-01 14:33
+        public static Vector2 GetRelativePosition(Vector2 pos)
         {
-            pos = position;
-            zoom = 1f;
+            return ( pos - _pos ) * zoom +
+                new Vector2(
+                    SGScreen.Area.Width / 2,
+                    SGScreen.Area.Height / 2
+                );
+        }
+        public static Vector3 GetRelativePosition(Vector3 pos)
+        {
+            Vector3 temp = pos;
+
+            temp.X = (temp.X - _pos.X) * zoom + SGScreen.Area.Width / 2;
+            temp.Y = (temp.Y - _pos.Y) * zoom + SGScreen.Area.Height / 2;
+
+            return temp;
         }
     }
 }
