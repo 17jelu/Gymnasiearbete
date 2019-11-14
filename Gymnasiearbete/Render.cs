@@ -12,7 +12,7 @@ namespace Gymnasiearbete
         {
             circleCell = new Circle(Circle.UnitCircle.Point16, Color.Red, 10f, Vector2.Zero);
             circleFood = new Circle(Circle.UnitCircle.Point8, Color.LawnGreen, 10f, Vector2.Zero);
-            line = new Line();
+            line = new Line { Color = Color.Orange };
         }
         public static void Draw(CellManager CM, GraphicsDevice GraphicsDevice)
         {
@@ -47,21 +47,11 @@ namespace Gymnasiearbete
                         // Drawing Cells "destination"/"direction"
                         for (int i = 0; i < sector.Cells.Count; i++)
                         {
-                            if (true)//sector.Cells[i].AI.lastIntresst != null)
-                            {
-                                circleCell.Color = Color.Black;
-                                circleCell.Radius = 2.5f * Camera.Zoom;
-                                circleCell.Position = Camera.GetRelativePosition(sector.Cells[i].Position + sector.Cells[i].AI.Direction);
-                                circleCell.UpdateVertices();
-                                circleCell.Render(GraphicsDevice);
-
-                                line.Color = Color.Orange;
-                                line.SetLine(
-                                    sector.Cells[i].Position,
-                                    sector.Cells[i].Position + (sector.Cells[i].AI.Direction)
-                                );
-                                line.Render(GraphicsDevice);
-                            }
+                            line.SetLine(
+                                sector.Cells[i].Position,
+                                sector.Cells[i].Position + (sector.Cells[i].AI.Direction)
+                            );
+                            line.Render(GraphicsDevice);
                         }
                     }
                 }
