@@ -29,7 +29,6 @@ namespace Gymnasiearbete
         // Jesper
         SpriteBatch spriteBatch;
         Grid grid;
-        Camera camera;
 
         public Game1()
         {
@@ -60,8 +59,10 @@ namespace Gymnasiearbete
 
             SGBasicEffect.Initialize(GraphicsDevice);
             SGScreen.Initialize(Window.ClientBounds);
+            Render.Initialize();
             grid = new Grid();
-            camera = new Camera(Vector2.Zero);
+            Camera.Position = Vector2.Zero;
+            Camera.Zoom = 1f;
 
             base.Initialize();
         }
@@ -145,7 +146,12 @@ namespace Gymnasiearbete
                 CM.pause = false;
             }
             CM.Update(random, gameTime);
-            
+
+            // Jesper
+            if (Keyboard.GetState().IsKeyDown(Keys.Up))
+                Camera.Zoom += 0.005f;
+            if (Keyboard.GetState().IsKeyDown(Keys.Down))
+                Camera.Zoom -= 0.005f;
 
             base.Update(gameTime);
         }
@@ -167,44 +173,20 @@ namespace Gymnasiearbete
             SGBasicEffect.ApplyCurrentTechnique();
 
             if (CM.Content.Cells.Count > 0)
-                camera.Position = (CM.Content.Cells[0].Position - new Vector2(
-                    SGScreen.Area.Width / (2 * camera.Zoom),
-                    SGScreen.Area.Height / (2 * camera.Zoom)));
-
-            for (int y = 0; y < 10; y++)
             {
-                for (int x = 0; x < 10; x++)
-                {
-                    Point p = new Point(x, y);
-                    if (CM.Sectors.ContainsKey(p))
-                    {
-                        SectorContent sector = CM.Sectors[p];
-                        // draw code ...
-                        // Draw Food
-                        for (int i = 0; i < sector.Foods.Count; i++)
-                        {
-                            new Circle(
-                                Circle.UnitCircle.Point8,
-                                GraphicsDevice,
-                                Color.LawnGreen,
-                                sector.Foods[i].Size * camera.Zoom,
-                                (sector.Foods[i].Position - camera.Position) * camera.Zoom
-                            ).Render(GraphicsDevice);
-                        }
-                        // Draw Cells
-                        for (int i = 0; i < sector.Cells.Count; i++)
-                        {
-                            new Circle(
-                                Circle.UnitCircle.Point16,
-                                GraphicsDevice,
-                                Color.Red,
-                                sector.Cells[i].Size * camera.Zoom,
-                                (sector.Cells[i].Position - camera.Position) * camera.Zoom
-                            ).Render(GraphicsDevice);
-                        }
-                    }
-                }
+                Camera.Position = Vector2.Lerp(Camera.Position, CM.Content.Cells[0].Position, 0.125f);
+                //Vector2.Lerp(
+                //    Camera.Position,
+                //    CM.Content.Cells[0].Position,
+                //    0.125f
+                //);
+                //Camera.Position -= new Vector2(
+                //    SGScreen.Area.Width / (2 * Camera.Zoom),
+                //    SGScreen.Area.Height / (2 * Camera.Zoom)
+                //);
             }
+
+            Render.Draw(CM, GraphicsDevice);
         }
 
         /// <summary>
