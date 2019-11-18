@@ -28,7 +28,7 @@ namespace Gymnasiearbete
     class Cell : Entity
     {
         protected CellManager CM;
-        protected static float energyRequirement = 333; //1000;
+        protected static float energyRequirement = 500; //333; //1000;
         public static double consumeScale = 1.2;
 
         protected float perception = 0;

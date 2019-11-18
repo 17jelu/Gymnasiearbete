@@ -45,13 +45,13 @@ namespace Gymnasiearbete
             }
         }
 
-        public CellManager(Rectangle simulationAreaSet, Random random)
+        public CellManager(Random random)
         {
             const int starterCells = 5;
 
             AI.AIType[] starterAI = new AI.AIType[starterCells]
             {
-                AI.AIType.Player,
+                AI.AIType.CloseTargeting,
                 AI.AIType.CloseTargeting,
                 AI.AIType.CloseTargeting,
                 AI.AIType.CloseTargeting,
@@ -261,31 +261,5 @@ namespace Gymnasiearbete
                 simulationEnd = true;
             }
         }
-
-        public void Draw(GraphicsDevice graphicsDevice, Camera camera)
-        {/*
-            foreach (GameObject g in Content.All())
-            {
-                Color clr = Color.White;
-                Circle.UnitCircle uc = Circle.UnitCircle.Point8;
-
-                if (g.GetType() == typeof(Cell))
-                {
-                    Cell c = (Cell)g;
-
-                    clr = new Color((int) c.Size * 10, (int) c.Speed * 10, (int) c.Detectionrange * 10);
-                    uc = Circle.UnitCircle.Point16;
-                    new Circle(Circle.UnitCircle.Point8, graphicsDevice, new Color(0.1f, 0.1f, 0.1f, 0.1f), (float)c.Detectionrange, g.Position - camera.Position).Render(graphicsDevice);
-                }
-
-                if (g.GetType() == typeof(Food))
-                {
-                    clr = Color.Green;
-                    uc = Circle.UnitCircle.Point8;
-                }
-
-                new Circle(uc, graphicsDevice, clr, (float)g.Size, g.Position - camera.Position).Render(graphicsDevice);
-            }
-        */}
     }
 }

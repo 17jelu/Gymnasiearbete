@@ -5,21 +5,17 @@ using System;
 
 namespace Gymnasiearbete
 {
-    static class SGScreen
+    struct StaticGlobal
     {
-        /*
-        static Keyboard keyboard;
-        public static Keyboard Keyboard
-        {
-            get { return keyboard; }
-        }
-        */
         static Random random = new Random();
         public static Random Random
         {
             get { return random; }
         }
+    }
 
+    static class SGScreen
+    {
         static Rectangle area;
         public static Rectangle Area
         {

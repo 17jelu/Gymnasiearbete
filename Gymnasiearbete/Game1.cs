@@ -22,7 +22,6 @@ namespace Gymnasiearbete
         // Martin
         SpriteFont spriteFont;
         CellManager CM;
-        public static Random random;
         public static string debugMessage = "";
         bool restart = false;
 
@@ -54,8 +53,7 @@ namespace Gymnasiearbete
 
             Window.ClientSizeChanged += new EventHandler<EventArgs>(OnResize);
 
-            random = new Random();
-            CM = new CellManager(new Rectangle(3, 1, 7, 5), random);
+            CM = new CellManager(StaticGlobal.Random);
 
             SGBasicEffect.Initialize(GraphicsDevice);
             SGScreen.Initialize(Window.ClientBounds);
@@ -138,14 +136,17 @@ namespace Gymnasiearbete
                 {
                     debugType = 3;
                 }
-                debugMessage = CM.DebugSector(Mouse.GetState().X, Mouse.GetState().Y, debugType);
+                debugMessage = CM.DebugSector(
+                    Camera.Position.X - Window.ClientBounds.Width / 2 + Mouse.GetState().X, 
+                    Camera.Position.Y - Window.ClientBounds.Height / 2 + Mouse.GetState().Y, 
+                    debugType);
             }
 
             if (Keyboard.GetState().IsKeyDown(Keys.Q))
             {
                 CM.pause = false;
             }
-            CM.Update(random, gameTime);
+            CM.Update(StaticGlobal.Random, gameTime);
 
             // Jesper
             if (Keyboard.GetState().IsKeyDown(Keys.Up))

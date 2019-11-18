@@ -44,7 +44,7 @@ namespace Gymnasiearbete
 
         public AI(Cell parent, Cell cell)
         {
-            r = Game1.random;
+            r = StaticGlobal.Random;
             if (parent != null && cell != null)
             {
                 idleDestination = new P(cell.Position);
@@ -362,11 +362,12 @@ namespace Gymnasiearbete
                 dir += new Vector2(0, 1);
             }
 
+            /*
             if (dir != Vector2.Zero)
             {
                 dir.Normalize();
             }
-
+            */
             Actions(cell, null, new int[] { (int)dir.X, (int)dir.Y });
         }
 
@@ -439,7 +440,8 @@ namespace Gymnasiearbete
                 }
             }
 
-            if (Math.Pow(idleDestination.Position.X - cell.Position.X, 2) + Math.Pow(idleDestination.Position.Y - cell.Position.Y, 2) < 5)
+            if (Math.Pow(idleDestination.Position.X - cell.Position.X, 2) + Math.Pow(idleDestination.Position.Y - cell.Position.Y, 2) < Math.Pow(2, 2) || 
+                Math.Pow(idleDestination.Position.X - cell.Position.X, 2) + Math.Pow(idleDestination.Position.Y - cell.Position.Y, 2) > Math.Pow(2 * cell.Detectionrange, 2))
             {
                 idleDestination.SetPosition(new Vector2(
                     r.Next((int)Math.Floor(cell.Position.X - cell.Detectionrange), (int)Math.Floor(cell.Position.X + cell.Detectionrange)),
