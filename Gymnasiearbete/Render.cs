@@ -54,11 +54,17 @@ namespace Gymnasiearbete
                 gridLine.Render(GraphicsDevice);
             }
 
+            int
+                xoff = (int)(Camera.Position.X / CellManager.SectorSize)
+                    - (gridWidth >> 1) - 1, // - 1 because out of screen
+                yoff = (int)(Camera.Position.Y / CellManager.SectorSize)
+                    - (gridHeight >> 1) - 1 // - 1 because out of screen
+            ;
             // Drawing content inside of Chunks
             // TODO: add offset to points
-            for (int y = 0; y < gridHeight; y++)
+            for (int y = yoff; y < gridHeight + yoff + 3; y++) // + 3 because out of screen
             {
-                for (int x = 0; x < gridWidth; x++)
+                for (int x = xoff; x < gridWidth + xoff + 3; x++) // + 3 because out of screen
                 {
                     Point p = new Point(
                         x,
