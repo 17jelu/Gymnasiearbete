@@ -15,7 +15,11 @@ namespace Gymnasiearbete
         public static float Zoom
         {
             get { return zoom; }
-            set { zoom = value; }
+            set
+            {
+                zoom = value;
+                zoom = zoom < 0.125f ? 0.125f : zoom;
+            }
         }
 
         public static Vector2 GetRelativePosition(Vector2 pos)
