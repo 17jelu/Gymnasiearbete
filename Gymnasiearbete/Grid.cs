@@ -5,6 +5,6 @@ namespace Gymnasiearbete
 {
     class Grid
     {
-        
+
     }
 }

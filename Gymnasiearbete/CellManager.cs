@@ -24,8 +24,6 @@ namespace Gymnasiearbete
             }
         }
 
-        public static Rectangle simulationArea;
-
         int spawnTimer = 0;
 
         public bool pause = false;
@@ -47,31 +45,51 @@ namespace Gymnasiearbete
             }
         }
 
-        public CellManager(Rectangle simulationAreaSet, Random random)
+        public CellManager(Random random)
         {
-            simulationArea = new Rectangle(simulationAreaSet.X * SectorSize, simulationAreaSet.Y * SectorSize, simulationAreaSet.Width * SectorSize, simulationAreaSet.Height * SectorSize);
+            const int starterCells = 5;
 
-            Content.AddRange
-                (
-                    new GameObject[]
-                    {
-                        new Cell(this, new AI_ClosestTargetingLearn(random, "1"), new Vector2(random.Next(simulationArea.X, simulationArea.X + simulationArea.Width), random.Next(simulationArea.Y, simulationArea.Y + simulationArea.Height)), 10, 2, 30),
-                        new Cell(this, new AI_ClosestTargetingLearn(random, "2"), new Vector2(random.Next(simulationArea.X, simulationArea.X + simulationArea.Width), random.Next(simulationArea.Y, simulationArea.Y + simulationArea.Height)), 10, 2, 30),
-                        new Cell(this, new AI_ClosestTargetingLearn(random, "3"), new Vector2(random.Next(simulationArea.X, simulationArea.X + simulationArea.Width), random.Next(simulationArea.Y, simulationArea.Y + simulationArea.Height)), 10, 2, 30),
-                        new Cell(this, new AI_ClosestTargetingLearn(random, "4"), new Vector2(random.Next(simulationArea.X, simulationArea.X + simulationArea.Width), random.Next(simulationArea.Y, simulationArea.Y + simulationArea.Height)), 10, 2, 30),
-                        new Cell(this, new AI_ClosestTargetingLearn(random, "5"), new Vector2(random.Next(simulationArea.X, simulationArea.X + simulationArea.Width), random.Next(simulationArea.Y, simulationArea.Y + simulationArea.Height)), 10, 2, 30)
-                    }
-                );
-
-            for (int i = 0; i < 10; i++)
+            AI.AIType[] starterAI = new AI.AIType[starterCells]
             {
-                Content.AddRange
-                    (
-                        new GameObject[1]
-                        {
-                            new Food(new Vector2(random.Next(CellManager.simulationArea.X, CellManager.simulationArea.X + CellManager.simulationArea.Width), random.Next(CellManager.simulationArea.Y, CellManager.simulationArea.Y + CellManager.simulationArea.Height)))
-                        }
-                    );
+                AI.AIType.CloseTargeting,
+                AI.AIType.CloseTargeting,
+                AI.AIType.CloseTargeting,
+                AI.AIType.CloseTargeting,
+                AI.AIType.CloseTargeting
+            };
+
+            int[,] starterDNA = new int[starterCells, 3]
+            {
+                { 10, 2, 30 },
+                { 10, 2, 30 },
+                { 10, 2, 30 },
+                { 10, 2, 30 },
+                { 10, 2, 30 }
+            };
+
+            for (int i = 0; i < starterCells; i++)
+            {
+
+                Cell c = new Cell
+                        (this, new Cell(this, null, AI.AIType.NoBrain, Vector2.Zero, 0,0,0), starterAI[i],
+                        new Vector2(random.Next(-0 * CellManager.SectorSize, starterCells * 2 * CellManager.SectorSize), random.Next(-0 * CellManager.SectorSize, starterCells * 2 * CellManager.SectorSize)),
+                        starterDNA[i, 0], starterDNA[i, 1], starterDNA[i, 2]
+                        );
+
+                Content.Add(c);
+
+                for (int f = 0; f < 3; f++) {
+                    int[] nORp = new int[] { -1, 1 };
+                    Content.Add
+                        (
+                        new Food(
+                            new Vector2(
+                                c.Position.X + nORp[random.Next(2)] * random.Next((int)Math.Floor(c.Size), (int)Math.Floor(c.Size) + SectorSize),
+                                c.Position.Y + nORp[random.Next(2)] * random.Next((int)Math.Floor(c.Size), (int)Math.Floor(c.Size) + SectorSize)
+                                )
+                            )
+                        );
+                }
             }
         }
 
@@ -220,22 +238,22 @@ namespace Gymnasiearbete
 
             //MatSpawn
             spawnTimer++;
-            if (spawnTimer > 60)
+            if (spawnTimer > 60 * 3)
             {
                 spawnTimer = 0;
-                Content.AddRange(
-                    new GameObject[1]
-                    {
-                        new Food
-                        (
-                            new Vector2
-                            (
-                                random.Next(simulationArea.X, simulationArea.X + simulationArea.Width),
-                                random.Next(simulationArea.Y, simulationArea.Y + simulationArea.Height)
+
+                foreach (Cell c in this.Content.Cells)
+                {
+                    int[] nORp = new int[] { -1, 1 };
+                    Content.Add(
+                        new Food(
+                            new Vector2(
+                                c.Position.X + nORp[random.Next(2)] * random.Next((int)Math.Floor(c.Size), (int)Math.Floor(c.Size) + SectorSize),
+                                c.Position.Y + nORp[random.Next(2)] * random.Next((int)Math.Floor(c.Size), (int)Math.Floor(c.Size) + SectorSize)
+                                )
                             )
-                        )
-                    }
-                    );
+                        );
+                }
             }
 
             if (content.Cells.Count() <= 0)
@@ -243,31 +261,5 @@ namespace Gymnasiearbete
                 simulationEnd = true;
             }
         }
-
-        public void Draw(GraphicsDevice graphicsDevice, Camera camera)
-        {/*
-            foreach (GameObject g in Content.All())
-            {
-                Color clr = Color.White;
-                Circle.UnitCircle uc = Circle.UnitCircle.Point8;
-
-                if (g.GetType() == typeof(Cell))
-                {
-                    Cell c = (Cell)g;
-
-                    clr = new Color((int) c.Size * 10, (int) c.Speed * 10, (int) c.Detectionrange * 10);
-                    uc = Circle.UnitCircle.Point16;
-                    new Circle(Circle.UnitCircle.Point8, graphicsDevice, new Color(0.1f, 0.1f, 0.1f, 0.1f), (float)c.Detectionrange, g.Position - camera.Position).Render(graphicsDevice);
-                }
-
-                if (g.GetType() == typeof(Food))
-                {
-                    clr = Color.Green;
-                    uc = Circle.UnitCircle.Point8;
-                }
-
-                new Circle(uc, graphicsDevice, clr, (float)g.Size, g.Position - camera.Position).Render(graphicsDevice);
-            }
-        */}
     }
 }

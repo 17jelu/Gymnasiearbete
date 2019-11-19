@@ -1,8 +1,19 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace Gymnasiearbete
 {
+    struct StaticGlobal
+    {
+        static Random random = new Random();
+        public static Random Random
+        {
+            get { return random; }
+        }
+    }
+
     static class SGScreen
     {
         static Rectangle area;
