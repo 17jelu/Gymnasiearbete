@@ -155,6 +155,10 @@ namespace Gymnasiearbete
 
         public void SetLine(Vector2 vector1, Vector2 vector2)
         {
+            SetLine(vector1, vector2, true);
+        }
+        public void SetLine(Vector2 vector1, Vector2 vector2, bool relativeToCamera)
+        {
             /*
             // 1 3 2 0
             if (vector1.X < vector2.X)
@@ -187,6 +191,7 @@ namespace Gymnasiearbete
             vertices[1].Position.X = vector2.X;
             vertices[1].Position.Y = vector2.Y;
 
+            if (relativeToCamera)
             // Align pos with Camera
             for (int i = 0; i < vertices.Length; i++)
             {
