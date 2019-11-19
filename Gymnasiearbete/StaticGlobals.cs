@@ -27,6 +27,11 @@ namespace Gymnasiearbete
         {
             area = ClientBounds;
         }
+
+        public static void Resize(Rectangle ClientBounds)
+        {
+            area = ClientBounds;
+        }
     }
     static class SGBasicEffect
     {
