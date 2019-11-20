@@ -257,7 +257,7 @@ namespace Gymnasiearbete
                     break;
 
                 case AIType.CloseTargeting:
-                    return new AI_ClosestTargetingLearn(parent, cell);
+                    return new AI_ClosestTargeting(parent, cell);
 
                 case AIType.Player:
                     return new Player();
@@ -377,9 +377,9 @@ namespace Gymnasiearbete
         }
     }
 
-    class AI_ClosestTargetingLearn : AI
+    class AI_ClosestTargeting : AI
     {
-        public AI_ClosestTargetingLearn(Cell parent, Cell cell) : base(parent, cell)
+        public AI_ClosestTargeting(Cell parent, Cell cell) : base(parent, cell)
         {
             choises = new string[] { "MOVETO", "MOVEFROM", "IDLE"};
         }
@@ -469,6 +469,29 @@ namespace Gymnasiearbete
                     cell.Move(-moveDirection);
                     break;
             }
+        }
+    }
+
+    class AllTargeting : AI
+    {
+        AllTargeting(Cell parent, Cell cell) : base(parent, cell)
+        {
+
+        }
+
+        protected override void Intresst(Cell cell, List<GameObject> percivableObjects)
+        {
+            base.Intresst(cell, percivableObjects);
+        }
+
+        protected override void Decision(Cell cell, GameObject intresst)
+        {
+            base.Decision(cell, intresst);
+        }
+
+        protected override void Actions(Cell cell, string decision, int[] parameters)
+        {
+            base.Actions(cell, decision, parameters);
         }
     }
 }

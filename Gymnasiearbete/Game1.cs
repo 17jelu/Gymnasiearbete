@@ -103,7 +103,8 @@ namespace Gymnasiearbete
 
             if (Keyboard.GetState().IsKeyDown(Keys.R) && restart == false || CM.simulationEnd)
             {
-                Initialize();
+                //Initialize();
+                CM = new CellManager(StaticGlobal.Random);
                 restart = true;
             }
 

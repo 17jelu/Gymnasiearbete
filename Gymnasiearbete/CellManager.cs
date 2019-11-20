@@ -60,18 +60,18 @@ namespace Gymnasiearbete
 
             int[,] starterDNA = new int[starterCells, 3]
             {
-                { 10, 2, 30 },
-                { 10, 2, 30 },
-                { 10, 2, 30 },
-                { 10, 2, 30 },
-                { 10, 2, 30 }
+                { 10, 2, 50 },
+                { 10, 2, 50 },
+                { 10, 2, 50 },
+                { 10, 2, 50 },
+                { 10, 2, 50 }
             };
 
             for (int i = 0; i < starterCells; i++)
             {
 
                 Cell c = new Cell
-                        (this, new Cell(this, null, AI.AIType.NoBrain, Vector2.Zero, 0,0,0), starterAI[i],
+                        (this, new Cell(this, null, AI.AIType.NoBrain, Vector2.Zero, 0, 0, 0), starterAI[i],
                         new Vector2(random.Next(-0 * CellManager.SectorSize, starterCells * 2 * CellManager.SectorSize), random.Next(-0 * CellManager.SectorSize, starterCells * 2 * CellManager.SectorSize)),
                         starterDNA[i, 0], starterDNA[i, 1], starterDNA[i, 2]
                         );
