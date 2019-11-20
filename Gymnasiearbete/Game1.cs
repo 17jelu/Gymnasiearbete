@@ -200,6 +200,7 @@ namespace Gymnasiearbete
         {
             Console.WriteLine(sender.ToString());
             SGBasicEffect.Resize(GraphicsDevice);
+            SGScreen.Resize(Window.ClientBounds);
         }
     }
 }
