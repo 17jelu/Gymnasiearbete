@@ -22,6 +22,25 @@ namespace Gymnasiearbete
             }
         }
 
+        private static bool freecam;
+        public static bool FreeCam
+        {
+            get { return freecam; }
+            set { freecam = value; }
+        }
+        public static bool ToggleFreeCam()
+        {
+            freecam =! freecam;
+            return freecam;
+        }
+
+        public static void Initialize()
+        {
+            Camera.Position = Vector2.Zero;
+            Camera.Zoom = 1f;
+            Camera.FreeCam = false;
+        }
+
         public static Vector2 GetRelativePosition(Vector2 pos)
         {
             return ( pos - _pos ) * zoom +
