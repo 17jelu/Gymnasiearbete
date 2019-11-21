@@ -12,16 +12,18 @@ namespace Gymnasiearbete
         List<Cell> cell = new List<Cell>();
         List<GameObject> other = new List<GameObject>();
 
-        public List<GameObject> All()
+        public List<GameObject> All
         {
-            
-            List<GameObject> content = new List<GameObject>();
+            get
+            {
+                List<GameObject> content = new List<GameObject>();
 
-            content.AddRange(food);
-            content.AddRange(cell);
-            content.AddRange(other);
+                content.AddRange(food);
+                content.AddRange(cell);
+                content.AddRange(other);
 
-            return content;
+                return content;
+            }
         }
 
         public List<Food> Foods
@@ -37,17 +39,6 @@ namespace Gymnasiearbete
         public List<GameObject> Others
         {
             get { return other; }
-        }
-
-        public Dictionary<Cell, Vector2> CellDestination()
-        {
-            Dictionary<Cell, Vector2> destination = new Dictionary<Cell, Vector2>();
-            foreach (Cell c in cell)
-            {
-                destination.Add(c, c.AI.lastIntresst.Position);
-            }
-
-            return destination;
         }
 
         public void Clear()

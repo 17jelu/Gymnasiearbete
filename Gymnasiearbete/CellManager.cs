@@ -51,20 +51,20 @@ namespace Gymnasiearbete
 
             AI.AIType[] starterAI = new AI.AIType[starterCells]
             {
-                AI.AIType.CloseTargeting,
-                AI.AIType.CloseTargeting,
-                AI.AIType.CloseTargeting,
-                AI.AIType.CloseTargeting,
-                AI.AIType.CloseTargeting
+                AI.AIType.PointsTargeting,
+                AI.AIType.PointsTargeting,
+                AI.AIType.PointsTargeting,
+                AI.AIType.PointsTargeting,
+                AI.AIType.PointsTargeting
             };
 
             int[,] starterDNA = new int[starterCells, 3]
             {
-                { 10, 2, 50 },
-                { 10, 2, 50 },
-                { 10, 2, 50 },
-                { 10, 2, 50 },
-                { 10, 2, 50 }
+                { 10, 2, 100 },
+                { 10, 2, 100 },
+                { 10, 2, 100 },
+                { 10, 2, 100 },
+                { 10, 2, 100 }
             };
 
             for (int i = 0; i < starterCells; i++)
@@ -101,11 +101,11 @@ namespace Gymnasiearbete
 
             if (sectors.ContainsKey(new Point(x, y)))
             {
-                foreach (GameObject g in sectors[new Point(x, y)].All())
+                foreach (GameObject g in sectors[new Point(x, y)].All)
                 {
                     if (debugType == 1 || debugType == 0)
                     {
-                        output += "{" + Content.All().IndexOf(g) + "-" + g.GetType().ToString().Split('.')[1] + "}";
+                        output += "{" + Content.All.IndexOf(g) + "-" + g.GetType().ToString().Split('.')[1] + "}";
                     }
                     if (debugType == 2 || debugType == 0)
                     {
@@ -148,15 +148,23 @@ namespace Gymnasiearbete
             civilazationTime += gameTime.ElapsedGameTime.TotalSeconds;
 
             //Clearar sectorer
-            foreach (KeyValuePair<Point, SectorContent> s in sectors)
+            Point[] sectorKeys = sectors.Keys.ToArray();
+            for (int i = 0; i < sectorKeys.Length; i++)
             {
-                s.Value.Clear();
+                if (sectors[sectorKeys[i]].All.Count <= 0)
+                {
+                    //sectors.Remove(sectorKeys[i]);
+                }
+                else
+                {
+                    sectors[sectorKeys[i]].Clear();
+                }
             }
 
             //Ofixerad Updatering
-            for (int i = 0; i < Content.All().Count; i++)
+            for (int i = 0; i < Content.All.Count; i++)
             {
-                GameObject g = Content.All()[i];
+                GameObject g = Content.All[i];
 
                 if (g.isMarkedForDelete)
                 {
@@ -200,42 +208,6 @@ namespace Gymnasiearbete
                 }
             }
 
-            //FixeradUpdatering
-            foreach (GameObject g in Content.All())
-            {
-                if (IsCell(g))
-                {
-                    Cell c = (Cell)g;
-                    List<GameObject> detectionCheck = new List<GameObject>();
-
-                    int xMax = (int)Math.Floor((c.Position.X + c.Detectionrange) / SectorSize);
-                    int xMin = (int)Math.Floor((c.Position.X - c.Detectionrange) / SectorSize);
-                    int yMax = (int)Math.Floor((c.Position.Y + c.Detectionrange) / SectorSize);
-                    int yMin = (int)Math.Floor((c.Position.Y - c.Detectionrange) / SectorSize);
-
-                    for (int x = xMin; x <= xMax; x++)
-                    {
-                        for (int y = yMin; y <= yMax; y++)
-                        {
-                            if (!sectors.ContainsKey(new Point(x, y)))
-                            {
-                                sectors.Add(new Point(x, y), new SectorContent());
-                            }
-
-                            for (int i = 0; i < sectors[new Point(x, y)].All().Count; i++)
-                            {
-                                if (!detectionCheck.Contains(sectors[new Point(x, y)].All()[i]))
-                                {
-                                    detectionCheck.Add(sectors[new Point(x, y)].All()[i]);
-                                }
-                            }
-                        }
-                    }
-
-                    c.Update(detectionCheck, random);
-                }
-            }
-
             //MatSpawn
             spawnTimer++;
             if (spawnTimer > 60 * 3)
@@ -256,9 +228,47 @@ namespace Gymnasiearbete
                 }
             }
 
+            //FixeradUpdatering
+            foreach (Cell c in Content.Cells)
+            {
+                List<GameObject> detectionCheck = new List<GameObject>();
+
+                int xMax = (int)Math.Floor((c.Position.X + c.Detectionrange) / SectorSize);
+                int xMin = (int)Math.Floor((c.Position.X - c.Detectionrange) / SectorSize);
+                int yMax = (int)Math.Floor((c.Position.Y + c.Detectionrange) / SectorSize);
+                int yMin = (int)Math.Floor((c.Position.Y - c.Detectionrange) / SectorSize);
+
+                for (int x = xMin; x <= xMax; x++)
+                {
+                    for (int y = yMin; y <= yMax; y++)
+                    {
+                        if (!sectors.ContainsKey(new Point(x, y)))
+                        {
+                            sectors.Add(new Point(x, y), new SectorContent());
+                        }
+
+                        for (int i = 0; i < sectors[new Point(x, y)].All.Count; i++)
+                        {
+                            if (!detectionCheck.Contains(sectors[new Point(x, y)].All[i]))
+                            {
+                                detectionCheck.Add(sectors[new Point(x, y)].All[i]);
+                            }
+                        }
+                    }
+                }
+
+                c.Update(detectionCheck, random);
+            }
+
+            foreach (Food f in Content.Foods)
+            {
+                f.Update();
+            }
+
             if (content.Cells.Count() <= 0)
             {
                 simulationEnd = true;
+                //Console.Beep(100, 1000);
             }
         }
     }

@@ -10,6 +10,8 @@ namespace Gymnasiearbete
     //MAT
     class Food : Entity
     {
+        int lifetime = 2 * 10 * 60;
+
         public float Energy
         {
             get
@@ -21,6 +23,14 @@ namespace Gymnasiearbete
         public Food(Vector2 startPosition, float energySet = 300) : base(startPosition)
         {
             energy = energySet;
+        }
+
+        public override void Update()
+        {
+            if (--lifetime < 0)
+            {
+                this.isMarkedForDelete = true;
+            }
         }
     }
 
@@ -105,7 +115,7 @@ namespace Gymnasiearbete
         //Perception
         void PerceptionCheck(List<GameObject> pc)
         {
-            List<GameObject> percivableObjects = new List<GameObject>();
+            SectorContent percivableObjects = new SectorContent();
             foreach (GameObject g in pc)
             {
                 if (g != this)

@@ -138,8 +138,8 @@ namespace Gymnasiearbete
                     debugType = 3;
                 }
                 debugMessage = CM.DebugSector(
-                    Camera.Position.X - Window.ClientBounds.Width / 2 + Mouse.GetState().X, 
-                    Camera.Position.Y - Window.ClientBounds.Height / 2 + Mouse.GetState().Y, 
+                    (Camera.Position.X - SGScreen.Area.Width / 2 + Mouse.GetState().X) * Camera.Zoom, 
+                    (Camera.Position.Y - SGScreen.Area.Height / 2 + Mouse.GetState().Y) * Camera.Zoom, 
                     debugType);
             }
 
@@ -200,7 +200,6 @@ namespace Gymnasiearbete
         {
             Console.WriteLine(sender.ToString());
             SGBasicEffect.Resize(GraphicsDevice);
-            SGScreen.Resize(Window.ClientBounds);
         }
     }
 }
