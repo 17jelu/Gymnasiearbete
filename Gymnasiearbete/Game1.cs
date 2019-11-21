@@ -27,7 +27,6 @@ namespace Gymnasiearbete
 
         // Jesper
         SpriteBatch spriteBatch;
-        Grid grid;
 
         public Game1()
         {
@@ -58,9 +57,7 @@ namespace Gymnasiearbete
             SGBasicEffect.Initialize(GraphicsDevice);
             SGScreen.Initialize(Window.ClientBounds);
             Render.Initialize();
-            grid = new Grid();
-            Camera.Position = Vector2.Zero;
-            Camera.Zoom = 1f;
+            Camera.Initialize();
 
             base.Initialize();
         }
@@ -153,6 +150,16 @@ namespace Gymnasiearbete
                 Camera.Zoom += 0.005f;
             if (Keyboard.GetState().IsKeyDown(Keys.Down))
                 Camera.Zoom -= 0.005f;
+            if (Keyboard.GetState().IsKeyDown(Keys.F))
+                Camera.ToggleFreeCam();
+            if (Keyboard.GetState().IsKeyDown(Keys.W) && Camera.FreeCam)
+                Camera.Position += new Vector2(0, -5 / Camera.Zoom);
+            if (Keyboard.GetState().IsKeyDown(Keys.S) && Camera.FreeCam)
+                Camera.Position += new Vector2(0,  5 / Camera.Zoom);
+            if (Keyboard.GetState().IsKeyDown(Keys.A) && Camera.FreeCam)
+                Camera.Position += new Vector2(-5 / Camera.Zoom, 0);
+            if (Keyboard.GetState().IsKeyDown(Keys.D) && Camera.FreeCam)
+                Camera.Position += new Vector2( 5 / Camera.Zoom, 0);
 
             base.Update(gameTime);
         }
@@ -167,13 +174,16 @@ namespace Gymnasiearbete
             spriteBatch.Begin();
 
             spriteBatch.DrawString(spriteFont, debugMessage, new Vector2(4, 10), Color.Gold);
+            spriteBatch.DrawString(spriteFont, Camera.Zoom.ToString(), new Vector2(10, 40), Color.Gold);
+            if (CM.Content.Cells.Count > 0)
+                spriteBatch.DrawString(spriteFont, CM.Content.Cells[0].Energy.ToString(), new Vector2(10, 80), Color.LawnGreen);
 
             spriteBatch.End();
             base.Draw(gameTime);
 
             SGBasicEffect.ApplyCurrentTechnique();
 
-            if (CM.Content.Cells.Count > 0)
+            if (CM.Content.Cells.Count > 0 && !Camera.FreeCam)
             {
                 Camera.Position = Vector2.Lerp(Camera.Position, CM.Content.Cells[0].Position, 0.125f);
                 //Vector2.Lerp(

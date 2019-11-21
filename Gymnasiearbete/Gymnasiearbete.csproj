@@ -77,7 +77,6 @@
     <Compile Include="Cell.cs" />
     <Compile Include="CellManager.cs" />
     <Compile Include="GameObject.cs" />
-    <Compile Include="Grid.cs" />
     <Compile Include="IDrawObject.cs" />
     <Compile Include="Memory.cs" />
     <Compile Include="PreCalc.cs" />
