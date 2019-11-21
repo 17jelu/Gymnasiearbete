@@ -27,6 +27,14 @@ namespace Gymnasiearbete
     //CELL
     class Cell : Entity
     {
+        public float Energy
+        {
+            get
+            {
+                return energy;
+            }
+        }
+
         protected CellManager CM;
         protected static float energyRequirement = 500; //333; //1000;
         public static double consumeScale = 1.2;
