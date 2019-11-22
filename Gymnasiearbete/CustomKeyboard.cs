@@ -2,14 +2,12 @@
 
 namespace Gymnasiearbete
 {
-    struct CustomKeyboard
+    class CustomInputHandler
     {
-        static KeyboardState oldState;
-        static KeyboardState currentState;
-        static bool hasBegun;
+        static bool hasBegun = false;
 
         #region Error Region
-        private static void CheckBegin()
+        protected static void CheckBegin()
         {
             // Check if Begin() hasn't already been called.
             // Otherwise, throw Error.
@@ -22,7 +20,7 @@ namespace Gymnasiearbete
                 throw new System.InvalidOperationException("Begin cannot be called again until End has been successfully called.");
             }
         }
-        private static void CheckEnd()
+        protected static void CheckEnd()
         {
             // Check if Begin() has been called successfully.
             // If not, throw Error.
@@ -35,11 +33,15 @@ namespace Gymnasiearbete
                 throw new System.InvalidOperationException("Begin must be called successfully before End can be called.");
             }
         }
-        private static void CheckOther()
+        protected static void CheckOther()
         {
 
         }
         #endregion
+    class CustomKeyboard : CustomInputHandler
+    {
+        static KeyboardState oldState;
+        static KeyboardState currentState;
 
         public static void Begin()
         {
