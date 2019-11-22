@@ -76,6 +76,7 @@
     <Compile Include="Camera.cs" />
     <Compile Include="Cell.cs" />
     <Compile Include="CellManager.cs" />
+    <Compile Include="CustomKeyboard.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="IDrawObject.cs" />
     <Compile Include="Memory.cs" />
