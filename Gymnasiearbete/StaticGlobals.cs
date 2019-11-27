@@ -12,6 +12,11 @@ namespace Gymnasiearbete
         {
             get { return random; }
         }
+
+        public float Clamp(float min, float max, float num)
+        {
+            return Math.Max(Math.Min(num, max), min);
+        }
     }
 
     static class SGScreen
