@@ -12,16 +12,24 @@ namespace Gymnasiearbete
     /// </summary>
     class AI
     {
-        public bool DEBUGNOMEMORYSAVE = true;
+        public bool DEBUGNOMEMORYSAVE = false;
 
         public string family;
         string dataPath;
+
         List<Memory> memory = new List<Memory>();
         public Memory lastMemory;
         public GameObject lastIntresst;
         protected string[] choises = new string[0];
 
-        //public int preformancepoints = 0;
+        protected AIType aiType;
+        public AIType GetAIType
+        {
+            get
+            {
+                return aiType;
+            }
+        }
 
         protected Vector2 direction;
         public Vector2 Direction
@@ -37,6 +45,7 @@ namespace Gymnasiearbete
         }
 
         protected P idleDestination;
+        protected int idleTimer = 0;
 
         readonly static char z = '|';
 
@@ -57,6 +66,8 @@ namespace Gymnasiearbete
             {
                 MemoryFileLoad();
             }
+
+            //aiType = AIType.NoBrain;
         }
 
         /// <summary>
@@ -138,13 +149,11 @@ namespace Gymnasiearbete
         /// <summary>
         /// Gör val utifrån minne beroende på typ och risk att bli uppäten
         /// </summary>
-        /// <param name="type"></param>
-        /// <param name="consume"></param>
-        /// <returns></returns>
         protected Memory MemoryChoice(string situation)
         {
             while (true)
             {
+                //Kollar efter minnen vilka är relevanta till situationen
                 List<Memory> memoryImportant = new List<Memory>();
                 foreach (Memory m in memory)
                 {
@@ -154,58 +163,50 @@ namespace Gymnasiearbete
                     }
                 }
 
+                //Välja bästa minnet, med chans för mutation
                 List<Memory> memoryChoice = new List<Memory>();
-                if (memoryImportant.Count > 0)
+                double curiosity = 1;
+                if (memoryImportant.Count > 0 && r.Next(100) < 100 - curiosity)
                 {
-                    double curiosity = 1;
-                    if (r.Next(100) < 100 - curiosity)
+                    //Jämför minnespoäng
+                    memoryChoice.Add(memoryImportant[0]);
+                    foreach (Memory m in memoryImportant)
                     {
-                        foreach (Memory m in memoryImportant)
+                        if (m.Points > memoryChoice[0].Points)
                         {
-                            if (memoryChoice.Count < 1)
-                            {
-                                memoryChoice.Add(m);
-                            }
-
-                            if (memoryChoice[0].Points < m.Points)
-                            {
-                                memoryChoice = new List<Memory>();
-                                memoryChoice.Add(m);
-                            }
-                            else
-                            if (memoryChoice[0].Points == m.Points)
-                            {
-                                memoryChoice.Add(m);
-                            }
-
-                            int memoryChoiseIndex = r.Next(memoryChoice.Count);
-
-                            lastMemory = memoryChoice[memoryChoiseIndex];
-                            return lastMemory;
+                            memoryChoice.Clear();
+                            memoryChoice.Add(m);
                         }
-                    }
-                    else
-                    {
-                        Memory mem = new Memory(situation, 0.ToString(), choises[r.Next(choises.Length)]);
-                        for (int i = 0; i < memory.Count; i++)
+                        else
+                        if (m.Points == memoryChoice[0].Points)
                         {
-                            if (memory[i].Situation == mem.Situation)
-                            {
-                                if (memory[i].Desicion == mem.Desicion)
-                                {
-                                    lastMemory = mem;
-                                    return lastMemory;
-                                }   
-                            }
+                            memoryChoice.Add(m);
                         }
-                        memory.Add(mem);
-                        lastMemory = mem;
+
+                        //Väljer slumpvalt utifrån de bästa minnena
+                        lastMemory = memoryChoice[r.Next(memoryChoice.Count)];
                         return lastMemory;
                     }
                 }
                 else
                 {
+                    //skapar ett minne som svar på att inga minnen för situationen finns eller mutation
                     Memory mem = new Memory(situation, 0.ToString(), choises[r.Next(choises.Length)]);
+
+                    //I fallet att det är mutation, undersöks det om minnet redan finns
+                    for (int i = 0; i < memory.Count; i++)
+                    {
+                        if (memory[i].Situation == mem.Situation)
+                        {
+                            if (memory[i].Desicion == mem.Desicion)
+                            {
+                                lastMemory = memory[i];
+                                return lastMemory;
+                            }
+                        }
+                    }
+
+                    //I fallet för att det inte finns minnen för situationen läggs det till
                     memory.Add(mem);
                     lastMemory = mem;
                     return lastMemory;
@@ -213,12 +214,15 @@ namespace Gymnasiearbete
             }
         }
 
-        //TILDELA POÄNG FÖR VAL
-        public void MemoryReward(int reward, bool lastT_allF = true)
+        /// <summary>
+        /// TILDELA POÄNG FÖR VAL. 
+        /// amplyfy ökar poäng för bra val och minskar poäng för dåliga val
+        /// </summary>
+        public void MemoryReward(int reward, bool amplify = false)
         {
             foreach (Memory m in memory)
             {
-                if (lastT_allF)
+                if (!amplify)
                 {
                     if (m.Situation == lastMemory.Situation)
                     {
@@ -228,16 +232,24 @@ namespace Gymnasiearbete
                         }
                     }
                 }
-                else
+                else 
                 {
-                    m.Points += reward;
+                    if (m.Points > 0)
+                    {
+                        m.Points += reward;
+                    } else
+                    {
+                        m.Points -= reward;
+                    }
+                    
                 }
             }
         }
 
+        //Standardiserat format för relevant data
         public string Data(Cell cell, GameObject dataObject)
         {
-            string dataOut = "NULL";
+            string dataOut = "NULL" + "/E" + (cell.Energy > Cell.energyRequirement);
             if (dataObject != null)
             {
                 if (dataObject.GetType() == typeof(Cell))
@@ -267,7 +279,7 @@ namespace Gymnasiearbete
                     }
                     if (dataCell.Speed < cell.Speed)
                     {
-                        speedData += "<";
+                        speedData = "<";
                     }
                     dataOut += speedData;
                 }
@@ -281,6 +293,7 @@ namespace Gymnasiearbete
             return dataOut;
         }
 
+        //Striver ut relevant data för debug
         public string DEBIUG()
         {
             string result = "";
@@ -293,6 +306,7 @@ namespace Gymnasiearbete
             return "{" + result + "}";
         }
 
+        //Retunerar AI för initiering av ny celler
         public static AI GetAI(AIType type, Cell parent, Cell cell)
         {
             switch (type)
@@ -314,6 +328,7 @@ namespace Gymnasiearbete
             return new AI_NoBrain();
         }
 
+        //Enum för de olika aityperna
         public enum AIType
         {
             NoBrain,
@@ -322,6 +337,9 @@ namespace Gymnasiearbete
             Player
         }
 
+        /// <summary>
+        /// Standardiserad utgångspunkt för AI Processen (AI-Run (AIR))
+        /// </summary>
         public void AIR(Cell cell, SectorContent percivableObjects)
         {
             Intresst(cell, percivableObjects);
@@ -330,9 +348,6 @@ namespace Gymnasiearbete
         /// <summary>
         /// Väljer vad som är intressant för AI
         /// </summary>
-        /// <param name="cell"></param>
-        /// <param name="percivableObjects"></param>
-        /// <returns></returns>
         protected virtual void Intresst(Cell cell, SectorContent percivableObjects)
         {
             GameObject intresst = null;
@@ -344,19 +359,14 @@ namespace Gymnasiearbete
         /// <summary>
         /// Väljer val utifrån intresse
         /// </summary>
-        /// <param name="cell"></param>
-        /// <param name="intresst"></param>
-        /// <returns></returns>
         protected virtual void Decision(Cell cell, GameObject intresst)
         {
             Actions(cell, "DEFAULT", new int[2] { 0, 0 });
         }
 
         /// <summary>
-        /// definerar vad valen innebär
+        /// Definerar vad valen innebär
         /// </summary>
-        /// <param name="cell"></param>
-        /// <param name="decision"></param>
         protected virtual void Actions(Cell cell, string decision, int[] parameters)
         {
             direction = new Vector2(parameters[0], parameters[1]);
@@ -364,20 +374,28 @@ namespace Gymnasiearbete
         }
     }
 
+    /// <summary>
+    /// AI-Typ vilken inte tänker
+    /// </summary>
     class AI_NoBrain : AI
     {
         public AI_NoBrain() : base(null, null)
         {
+            aiType = AIType.NoBrain;
             choises = new string[0];
             lastMemory = new Memory("NULL", "0", "NULL");
             lastIntresst = null;
         }
     }
 
+    /// <summary>
+    /// "AI-Typ" vilken kan kontrolleras av spelare
+    /// </summary>
     class Player : AI
     {
         public Player() : base(null, null)
         {
+            aiType = AIType.Player;
             choises = new string[] { "W", "A", "S", "D", "WA", "WD", "SA", "SD" };
             direction = new Vector2(1, 1);
             lastMemory = new Memory("PLAYER", "0", "PLAYER");
@@ -427,10 +445,14 @@ namespace Gymnasiearbete
         }
     }
 
+    /// <summary>
+    /// AI-Typ vilken endast bryr sig om vad som är närmast den
+    /// </summary>
     class AI_ClosestTargeting : AI
     {
         public AI_ClosestTargeting(Cell parent, Cell cell) : base(parent, cell)
         {
+            aiType = AIType.CloseTargeting;
             choises = new string[] { "MOVETO", "MOVEFROM", "IDLE"};
         }
 
@@ -441,6 +463,7 @@ namespace Gymnasiearbete
             {
                 intresst = percivableObjects.All[0];
 
+                //gör intresset till det närmaste objectet av saker AI kan se
                 foreach (GameObject g in percivableObjects.All)
                 {
                     if (
@@ -453,29 +476,29 @@ namespace Gymnasiearbete
                 }
             }
 
+            if (intresst == null)
+            {
+                intresst = idleDestination;
+            }
             lastIntresst = intresst;
-            Decision(cell, intresst);
+            Decision(cell, lastIntresst);
         }
 
         protected override void Decision(Cell cell, GameObject intresst)
         {
+            //Om AI har nått-, är för långt ifrån- eller inte hunnit till idle positionen, sätts en ny idle position.
             if (Math.Pow(idleDestination.Position.X - cell.Position.X, 2) + Math.Pow(idleDestination.Position.Y - cell.Position.Y, 2) < Math.Pow(2, 2) || 
-                Math.Pow(idleDestination.Position.X - cell.Position.X, 2) + Math.Pow(idleDestination.Position.Y - cell.Position.Y, 2) > Math.Pow(2 * cell.Detectionrange, 2))
+                Math.Pow(idleDestination.Position.X - cell.Position.X, 2) + Math.Pow(idleDestination.Position.Y - cell.Position.Y, 2) > Math.Pow(2 * cell.Detectionrange, 2) ||
+                --idleTimer <= 0)
             {
+                idleTimer = (int)Math.Floor(cell.Detectionrange/cell.Speed);
                 idleDestination.SetPosition(new Vector2(
-                    r.Next((int)Math.Floor(cell.Position.X - cell.Detectionrange), (int)Math.Floor(cell.Position.X + 2 * cell.Detectionrange)),
-                    r.Next((int)Math.Floor(cell.Position.Y - cell.Detectionrange), (int)Math.Floor(cell.Position.Y + 2 * cell.Detectionrange))
+                    r.Next((int)Math.Floor(cell.Position.X - 2 * cell.Detectionrange), (int)Math.Floor(cell.Position.X + 2 * cell.Detectionrange)),
+                    r.Next((int)Math.Floor(cell.Position.Y - 2 * cell.Detectionrange), (int)Math.Floor(cell.Position.Y + 2 * cell.Detectionrange))
                     ));
             }
 
-            if (intresst != null)
-            {
-                direction = intresst.Position - cell.Position;
-            }
-            else
-            {
-                direction = idleDestination.Position - cell.Position;
-            }
+            direction = intresst.Position - cell.Position;
 
             Actions(cell, MemoryChoice(Data(cell, intresst)).Desicion, new int[2] { (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) });
 
@@ -483,11 +506,12 @@ namespace Gymnasiearbete
 
         protected override void Actions(Cell cell, string decision, int[] parameters)
         {
+            //Utför val
             Vector2 moveDirection = new Vector2(parameters[0], parameters[1]);
             switch (decision)
             {
                 case "IDLE":
-                    cell.Move(idleDestination.Position - cell.Position);
+                    cell.Move(moveDirection);
                     break;
 
                 case "MOVETO":
@@ -501,63 +525,71 @@ namespace Gymnasiearbete
         }
     }
 
+    /// <summary>
+    /// AI-Typ vilken bryr sig om situationer med mest poäng
+    /// </summary>
     class AI_PointsTargeting : AI
     {
         public AI_PointsTargeting(Cell parent, Cell cell) : base(parent, cell)
         {
+            aiType = AIType.PointsTargeting;
             choises = new string[] { "MOVETO", "MOVEFROM", "IDLE" };
         }
 
         protected override void Intresst(Cell cell, SectorContent percivableObjects)
         {
+            //Samlar val med mest poäng
             List<GameObject> bestIntrest = new List<GameObject>();
-            int points = 0;
-            foreach (GameObject g in percivableObjects.All)
+            if (percivableObjects.All.Count > 0)
             {
-                if(MemoryChoice(Data(cell, g)).Points > points || bestIntrest.Count <= 0)
+                bestIntrest.Add(percivableObjects.All[0]);
+                foreach (GameObject g in percivableObjects.All)
                 {
-                    bestIntrest = new List<GameObject>();
-                    bestIntrest.Add(g);
-                } else
-                if (MemoryChoice(Data(cell, g)).Points == points)
-                {
-                    bestIntrest.Add(g);
+                    if (MemoryChoice(Data(cell, g)).Points > MemoryChoice(Data(cell, bestIntrest[0])).Points)
+                    {
+                        bestIntrest.Clear();
+                        bestIntrest.Add(g);
+                    }
+                    else
+                    if (MemoryChoice(Data(cell, g)).Points == MemoryChoice(Data(cell, bestIntrest[0])).Points)
+                    {
+                        bestIntrest.Add(g);
+                    }
                 }
             }
 
+            //Om det inte finns minnen
             if(bestIntrest.Count <= 0)
             {
-                bestIntrest.Add(null);
+                bestIntrest.Add(idleDestination);
             }
 
+            //För att hindra obeslutsamhet ska den fortsätta göra det den val att göra från början
             if (bestIntrest.Contains(lastIntresst))
             {
-                bestIntrest = new List<GameObject>();
+                bestIntrest.Clear();
                 bestIntrest.Add(lastIntresst);
             }
 
+            //Väljer slumpvalt val utifrån val med mest poäng
             Decision(cell, bestIntrest[StaticGlobal.Random.Next(bestIntrest.Count)]);
         }
 
         protected override void Decision(Cell cell, GameObject intresst)
         {
+            //Om AI har nått-, är för långt ifrån- eller inte hunnit till idle positionen, sätts en ny idle position.
             if (Math.Pow(idleDestination.Position.X - cell.Position.X, 2) + Math.Pow(idleDestination.Position.Y - cell.Position.Y, 2) < Math.Pow(2, 2) ||
-                Math.Pow(idleDestination.Position.X - cell.Position.X, 2) + Math.Pow(idleDestination.Position.Y - cell.Position.Y, 2) > Math.Pow(2 * cell.Detectionrange, 2))
+                Math.Pow(idleDestination.Position.X - cell.Position.X, 2) + Math.Pow(idleDestination.Position.Y - cell.Position.Y, 2) > Math.Pow(2 * cell.Detectionrange, 2) ||
+                --idleTimer <= 0)
             {
+                idleTimer = (int)Math.Floor(cell.Detectionrange/cell.Speed);
                 idleDestination.SetPosition(new Vector2(
-                    r.Next((int)Math.Floor(cell.Position.X - cell.Detectionrange), (int)Math.Floor(cell.Position.X + 2 * cell.Detectionrange)),
-                    r.Next((int)Math.Floor(cell.Position.Y - cell.Detectionrange), (int)Math.Floor(cell.Position.Y + 2 * cell.Detectionrange))
+                    r.Next((int)Math.Floor(cell.Position.X - 2 * cell.Detectionrange), (int)Math.Floor(cell.Position.X + 2 * cell.Detectionrange)),
+                    r.Next((int)Math.Floor(cell.Position.Y - 2 * cell.Detectionrange), (int)Math.Floor(cell.Position.Y + 2 * cell.Detectionrange))
                     ));
             }
 
-            if (intresst != null)
-            {
-                direction = intresst.Position - cell.Position;
-            }
-            else
-            {
-                direction = idleDestination.Position - cell.Position;
-            }
+            direction = intresst.Position - cell.Position;
 
             Actions(cell, MemoryChoice(Data(cell, intresst)).Desicion, new int[2] { (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) });
 
@@ -565,11 +597,12 @@ namespace Gymnasiearbete
 
         protected override void Actions(Cell cell, string decision, int[] parameters)
         {
+            //Utför val
             Vector2 moveDirection = new Vector2(parameters[0], parameters[1]);
             switch (decision)
             {
                 case "IDLE":
-                    cell.Move(idleDestination.Position - cell.Position);
+                    cell.Move(moveDirection);
                     break;
 
                 case "MOVETO":
