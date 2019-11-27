@@ -5,6 +5,16 @@ using System;
 
 namespace Gymnasiearbete
 {
+    struct AI_Controlls
+    {
+        public static bool NoMemorySave = true;
+    }
+
+    struct CellManagerControlls
+    {
+        public static bool DeleteSectorIfEmpty = false;
+    }
+
     struct StaticGlobal
     {
         static Random random = new Random();

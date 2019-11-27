@@ -12,8 +12,6 @@ namespace Gymnasiearbete
     /// </summary>
     class AI
     {
-        public bool DEBUGNOMEMORYSAVE = false;
-
         public string family;
         string dataPath;
 
@@ -58,11 +56,12 @@ namespace Gymnasiearbete
             {
                 idleDestination = new P(cell.Position);
                 direction = -parent.AI.Direction;
+                direction.Normalize();
                 family = parent.AI.family;
             }
 
             
-            if (!DEBUGNOMEMORYSAVE)
+            if (!AI_Controlls.NoMemorySave)
             {
                 MemoryFileLoad();
             }
@@ -100,7 +99,7 @@ namespace Gymnasiearbete
         /// </summary>
         public void MemoryFileWrite()
         {
-            if (DEBUGNOMEMORYSAVE)
+            if (AI_Controlls.NoMemorySave)
             {
                 return;
             }

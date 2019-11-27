@@ -153,7 +153,10 @@ namespace Gymnasiearbete
             {
                 if (sectors[sectorKeys[i]].All.Count <= 0)
                 {
-                    sectors.Remove(sectorKeys[i]);
+                    if (CellManagerControlls.DeleteSectorIfEmpty)
+                    {
+                        sectors.Remove(sectorKeys[i]);
+                    }
                 }
                 else
                 {
