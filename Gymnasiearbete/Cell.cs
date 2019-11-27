@@ -12,13 +12,6 @@ namespace Gymnasiearbete
     {
         int lifetime = 2 * 10 * 60;
 
-        public float Energy
-        {
-            get
-            {
-                return energy;
-            }
-        }
 
         public Food(Vector2 startPosition, float energySet = 300) : base(startPosition)
         {
@@ -38,7 +31,7 @@ namespace Gymnasiearbete
     class Cell : Entity
     {
         protected CellManager CM;
-        protected static float energyRequirement = 500; //333; //1000;
+        public static float energyRequirement = 500; //333; //1000;
         public static double consumeScale = 1.2;
 
         protected float perception = 0;
@@ -87,9 +80,9 @@ namespace Gymnasiearbete
 
         public Cell Reproduce(Random random)
         {
-            //ai.preformancepoints++;
+            AI.MemoryReward(1, true);
             AI.MemoryFileWrite();
-            Cell cchild = new Cell(CM, this, AI.AIType.CloseTargeting, Vector2.Zero, this.size, this.speed, this.perception);
+            Cell cchild = new Cell(CM, this, ai.GetAIType, Position, this.size, this.speed, this.perception);
 
             int mutationChance = 50;
             if (random.Next(100) < mutationChance)
@@ -110,6 +103,12 @@ namespace Gymnasiearbete
             {
                 this.isMarkedForDelete = true;
             }
+        }
+
+        void EnergyGain(float amount)
+        {
+            energy += amount;
+            ai.MemoryReward((int)Math.Floor(amount / 100));
         }
 
         //Perception
@@ -153,8 +152,7 @@ namespace Gymnasiearbete
                 Cell c = (Cell)g;
                 if(g.Size * consumeScale < this.size)
                 {
-                    ai.MemoryReward(3);
-                    this.energy += c.energy;
+                    EnergyGain(c.energy);
                     g.isMarkedForDelete = true;
                 }
             }
@@ -162,9 +160,8 @@ namespace Gymnasiearbete
             if (g.GetType() == typeof(Food))
             {
                 Food f = (Food)g;
+                EnergyGain(f.Energy);
                 g.isMarkedForDelete = true;
-                this.energy += f.Energy;
-                ai.MemoryReward(3);
             }
         }
 

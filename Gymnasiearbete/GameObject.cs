@@ -92,6 +92,13 @@ namespace Gymnasiearbete
     class Entity : GameObject
     {
         protected float energy = 0;
+        public float Energy
+        {
+            get
+            {
+                return energy;
+            }
+        }
 
         public Entity(Vector2 startPosition) : base(startPosition)
         {

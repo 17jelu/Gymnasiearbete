@@ -62,9 +62,9 @@ namespace Gymnasiearbete
             {
                 { 10, 2, 100 },
                 { 10, 2, 100 },
-                { 10, 2, 100 },
-                { 10, 2, 100 },
-                { 10, 2, 100 }
+                { 14, 3, 50 },
+                { 14, 3, 50 },
+                { 14, 3, 50 }
             };
 
             for (int i = 0; i < starterCells; i++)
@@ -153,7 +153,7 @@ namespace Gymnasiearbete
             {
                 if (sectors[sectorKeys[i]].All.Count <= 0)
                 {
-                    //sectors.Remove(sectorKeys[i]);
+                    sectors.Remove(sectorKeys[i]);
                 }
                 else
                 {
@@ -171,7 +171,8 @@ namespace Gymnasiearbete
                     if (g.GetType() == typeof(Cell))
                     {
                         Cell c = (Cell)g;
-                        c.AI.MemoryReward(-2, false);
+                        c.AI.MemoryReward(2, true);
+                        c.AI.MemoryReward(-(int)Math.Floor(c.Energy / 100) + 1);
                         c.AI.MemoryFileWrite();
                     }
 
