@@ -5,7 +5,39 @@ using System;
 
 namespace Gymnasiearbete
 {
-    struct AI_Controlls
+    struct EnergyControlls
+    {
+        public static double FoodEnergy
+        {
+            get
+            {
+                return 300;
+            }
+        }
+        public static double FoodSpawnAmount
+        {
+            get
+            {
+                return 2;
+            }
+        }
+        public static double FoodSpawnTime
+        {
+            get
+            {
+                return FoodEnergy/(FoodSpawnAmount * 100) * 2;
+            }
+        }
+        public static double CellEnergyRequirement
+        {
+            get
+            {
+                return (FoodEnergy * FoodSpawnTime * FoodSpawnAmount);
+            }
+        }
+    }
+
+    struct AIControlls
     {
         public static bool NoMemorySave = true;
     }
@@ -13,11 +45,16 @@ namespace Gymnasiearbete
     struct CellManagerControlls
     {
         public static bool DeleteSectorIfEmpty = false;
+
+        public static int DefaultCellSize = 10;
+        public static int DefaultCellSpeed = 20;
+        public static int DefaultCellPerception = 100;
+        public static int[] DefaultCellDNA = new int[3] { DefaultCellSize, DefaultCellSpeed, DefaultCellPerception };
     }
 
     struct StaticGlobal
     {
-        static Random random = new Random();
+        static readonly Random random = new Random();
         public static Random Random
         {
             get { return random; }

@@ -60,11 +60,11 @@ namespace Gymnasiearbete
 
             int[,] starterDNA = new int[starterCells, 3]
             {
-                { 10, 2, 100 },
-                { 10, 2, 100 },
-                { 14, 3, 50 },
-                { 14, 3, 50 },
-                { 14, 3, 50 }
+                { 10, 20, 100 },
+                { 10, 20, 100 },
+                { 14, 30, 50 },
+                { 14, 30, 50 },
+                { 14, 30, 50 }
             };
 
             for (int i = 0; i < starterCells; i++)
@@ -214,21 +214,24 @@ namespace Gymnasiearbete
 
             //MatSpawn
             spawnTimer++;
-            if (spawnTimer > 60 * 3)
+            if (spawnTimer > 60 * EnergyControlls.FoodSpawnTime)
             {
                 spawnTimer = 0;
 
                 foreach (Cell c in this.Content.Cells)
                 {
-                    int[] nORp = new int[] { -1, 1 };
-                    Content.Add(
-                        new Food(
-                            new Vector2(
-                                c.Position.X + nORp[random.Next(2)] * random.Next((int)Math.Floor(c.Size), (int)Math.Floor(c.Size) + SectorSize),
-                                c.Position.Y + nORp[random.Next(2)] * random.Next((int)Math.Floor(c.Size), (int)Math.Floor(c.Size) + SectorSize)
+                    for (int i = 0; i < EnergyControlls.FoodSpawnAmount; i++)
+                    {
+                        int[] nORp = new int[] { -1, 1 };
+                        Content.Add(
+                            new Food(
+                                new Vector2(
+                                    c.Position.X + nORp[random.Next(2)] * random.Next((int)Math.Floor(c.Size), (int)Math.Floor(c.Size) + SectorSize),
+                                    c.Position.Y + nORp[random.Next(2)] * random.Next((int)Math.Floor(c.Size), (int)Math.Floor(c.Size) + SectorSize)
+                                    )
                                 )
-                            )
-                        );
+                            );
+                    }
                 }
             }
 

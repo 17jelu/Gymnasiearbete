@@ -10,12 +10,12 @@ namespace Gymnasiearbete
     //MAT
     class Food : Entity
     {
-        int lifetime = 2 * 10 * 60;
+        int lifetime = 60 * 2 * (int)EnergyControlls.FoodSpawnTime;
 
 
-        public Food(Vector2 startPosition, float energySet = 300) : base(startPosition)
+        public Food(Vector2 startPosition) : base(startPosition)
         {
-            energy = energySet;
+            energy = (float)EnergyControlls.FoodEnergy;
         }
 
         public override void Update()
@@ -31,7 +31,7 @@ namespace Gymnasiearbete
     class Cell : Entity
     {
         protected CellManager CM;
-        public static float energyRequirement = 500; //333; //1000;
+        public static float energyRequirement = (float)EnergyControlls.CellEnergyRequirement; //500; //333; //1000;
         public static double consumeScale = 1.2;
 
         protected float perception = 0;
@@ -88,7 +88,7 @@ namespace Gymnasiearbete
             if (random.Next(100) < mutationChance)
             {
                 cchild.size = Math.Max(1, cchild.size + random.Next(-5, 5+1));
-                cchild.speed = Math.Max(0.5f, cchild.speed + random.Next(-10, 10+1) * 0.1f);
+                cchild.speed = Math.Max(1, cchild.speed + random.Next(-5, 5+1));
                 cchild.perception = Math.Max(1, cchild.perception + random.Next(-5, 5+1));
             }
 
@@ -98,7 +98,12 @@ namespace Gymnasiearbete
         
         void EnergyManagement()
         {
-            energy -= (this.size/10 + this.speed/2 + this.perception/30)/3;
+            energy -= (
+                this.size/CellManagerControlls.DefaultCellSize + 
+                this.speed/CellManagerControlls.DefaultCellSpeed + 
+                this.perception/CellManagerControlls.DefaultCellPerception
+                )/3;
+
             if (energy <= 0)
             {
                 this.isMarkedForDelete = true;

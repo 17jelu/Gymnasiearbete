@@ -110,7 +110,7 @@ namespace Gymnasiearbete
             if (direction != Vector2.Zero)
             {
                 direction.Normalize();
-                position += direction * speed;
+                position += direction * speed/10;
             }
         }
     }

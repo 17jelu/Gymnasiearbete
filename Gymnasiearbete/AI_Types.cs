@@ -61,7 +61,7 @@ namespace Gymnasiearbete
             }
 
             
-            if (!AI_Controlls.NoMemorySave)
+            if (!AIControlls.NoMemorySave)
             {
                 MemoryFileLoad();
             }
@@ -99,7 +99,7 @@ namespace Gymnasiearbete
         /// </summary>
         public void MemoryFileWrite()
         {
-            if (AI_Controlls.NoMemorySave)
+            if (AIControlls.NoMemorySave)
             {
                 return;
             }
@@ -164,7 +164,7 @@ namespace Gymnasiearbete
 
                 //Välja bästa minnet, med chans för mutation
                 List<Memory> memoryChoice = new List<Memory>();
-                double curiosity = 1;
+                double curiosity = 0;
                 if (memoryImportant.Count > 0 && r.Next(100) < 100 - curiosity)
                 {
                     //Jämför minnespoäng
@@ -490,7 +490,7 @@ namespace Gymnasiearbete
                 Math.Pow(idleDestination.Position.X - cell.Position.X, 2) + Math.Pow(idleDestination.Position.Y - cell.Position.Y, 2) > Math.Pow(2 * cell.Detectionrange, 2) ||
                 --idleTimer <= 0)
             {
-                idleTimer = (int)Math.Floor(cell.Detectionrange/cell.Speed);
+                idleTimer = (int)Math.Floor(cell.Detectionrange/cell.Speed*10);
                 idleDestination.SetPosition(new Vector2(
                     r.Next((int)Math.Floor(cell.Position.X - 2 * cell.Detectionrange), (int)Math.Floor(cell.Position.X + 2 * cell.Detectionrange)),
                     r.Next((int)Math.Floor(cell.Position.Y - 2 * cell.Detectionrange), (int)Math.Floor(cell.Position.Y + 2 * cell.Detectionrange))
@@ -564,14 +564,15 @@ namespace Gymnasiearbete
             }
 
             //För att hindra obeslutsamhet ska den fortsätta göra det den val att göra från början
-            if (bestIntrest.Contains(lastIntresst))
+            if (percivableObjects.All.Contains(lastIntresst))
             {
                 bestIntrest.Clear();
                 bestIntrest.Add(lastIntresst);
             }
 
             //Väljer slumpvalt val utifrån val med mest poäng
-            Decision(cell, bestIntrest[StaticGlobal.Random.Next(bestIntrest.Count)]);
+            lastIntresst = bestIntrest[StaticGlobal.Random.Next(bestIntrest.Count)];
+            Decision(cell, lastIntresst);
         }
 
         protected override void Decision(Cell cell, GameObject intresst)
@@ -581,7 +582,7 @@ namespace Gymnasiearbete
                 Math.Pow(idleDestination.Position.X - cell.Position.X, 2) + Math.Pow(idleDestination.Position.Y - cell.Position.Y, 2) > Math.Pow(2 * cell.Detectionrange, 2) ||
                 --idleTimer <= 0)
             {
-                idleTimer = (int)Math.Floor(cell.Detectionrange/cell.Speed);
+                idleTimer = (int)Math.Floor(cell.Detectionrange/cell.Speed*10);
                 idleDestination.SetPosition(new Vector2(
                     r.Next((int)Math.Floor(cell.Position.X - 2 * cell.Detectionrange), (int)Math.Floor(cell.Position.X + 2 * cell.Detectionrange)),
                     r.Next((int)Math.Floor(cell.Position.Y - 2 * cell.Detectionrange), (int)Math.Floor(cell.Position.Y + 2 * cell.Detectionrange))
