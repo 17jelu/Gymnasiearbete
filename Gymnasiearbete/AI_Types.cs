@@ -60,13 +60,7 @@ namespace Gymnasiearbete
                 family = parent.AI.family;
             }
 
-            
-            if (!AIControlls.NoMemorySave)
-            {
-                MemoryFileLoad();
-            }
-
-            //aiType = AIType.NoBrain;
+            MemoryFileLoad();
         }
 
         /// <summary>
@@ -87,6 +81,11 @@ namespace Gymnasiearbete
         /// </summary>
         public void MemoryFileLoad()
         {
+            if (AIControlls.NoMemorySave)
+            {
+                return;
+            }
+
             MemoryFileExsist();
             foreach (string line in File.ReadAllLines(dataPath))
             {
@@ -557,6 +556,7 @@ namespace Gymnasiearbete
                 }
             }
 
+            
             //Om det inte finns minnen
             if(bestIntrest.Count <= 0)
             {
@@ -564,7 +564,7 @@ namespace Gymnasiearbete
             }
 
             //För att hindra obeslutsamhet ska den fortsätta göra det den val att göra från början
-            if (percivableObjects.All.Contains(lastIntresst))
+            if (bestIntrest.Contains(lastIntresst))
             {
                 bestIntrest.Clear();
                 bestIntrest.Add(lastIntresst);
