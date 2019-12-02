@@ -92,6 +92,9 @@ namespace Gymnasiearbete
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            StaticGlobal.Keyboard.Begin();
+            StaticGlobal.Mouse.Begin();
+
             // Allows the game to exit
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
@@ -147,21 +150,35 @@ namespace Gymnasiearbete
             CM.Update(StaticGlobal.Random, gameTime);
 
             // Jesper
-            if (Keyboard.GetState().IsKeyDown(Keys.Up))
+            if (StaticGlobal.Keyboard.IsKeyHeld(Keys.Up))
                 Camera.Zoom += 0.005f;
-            if (Keyboard.GetState().IsKeyDown(Keys.Down))
+            if (StaticGlobal.Keyboard.IsKeyHeld(Keys.Down))
                 Camera.Zoom -= 0.005f;
-            if (Keyboard.GetState().IsKeyDown(Keys.F))
+            if (StaticGlobal.Mouse.ScrollWheelDifference != 0)
+            {
+                Camera.Zoom += StaticGlobal.Mouse.ScrollWheelDifference * 0.001f;
+            }
+            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.F))
                 Camera.ToggleFreeCam();
-            if (Keyboard.GetState().IsKeyDown(Keys.W) && Camera.FreeCam)
-                Camera.Position += new Vector2(0, -5 / Camera.Zoom);
-            if (Keyboard.GetState().IsKeyDown(Keys.S) && Camera.FreeCam)
-                Camera.Position += new Vector2(0,  5 / Camera.Zoom);
-            if (Keyboard.GetState().IsKeyDown(Keys.A) && Camera.FreeCam)
-                Camera.Position += new Vector2(-5 / Camera.Zoom, 0);
-            if (Keyboard.GetState().IsKeyDown(Keys.D) && Camera.FreeCam)
-                Camera.Position += new Vector2( 5 / Camera.Zoom, 0);
+            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.W) ||
+                StaticGlobal.Keyboard.IsKeyClicked(Keys.A) ||
+                StaticGlobal.Keyboard.IsKeyClicked(Keys.S) ||
+                StaticGlobal.Keyboard.IsKeyClicked(Keys.D))
+                Camera.FreeCam = true;
+            if (Camera.FreeCam)
+            {
+                if (StaticGlobal.Keyboard.IsKeyHeld(Keys.W))
+                    Camera.Position += new Vector2(0, -5 / Camera.Zoom);
+                if (StaticGlobal.Keyboard.IsKeyHeld(Keys.S))
+                    Camera.Position += new Vector2(0, 5 / Camera.Zoom);
+                if (StaticGlobal.Keyboard.IsKeyHeld(Keys.A))
+                    Camera.Position += new Vector2(-5 / Camera.Zoom, 0);
+                if (StaticGlobal.Keyboard.IsKeyHeld(Keys.D))
+                    Camera.Position += new Vector2(5 / Camera.Zoom, 0);
+            }
 
+            StaticGlobal.Keyboard.End();
+            StaticGlobal.Mouse.End();
             base.Update(gameTime);
         }
 
