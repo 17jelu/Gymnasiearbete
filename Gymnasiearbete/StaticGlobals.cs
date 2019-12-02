@@ -54,15 +54,32 @@ namespace Gymnasiearbete
 
     struct StaticGlobal
     {
+        public const string ExperimentalFeatureMessage = @"Message:
+This method or property is an experimental feature and has thus limited support.
+Consider not using it as it is at high risk of getting removed.";
+
         static readonly Random random = new Random();
         public static Random Random
         {
             get { return random; }
         }
 
+
         public float Clamp(float min, float max, float num)
         {
             return Math.Max(Math.Min(num, max), min);
+        }
+
+        static CustomKeyboard keyboard = new CustomKeyboard();
+        public static CustomKeyboard Keyboard
+        {
+            get { return keyboard; }
+        }
+
+        static CustomMouse mouse = new CustomMouse();
+        public static CustomMouse Mouse
+        {
+            get { return mouse; }
         }
     }
 
