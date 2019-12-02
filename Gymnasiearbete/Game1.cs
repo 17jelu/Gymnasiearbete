@@ -23,7 +23,6 @@ namespace Gymnasiearbete
         SpriteFont spriteFont;
         CellManager CM;
         public static string debugMessage = "";
-        bool restart = false;
 
         // Jesper
         SpriteBatch spriteBatch;
@@ -96,21 +95,15 @@ namespace Gymnasiearbete
             StaticGlobal.Mouse.Begin();
 
             // Allows the game to exit
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Escape))
             {
                 this.Exit();
             }
 
-            if (Keyboard.GetState().IsKeyDown(Keys.R) && restart == false || CM.simulationEnd)
+            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.R) || CM.simulationEnd)
             {
                 //Initialize();
                 CM = new CellManager(StaticGlobal.Random);
-                restart = true;
-            }
-
-            if (Keyboard.GetState().IsKeyUp(Keys.R) && restart == true)
-            {
-                restart = false;
             }
 
             int h = (int)(Math.Floor((CM.civilazationTime) / 60) / 60);
@@ -121,7 +114,7 @@ namespace Gymnasiearbete
             if (m > 0){debugMessage += " m:" + m;}
             debugMessage += " s:" + s;
 
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Space))
+            if (StaticGlobal.Mouse.IsButtonClicked(CustomMouseButtons.MOUSE_1) || StaticGlobal.Keyboard.IsKeyClicked(Keys.Space))
             {
                 CM.pause = true;
                 int debugType = 0;
@@ -143,7 +136,7 @@ namespace Gymnasiearbete
                     debugType);
             }
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Q))
+            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Q))
             {
                 CM.pause = false;
             }
@@ -194,7 +187,10 @@ namespace Gymnasiearbete
             spriteBatch.DrawString(spriteFont, debugMessage, new Vector2(4, 10), Color.Gold);
             spriteBatch.DrawString(spriteFont, Camera.Zoom.ToString(), new Vector2(10, 40), Color.Gold);
             if (CM.Content.Cells.Count > 0)
+            {
                 spriteBatch.DrawString(spriteFont, CM.Content.Cells[0].Energy.ToString(), new Vector2(10, 80), Color.LawnGreen);
+                spriteBatch.DrawString(spriteFont, CM.Content.Cells[0].AI.lastMemory.ToString(), new Vector2(10, 80 +16), Color.LawnGreen);
+            }
 
             spriteBatch.End();
             base.Draw(gameTime);
