@@ -66,7 +66,7 @@ namespace Gymnasiearbete
         }
     }
 
-    static class SGScreen
+    struct SGScreen
     {
         static Rectangle area;
         public static Rectangle Area
@@ -77,15 +77,19 @@ namespace Gymnasiearbete
 
         public static void Initialize(Rectangle ClientBounds)
         {
-            area = ClientBounds;
+            area = new Rectangle();
+            area.Width = ClientBounds.Width;
+            area.Height = ClientBounds.Height;
         }
 
         public static void Resize(Rectangle ClientBounds)
         {
-            area = ClientBounds;
+            area.Width = ClientBounds.Width;
+            area.Height = ClientBounds.Height;
         }
     }
-    static class SGBasicEffect
+
+    struct SGBasicEffect
     {
         static BasicEffect effect;
         public static BasicEffect Effect

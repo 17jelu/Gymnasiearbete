@@ -18,8 +18,8 @@ namespace Gymnasiearbete
         public static void Draw(CellManager CM, GraphicsDevice GraphicsDevice)
         {
             byte
-                gridWidth = (byte)(SGScreen.Area.Width / (CellManager.SectorSize * Camera.Zoom)),
-                gridHeight = (byte)(SGScreen.Area.Height / (CellManager.SectorSize * Camera.Zoom));
+                gridWidth = (byte)(1+ SGScreen.Area.Width / (CellManager.SectorSize * Camera.Zoom)),
+                gridHeight = (byte)(1+ SGScreen.Area.Height / (CellManager.SectorSize * Camera.Zoom));
             float
                 offset;
 
@@ -39,7 +39,7 @@ namespace Gymnasiearbete
                 gridLine.Render(GraphicsDevice);
             }
             // Drawing the Grid (horizontal)
-            for (int x = -(gridWidth >> 1); x < (gridWidth << 1); x++)
+            for (int x = -(gridWidth >> 1) - 1; x < (gridWidth << 1); x++)
             {
                 offset =
                     x * CellManager.SectorSize * Camera.Zoom
@@ -56,9 +56,9 @@ namespace Gymnasiearbete
 
             int
                 xoff = (int)(Camera.Position.X / CellManager.SectorSize)
-                    - (gridWidth >> 1) - 1, // - 1 because out of screen
+                    - (gridWidth >> 1) - 2, // - 2 because out of screen
                 yoff = (int)(Camera.Position.Y / CellManager.SectorSize)
-                    - (gridHeight >> 1) - 1 // - 1 because out of screen
+                    - (gridHeight >> 1) - 2 // - 2 because out of screen
             ;
             // Drawing content inside of Chunks
             // TODO: add offset to points
