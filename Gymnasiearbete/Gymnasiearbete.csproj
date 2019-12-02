@@ -76,8 +76,7 @@
     <Compile Include="Camera.cs" />
     <Compile Include="Cell.cs" />
     <Compile Include="CellManager.cs" />
-    <Compile Include="CSS.cs" />
-    <Compile Include="CustomInputHandler.cs" />
+    <Compile Include="CustomKeyboard.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="IDrawObject.cs" />
     <Compile Include="Memory.cs" />
@@ -88,7 +87,6 @@
     <Compile Include="Render.cs" />
     <Compile Include="Sectorcontent.cs" />
     <Compile Include="StaticGlobals.cs" />
-    <Compile Include="UIElement.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />
