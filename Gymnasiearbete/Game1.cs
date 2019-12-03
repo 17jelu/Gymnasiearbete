@@ -210,7 +210,11 @@ namespace Gymnasiearbete
             spriteBatch.DrawString(spriteFont, debugMessage, new Vector2(4, 10), Color.Gold);
             spriteBatch.DrawString(spriteFont, Camera.Zoom.ToString(), new Vector2(10, 40), Color.Gold);
             if (CM.Content.Cells.Count > 0)
-                spriteBatch.DrawString(spriteFont, CM.Content.Cells[0].Energy.ToString(), new Vector2(10, 80), Color.LawnGreen);
+            {
+                spriteBatch.DrawString(spriteFont, Camera.SpectatingCell.Energy.ToString(), new Vector2(10, 80 + 0*16), Color.LawnGreen);
+                spriteBatch.DrawString(spriteFont, Camera.SpectatingCell.AI.family, new Vector2(10, 80 + 1*16), Color.LawnGreen);
+                spriteBatch.DrawString(spriteFont, Camera.SpectatingCell.AI.lastMemory.ToString(), new Vector2(10, 80 + 2*16), Color.LawnGreen);
+            }
 
             spriteBatch.End();
             base.Draw(gameTime);
