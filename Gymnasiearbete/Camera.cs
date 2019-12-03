@@ -11,6 +11,13 @@ namespace Gymnasiearbete
             set { _pos = value; }
         }
 
+        private static Cell cell;
+        public static Cell SpectatingCell
+        {
+            get { return cell; }
+            set { cell = value; }
+        }
+
         private static float zoom;
         public static float Zoom
         {
@@ -36,9 +43,9 @@ namespace Gymnasiearbete
 
         public static void Initialize()
         {
-            Camera.Position = Vector2.Zero;
-            Camera.Zoom = 1f;
-            Camera.FreeCam = false;
+            _pos = Vector2.Zero;
+            zoom = 1f;
+            freecam = false;
         }
 
         public static Vector2 GetRelativePosition(Vector2 pos)

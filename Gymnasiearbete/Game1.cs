@@ -149,6 +149,11 @@ namespace Gymnasiearbete
             CM.Update(StaticGlobal.Random, gameTime);
 
             // Jesper
+            if (StaticGlobal.Mouse.IsButtonClicked(CustomMouseButtons.MiddleButton))
+            {
+                CM.pause = !CM.pause;
+            }
+                
             if (StaticGlobal.Keyboard.IsKeyHeld(Keys.Up))
                 Camera.Zoom += 0.005f;
             if (StaticGlobal.Keyboard.IsKeyHeld(Keys.Down))
@@ -176,6 +181,18 @@ namespace Gymnasiearbete
                     Camera.Position += new Vector2(5 / Camera.Zoom, 0);
             }
 
+
+            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.J))
+            {
+                if (Camera.SpectatingCell == null)
+                {
+                    Camera.SpectatingCell = CM.Content.Cells[0];
+                }
+                else
+                {
+                    Camera.SpectatingCell = CM.Content.Cells[CM.Content.Cells.IndexOf(Camera.SpectatingCell) + 1];
+                }
+            }
             StaticGlobal.Keyboard.End();
             StaticGlobal.Mouse.End();
             base.Update(gameTime);
