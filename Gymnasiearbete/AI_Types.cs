@@ -57,7 +57,14 @@ namespace Gymnasiearbete
                 idleDestination = new P(cell.Position);
                 direction = -parent.AI.Direction;
                 direction.Normalize();
-                family = parent.AI.family;
+                if (parent.AI.family == null)
+                {
+                    family = StaticGlobal.Family.NewFamily;
+                }
+                else
+                {
+                    family = parent.AI.family;
+                }
             }
 
             MemoryFileLoad();
