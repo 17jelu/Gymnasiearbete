@@ -159,11 +159,11 @@ Consider not using it as it is at high risk of getting removed.";
             private string GenerateRandomName()
             {
                 string name = string.Empty;
-                name += nl_color[random.Next(nl_color.Length - 1)];
+                name += nl_color[random.Next(nl_color.Length)];
                 name += " ";
-                name += nl_adjective[random.Next(nl_adjective.Length - 1)];
+                name += nl_adjective[random.Next(nl_adjective.Length)];
                 name += " ";
-                name += nl_noun[random.Next(nl_noun.Length - 1)];
+                name += nl_noun[random.Next(nl_noun.Length)];
 
                 return name;
             }
