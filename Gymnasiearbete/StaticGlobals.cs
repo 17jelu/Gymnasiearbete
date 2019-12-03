@@ -11,7 +11,7 @@ namespace Gymnasiearbete
         {
             get
             {
-                return 300;
+                return 100;
             }
         }
         public static double FoodSpawnAmount
@@ -25,14 +25,14 @@ namespace Gymnasiearbete
         {
             get
             {
-                return FoodEnergy/(FoodSpawnAmount * 100) * 2;
+                return (FoodEnergy*(FoodSpawnAmount/2) * 2)/60;
             }
         }
         public static double CellEnergyRequirement
         {
             get
             {
-                return (FoodEnergy * FoodSpawnTime * FoodSpawnAmount);
+                return (FoodSpawnTime * 60 * 2)*3;
             }
         }
     }
