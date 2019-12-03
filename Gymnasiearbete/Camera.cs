@@ -46,6 +46,7 @@ namespace Gymnasiearbete
             _pos = Vector2.Zero;
             zoom = 1f;
             freecam = false;
+            cell = null;
         }
 
         public static Vector2 GetRelativePosition(Vector2 pos)
@@ -64,6 +65,21 @@ namespace Gymnasiearbete
             temp.Y = (temp.Y - _pos.Y) * zoom + SGScreen.Area.Height / 2;
 
             return temp;
+        }
+
+        public static void ChangeSpectatingCell(int num, CellManager CM)
+        {
+            int index = CM.Content.Cells.IndexOf(cell);
+
+            if (CM.Content.Cells.Count > 0)
+            {
+                cell = CM.Content.Cells[
+                    (CM.Content.Cells.Count
+                    + index
+                    + num)
+                    % (CM.Content.Cells.Count)
+                ];
+            }
         }
     }
 }
