@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 
 namespace Gymnasiearbete
 {
@@ -27,6 +28,107 @@ Consider not using it as it is at high risk of getting removed.";
         public static CustomMouse Mouse
         {
             get { return mouse; }
+        }
+
+        static sgFamily family = new sgFamily();
+        public static sgFamily Family
+        {
+            get { return family; }
+        }
+        internal class sgFamily
+        {
+            List<string> families = new List<string>();
+            #region NameList
+            string[] nl_color = new string[]
+            {
+                    "Red",
+                    "Green",
+                    "Blue",
+                    "Yellow",
+                    "Black",
+                    "White"
+            };
+            string[] nl_adjective = new string[]
+            {
+                    "Superior",
+                    "Inferior",
+                    "Innocent",
+                    "Physical",
+                    "Yummy",
+                    "Distinct",
+                    "Hissing",
+                    "Sad",
+                    "Glorious",
+                    "Guarded",
+                    "Wild",
+                    "Spotless",
+                    "Boring",
+                    "Imperfect",
+                    "Full",
+                    "Reflective",
+                    "Smart",
+                    "Silky",
+                    "Flat",
+                    "Icy",
+                    "Skillfull"
+            };
+            string[] nl_noun = new string[]
+            {
+                    "Gangster",
+                    "Dragon",
+                    "Dolphin",
+                    "Ground",
+                    "Elbow",
+                    "Tray",
+                    "Gate",
+                    "Crow",
+                    "Zinc",
+                    "Blade",
+                    "Sisters",
+                    "Ocean",
+                    "Library",
+                    "Disease",
+                    "Twig",
+                    "Bomb",
+                    "Nest",
+                    "Wind",
+                    "Downtown",
+                    "Apparatus",
+                    "Top",
+                    "Magic",
+                    "Eggs",
+                    "Nest",
+                    "Bears",
+                    "Coat"
+            };
+            #endregion
+
+            private string GenerateRandomName()
+            {
+                string name = string.Empty;
+                name += nl_color[random.Next(nl_color.Length - 1)];
+                name += " ";
+                name += nl_adjective[random.Next(nl_adjective.Length - 1)];
+                name += " ";
+                name += nl_noun[random.Next(nl_noun.Length - 1)];
+
+                return name;
+            }
+
+            public string NewFamily
+            {
+                get
+                {
+                    string name = string.Empty;
+                    do
+                    {
+                        name = GenerateRandomName();
+                    }
+                    while (families.Contains(name));
+
+                    return name;
+                }
+            }
         }
     }
 
