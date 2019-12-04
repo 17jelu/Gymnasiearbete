@@ -104,16 +104,16 @@ This is survival. This is war.
         }
         internal class sgFamily
         {
-            List<string> families = new List<string>();
+            Dictionary<string, int> families = new Dictionary<string, int>();
             #region NameList
             string[] nl_color = new string[]
             {
                     "Red",
                     "Green",
                     "Blue",
-                    "Yellow",
-                    "Black",
-                    "White"
+                    "Cyan",
+                    "Magenta",
+                    "Yellow"
             };
             string[] nl_adjective = new string[]
             {
@@ -191,9 +191,27 @@ This is survival. This is war.
                     {
                         name = GenerateRandomName();
                     }
-                    while (families.Contains(name));
+                    while (families.ContainsKey(name));
+
+                    families.Add(name, 1);
 
                     return name;
+                }
+            }
+
+            public void KillMember(string family)
+            {
+                if (families.ContainsKey(family))
+                {
+                    families[family] -= 1;
+                }
+            }
+
+            public void AddMember(string family)
+            {
+                if (families.ContainsKey(family))
+                {
+                    families[family] += 1;
                 }
             }
         }
