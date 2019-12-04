@@ -87,6 +87,35 @@ namespace Gymnasiearbete
                         // Draw Cells
                         for (int i = 0; i < sector.Cells.Count; i++)
                         {
+                            switch (sector.Cells[i].AI.family.Split(' ')[0])
+                            {
+                                case "Red":
+                                    circleCell.Color = Color.Red;
+                                    break;
+                                case "Blue":
+                                    circleCell.Color = Color.Blue;
+                                    break;
+                                case "Green":
+                                    circleCell.Color = Color.Green;
+                                    break;
+                                case "Cyan":
+                                    circleCell.Color = Color.Cyan;
+                                    break;
+                                case "Magenta":
+                                    circleCell.Color = Color.Magenta;
+                                    break;
+                                case "Yellow":
+                                    circleCell.Color = Color.Yellow;
+                                    break;
+                                case "Black":
+                                    circleCell.Color = Color.Black;
+                                    break;
+                                case "White":
+                                    circleCell.Color = Color.White;
+                                    break;
+                                default: break;
+                            };
+
                             circleCell.Radius = sector.Cells[i].Size * Camera.Zoom;
                             circleCell.Position = Camera.GetRelativePosition(sector.Cells[i].Position);
                             circleCell.UpdateVertices();
