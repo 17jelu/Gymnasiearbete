@@ -46,7 +46,9 @@ Consider not using it as it is at high risk of getting removed.";
                     "Blue",
                     "Cyan",
                     "Magenta",
-                    "Yellow"
+                    "Yellow",
+                    "Black",
+                    "White"
             };
             string[] nl_adjective = new string[]
             {

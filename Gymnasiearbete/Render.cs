@@ -13,8 +13,9 @@ namespace Gymnasiearbete
             circleCell = new Circle(Circle.UnitCircle.Point16, Color.Red, 10f, Vector2.Zero);
             circleFood = new Circle(Circle.UnitCircle.Point8, Color.LawnGreen, 10f, Vector2.Zero);
             line = new Line { Color = Color.Orange };
-            gridLine = new Line { Color = Color.White };
+            gridLine = new Line { Color = Color.Gray };
         }
+
         public static void Draw(CellManager CM, GraphicsDevice GraphicsDevice)
         {
             byte
@@ -104,6 +105,7 @@ namespace Gymnasiearbete
                     }
                     else
                     {
+                        /*
                         line.SetLine(
                             new Vector2(
                                 x * CellManager.SectorSize,
@@ -123,9 +125,20 @@ namespace Gymnasiearbete
                                 y * CellManager.SectorSize + CellManager.SectorSize
                             ));
                         line.Render(GraphicsDevice);
+                        */
                     }
                 }
             }
+
+            // DEBUG THING
+            line.SetLine(
+                new Vector2(SGScreen.Area.Left + 10, SGScreen.Area.Top + 10),
+                new Vector2(SGScreen.Area.Right - 10, SGScreen.Area.Bottom - 10),
+                false
+            );
+            line.Render(GraphicsDevice);
+
+            // END OF Draw()
         }
     }
 }
