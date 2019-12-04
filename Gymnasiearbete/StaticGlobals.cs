@@ -59,6 +59,20 @@ namespace Gymnasiearbete
 This method or property is an experimental feature and has thus limited support.
 Consider not using it as it is at high risk of getting removed.";
 
+        public static string Lore
+        {
+            get
+            {
+                return @"As the story goes;
+War. War, always war. The year 2151. 
+The nukes erased life as we know it. 
+Left are only somewhat mindless blobbs of iradiated mass, 
+ruled by their primal instinct of, fight, flight, eat or get eaten.
+This is survival. This is war. 
+";
+            }
+        }
+
         static readonly Random random = new Random();
         public static Random Random
         {

@@ -171,12 +171,13 @@ namespace Gymnasiearbete
 
                 if (g.isMarkedForDelete)
                 {
-                    if (g.GetType() == typeof(Cell))
+                    if (IsCell(g))
                     {
                         Cell c = (Cell)g;
                         c.AI.MemoryReward(2, true);
-                        c.AI.MemoryReward(-(int)Math.Floor(c.Energy / 100) + 1);
+                        c.AI.MemoryReward(-(int)Math.Floor(c.Energy / 100) + 2);
                         c.AI.MemoryFileWrite();
+                        //StaticGlobal.Family.KillMember(c.AI.family);
                     }
 
                     Content.Remove(g);
