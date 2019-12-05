@@ -94,7 +94,9 @@ This is survival. This is war.";
                     "Blue",
                     "Cyan",
                     "Magenta",
-                    "Yellow"
+                    "Yellow",
+                    "Black",
+                    "White"
             };
             string[] nl_adjective = new string[]
             {
