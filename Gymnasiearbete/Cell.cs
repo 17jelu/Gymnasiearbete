@@ -10,7 +10,7 @@ namespace Gymnasiearbete
     //MAT
     class Food : Entity
     {
-        int lifetime = 60 * 2 * (int)EnergyControlls.FoodSpawnTime;
+        int lifetime = 60 * 5 * (int)EnergyControlls.FoodSpawnTime;
 
 
         public Food(Vector2 startPosition) : base(startPosition)

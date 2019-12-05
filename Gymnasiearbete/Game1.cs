@@ -18,10 +18,9 @@ namespace Gymnasiearbete
     public class Game1 : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
-        
+
         // Martin
         SpriteFont spriteFont;
-        CellManager CM;
         public static string debugMessage = "";
 
         // Jesper
@@ -51,13 +50,15 @@ namespace Gymnasiearbete
 
             Window.ClientSizeChanged += new EventHandler<EventArgs>(OnResize);
 
-            CM = new CellManager(StaticGlobal.Random);
 
             SGBasicEffect.Initialize(GraphicsDevice);
             SGScreen.Initialize(Window.ClientBounds);
             Render.Initialize();
             Camera.Initialize();
 
+            StaticGlobal.CM = new CellManager();
+            StaticGlobal.CM.Initilize();
+            
             base.Initialize();
         }
 
@@ -100,47 +101,26 @@ namespace Gymnasiearbete
                 this.Exit();
             }
 
-            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.R) || CM.simulationEnd)
+            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.R) || StaticGlobal.CM.simulationEnd)
             {
                 //Initialize();
-                CM = new CellManager(StaticGlobal.Random);
+                StaticGlobal.CM.Initilize();
             }
 
-            int h = (int)(Math.Floor((CM.civilazationTime) / 60) / 60);
-            int m = (int)(Math.Floor(CM.civilazationTime) / 60) - (60 * h);
-            int s = (int)Math.Floor(CM.civilazationTime) - (60 * m);
+            int h = (int)(Math.Floor((StaticGlobal.CM.civilazationTime) / 60) / 60);
+            int m = (int)(Math.Floor(StaticGlobal.CM.civilazationTime) / 60) - (60 * h);
+            int s = (int)Math.Floor(StaticGlobal.CM.civilazationTime) - (60 * m);
             debugMessage = "";
             if (h > 0){debugMessage += " h:" + h;}
             if (m > 0){debugMessage += " m:" + m;}
             debugMessage += " s:" + s;
 
-            if (StaticGlobal.Mouse.IsButtonClicked(CustomMouseButtons.MOUSE_1) || StaticGlobal.Keyboard.IsKeyClicked(Keys.Space))
+            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Space))
             {
-                CM.pause = true;
-                int debugType = 0;
-                if (Keyboard.GetState().IsKeyDown(Keys.D1))
-                {
-                    debugType = 1;
-                }
-                if (Keyboard.GetState().IsKeyDown(Keys.D2))
-                {
-                    debugType = 2;
-                }
-                if (Keyboard.GetState().IsKeyDown(Keys.D3))
-                {
-                    debugType = 3;
-                }
-                debugMessage = CM.DebugSector(
-                    (Camera.Position.X - SGScreen.Area.Width / 2 + Mouse.GetState().X) * Camera.Zoom, 
-                    (Camera.Position.Y - SGScreen.Area.Height / 2 + Mouse.GetState().Y) * Camera.Zoom, 
-                    debugType);
+                StaticGlobal.CM.Pause();
             }
 
-            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Q))
-            {
-                CM.pause = false;
-            }
-            CM.Update(StaticGlobal.Random, gameTime);
+            StaticGlobal.CM.Update(gameTime);
 
             // Jesper
             if (StaticGlobal.Keyboard.IsKeyHeld(Keys.Up))
@@ -186,7 +166,7 @@ namespace Gymnasiearbete
 
             spriteBatch.DrawString(spriteFont, debugMessage, new Vector2(4, 10), Color.Gold);
             spriteBatch.DrawString(spriteFont, Camera.Zoom.ToString(), new Vector2(10, 40), Color.Gold);
-            if (CM.Content.Cells.Count > 0)
+            if (StaticGlobal.CM.Content.Cells.Count > 0)
             {
                 if (Camera.SpectatingCell != null)
                 {
@@ -201,9 +181,9 @@ namespace Gymnasiearbete
 
             SGBasicEffect.ApplyCurrentTechnique();
 
-            if (CM.Content.Cells.Count > 0 && !Camera.FreeCam)
+            if (StaticGlobal.CM.Content.Cells.Count > 0 && !Camera.FreeCam)
             {
-                Camera.Position = Vector2.Lerp(Camera.Position, CM.Content.Cells[0].Position, 0.125f);
+                Camera.Position = Vector2.Lerp(Camera.Position, StaticGlobal.CM.Content.Cells[0].Position, 0.125f);
                 //Vector2.Lerp(
                 //    Camera.Position,
                 //    CM.Content.Cells[0].Position,
@@ -215,7 +195,7 @@ namespace Gymnasiearbete
                 //);
             }
 
-            Render.Draw(CM, GraphicsDevice);
+            Render.Draw(StaticGlobal.CM, GraphicsDevice);
         }
 
         /// <summary>

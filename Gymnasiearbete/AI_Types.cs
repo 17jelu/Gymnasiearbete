@@ -47,11 +47,8 @@ namespace Gymnasiearbete
 
         readonly static char z = '|';
 
-        protected Random r;
-
         public AI(Cell parent, Cell cell)
         {
-            r = StaticGlobal.Random;
             if (parent != null && cell != null)
             {
                 idleDestination = new P(cell.Position);
@@ -171,7 +168,7 @@ namespace Gymnasiearbete
                 //Välja bästa minnet, med chans för mutation
                 List<Memory> memoryChoice = new List<Memory>();
                 double curiosity = 0;
-                if (memoryImportant.Count > 0 && r.Next(100) < 100 - curiosity)
+                if (memoryImportant.Count > 0 && StaticGlobal.Random.Next(100) < 100 - curiosity)
                 {
                     //Jämför minnespoäng
                     memoryChoice.Add(memoryImportant[0]);
@@ -189,14 +186,14 @@ namespace Gymnasiearbete
                         }
 
                         //Väljer slumpvalt utifrån de bästa minnena
-                        lastMemory = memoryChoice[r.Next(memoryChoice.Count)];
+                        lastMemory = memoryChoice[StaticGlobal.Random.Next(memoryChoice.Count)];
                         return lastMemory;
                     }
                 }
                 else
                 {
                     //skapar ett minne som svar på att inga minnen för situationen finns eller mutation
-                    Memory mem = new Memory(situation, 0.ToString(), choises[r.Next(choises.Length)]);
+                    Memory mem = new Memory(situation, 0.ToString(), choises[StaticGlobal.Random.Next(choises.Length)]);
 
                     //I fallet att det är mutation, undersöks det om minnet redan finns
                     for (int i = 0; i < memory.Count; i++)
@@ -498,8 +495,8 @@ namespace Gymnasiearbete
             {
                 idleTimer = (int)Math.Floor(cell.Detectionrange/cell.Speed*10);
                 idleDestination.SetPosition(new Vector2(
-                    r.Next((int)Math.Floor(cell.Position.X - 2 * cell.Detectionrange), (int)Math.Floor(cell.Position.X + 2 * cell.Detectionrange)),
-                    r.Next((int)Math.Floor(cell.Position.Y - 2 * cell.Detectionrange), (int)Math.Floor(cell.Position.Y + 2 * cell.Detectionrange))
+                    StaticGlobal.Random.Next((int)Math.Floor(cell.Position.X - 2 * cell.Detectionrange), (int)Math.Floor(cell.Position.X + 2 * cell.Detectionrange)),
+                    StaticGlobal.Random.Next((int)Math.Floor(cell.Position.Y - 2 * cell.Detectionrange), (int)Math.Floor(cell.Position.Y + 2 * cell.Detectionrange))
                     ));
             }
 
@@ -591,8 +588,8 @@ namespace Gymnasiearbete
             {
                 idleTimer = (int)Math.Floor(cell.Detectionrange/cell.Speed*10);
                 idleDestination.SetPosition(new Vector2(
-                    r.Next((int)Math.Floor(cell.Position.X - 2 * cell.Detectionrange), (int)Math.Floor(cell.Position.X + 2 * cell.Detectionrange)),
-                    r.Next((int)Math.Floor(cell.Position.Y - 2 * cell.Detectionrange), (int)Math.Floor(cell.Position.Y + 2 * cell.Detectionrange))
+                    StaticGlobal.Random.Next((int)Math.Floor(cell.Position.X - 2 * cell.Detectionrange), (int)Math.Floor(cell.Position.X + 2 * cell.Detectionrange)),
+                    StaticGlobal.Random.Next((int)Math.Floor(cell.Position.Y - 2 * cell.Detectionrange), (int)Math.Floor(cell.Position.Y + 2 * cell.Detectionrange))
                     ));
             }
 

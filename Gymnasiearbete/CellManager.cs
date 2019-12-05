@@ -26,15 +26,8 @@ namespace Gymnasiearbete
 
         int spawnTimer = 0;
 
-        public bool pause = false;
+        bool pause = false;
         public bool simulationEnd = false;
-
-        public static int SectorSize {
-            get
-            {
-                return 100;
-            }
-        }
 
         Dictionary<Point, SectorContent> sectors = new Dictionary<Point, SectorContent>();
         public Dictionary<Point, SectorContent> Sectors
@@ -45,8 +38,18 @@ namespace Gymnasiearbete
             }
         }
 
-        public CellManager(Random random)
+        public CellManager()
         {
+            Initilize();
+        }
+
+        public void Initilize()
+        {
+            Sectors.Clear();
+            civilazationTime = 0;
+            pause = false;
+            simulationEnd = false;
+
             const int starterCells = 5;
 
             AI.AIType[] starterAI = new AI.AIType[starterCells]
@@ -69,23 +72,25 @@ namespace Gymnasiearbete
 
             for (int i = 0; i < starterCells; i++)
             {
-
                 Cell c = new Cell
                         (this, new Cell(this, null, AI.AIType.NoBrain, Vector2.Zero, 0, 0, 0), starterAI[i],
-                        new Vector2(random.Next(-0 * CellManager.SectorSize, starterCells * 2 * CellManager.SectorSize), random.Next(-0 * CellManager.SectorSize, starterCells * 2 * CellManager.SectorSize)),
+                        new Vector2(
+                            StaticGlobal.Random.Next(-0 * StaticGlobal.SectorSize, starterCells * 2 * StaticGlobal.SectorSize), 
+                            StaticGlobal.Random.Next(-0 * StaticGlobal.SectorSize, starterCells * 2 * StaticGlobal.SectorSize)),
                         starterDNA[i, 0], starterDNA[i, 1], starterDNA[i, 2]
                         );
 
                 Content.Add(c);
 
-                for (int f = 0; f < 3; f++) {
+                for (int f = 0; f < 3; f++)
+                {
                     int[] nORp = new int[] { -1, 1 };
                     Content.Add
                         (
                         new Food(
                             new Vector2(
-                                c.Position.X + nORp[random.Next(2)] * random.Next((int)Math.Floor(c.Size), (int)Math.Floor(c.Size) + SectorSize),
-                                c.Position.Y + nORp[random.Next(2)] * random.Next((int)Math.Floor(c.Size), (int)Math.Floor(c.Size) + SectorSize)
+                                c.Position.X + nORp[StaticGlobal.Random.Next(2)] * StaticGlobal.Random.Next((int)Math.Floor(c.Size), (int)Math.Floor(c.Size) + StaticGlobal.SectorSize),
+                                c.Position.Y + nORp[StaticGlobal.Random.Next(2)] * StaticGlobal.Random.Next((int)Math.Floor(c.Size), (int)Math.Floor(c.Size) + StaticGlobal.SectorSize)
                                 )
                             )
                         );
@@ -93,39 +98,9 @@ namespace Gymnasiearbete
             }
         }
 
-        public string DebugSector(float Xposition, float Yposition, int debugType = 0)
+        public void Pause()
         {
-            string output = "";
-            int x = (int)Math.Floor(Xposition / SectorSize);
-            int y = (int)Math.Floor(Yposition / SectorSize);
-
-            if (sectors.ContainsKey(new Point(x, y)))
-            {
-                foreach (GameObject g in sectors[new Point(x, y)].All)
-                {
-                    if (debugType == 1 || debugType == 0)
-                    {
-                        output += "{" + Content.All.IndexOf(g) + "-" + g.GetType().ToString().Split('.')[1] + "}";
-                    }
-                    if (debugType == 2 || debugType == 0)
-                    {
-                        output += g.DEBUG();
-                    }
-                    if (debugType == 3 || debugType == 0)
-                    {
-                        if (g.GetType() == typeof(Cell))
-                        {
-                            Cell c = (Cell)g;
-                            output += c.AI.DEBIUG();
-                        }
-                    }
-                    output += "\n";
-                }
-
-                return output;
-            }
-
-            return "-";
+            pause = !pause;
         }
 
         public bool IsCell(GameObject g)
@@ -138,7 +113,7 @@ namespace Gymnasiearbete
             return false;
         }
 
-        public void Update(Random random, GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
             if (pause || simulationEnd)
             {
@@ -184,10 +159,10 @@ namespace Gymnasiearbete
                 }
                 else
                 {
-                    int xMax = (int)Math.Floor((g.Position.X + g.Size) / SectorSize);
-                    int yMax = (int)Math.Floor((g.Position.Y + g.Size) / SectorSize);
-                    int xMin = (int)Math.Floor((g.Position.X - g.Size) / SectorSize);
-                    int yMin = (int)Math.Floor((g.Position.Y - g.Size) / SectorSize);
+                    int xMax = (int)Math.Floor((g.Position.X + g.Size) / StaticGlobal.SectorSize);
+                    int yMax = (int)Math.Floor((g.Position.Y + g.Size) / StaticGlobal.SectorSize);
+                    int xMin = (int)Math.Floor((g.Position.X - g.Size) / StaticGlobal.SectorSize);
+                    int yMin = (int)Math.Floor((g.Position.Y - g.Size) / StaticGlobal.SectorSize);
 
                     for (int x = xMin; x <= xMax; x++)
                     {
@@ -207,7 +182,7 @@ namespace Gymnasiearbete
 
                         if (c.isMarkForReproduce)
                         {
-                            Content.AddRange(new GameObject[1] { c.Reproduce(random) });
+                            Content.AddRange(new GameObject[1] { c.Reproduce(StaticGlobal.Random) });
                         }
                     }
                 }
@@ -227,8 +202,8 @@ namespace Gymnasiearbete
                         Content.Add(
                             new Food(
                                 new Vector2(
-                                    c.Position.X + nORp[random.Next(2)] * random.Next((int)Math.Floor(c.Size), (int)Math.Floor(c.Size) + SectorSize),
-                                    c.Position.Y + nORp[random.Next(2)] * random.Next((int)Math.Floor(c.Size), (int)Math.Floor(c.Size) + SectorSize)
+                                    c.Position.X + nORp[StaticGlobal.Random.Next(2)] * StaticGlobal.Random.Next((int)Math.Floor(c.Size), (int)Math.Floor(c.Size) + StaticGlobal.SectorSize),
+                                    c.Position.Y + nORp[StaticGlobal.Random.Next(2)] * StaticGlobal.Random.Next((int)Math.Floor(c.Size), (int)Math.Floor(c.Size) + StaticGlobal.SectorSize)
                                     )
                                 )
                             );
@@ -241,10 +216,10 @@ namespace Gymnasiearbete
             {
                 List<GameObject> detectionCheck = new List<GameObject>();
 
-                int xMax = (int)Math.Floor((c.Position.X + c.Detectionrange) / SectorSize);
-                int xMin = (int)Math.Floor((c.Position.X - c.Detectionrange) / SectorSize);
-                int yMax = (int)Math.Floor((c.Position.Y + c.Detectionrange) / SectorSize);
-                int yMin = (int)Math.Floor((c.Position.Y - c.Detectionrange) / SectorSize);
+                int xMax = (int)Math.Floor((c.Position.X + c.Detectionrange) / StaticGlobal.SectorSize);
+                int xMin = (int)Math.Floor((c.Position.X - c.Detectionrange) / StaticGlobal.SectorSize);
+                int yMax = (int)Math.Floor((c.Position.Y + c.Detectionrange) / StaticGlobal.SectorSize);
+                int yMin = (int)Math.Floor((c.Position.Y - c.Detectionrange) / StaticGlobal.SectorSize);
 
                 for (int x = xMin; x <= xMax; x++)
                 {
@@ -265,7 +240,7 @@ namespace Gymnasiearbete
                     }
                 }
 
-                c.Update(detectionCheck, random);
+                c.Update(detectionCheck, StaticGlobal.Random);
             }
 
             foreach (Food f in Content.Foods)
