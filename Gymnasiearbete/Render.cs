@@ -13,8 +13,9 @@ namespace Gymnasiearbete
             circleCell = new Circle(Circle.UnitCircle.Point16, Color.Red, 10f, Vector2.Zero);
             circleFood = new Circle(Circle.UnitCircle.Point8, Color.LawnGreen, 10f, Vector2.Zero);
             line = new Line { Color = Color.Orange };
-            gridLine = new Line { Color = Color.White };
+            gridLine = new Line { Color = Color.Gray };
         }
+
         public static void Draw(CellManager CM, GraphicsDevice GraphicsDevice)
         {
             byte
@@ -86,6 +87,35 @@ namespace Gymnasiearbete
                         // Draw Cells
                         for (int i = 0; i < sector.Cells.Count; i++)
                         {
+                            switch (sector.Cells[i].AI.family.Split(' ')[0])
+                            {
+                                case "Red":
+                                    circleCell.Color = Color.Red;
+                                    break;
+                                case "Blue":
+                                    circleCell.Color = Color.Blue;
+                                    break;
+                                case "Green":
+                                    circleCell.Color = Color.Green;
+                                    break;
+                                case "Cyan":
+                                    circleCell.Color = Color.Cyan;
+                                    break;
+                                case "Magenta":
+                                    circleCell.Color = Color.Magenta;
+                                    break;
+                                case "Yellow":
+                                    circleCell.Color = Color.Yellow;
+                                    break;
+                                case "Black":
+                                    circleCell.Color = Color.Black;
+                                    break;
+                                case "White":
+                                    circleCell.Color = Color.White;
+                                    break;
+                                default: break;
+                            };
+
                             circleCell.Radius = sector.Cells[i].Size * Camera.Zoom;
                             circleCell.Position = Camera.GetRelativePosition(sector.Cells[i].Position);
                             circleCell.UpdateVertices();
@@ -104,6 +134,7 @@ namespace Gymnasiearbete
                     }
                     else
                     {
+                        /*
                         line.SetLine(
                             new Vector2(
                                 x * CellManager.SectorSize,
@@ -123,9 +154,20 @@ namespace Gymnasiearbete
                                 y * CellManager.SectorSize + CellManager.SectorSize
                             ));
                         line.Render(GraphicsDevice);
+                        */
                     }
                 }
             }
+
+            // DEBUG THING
+            line.SetLine(
+                new Vector2(SGScreen.Area.Left + 10, SGScreen.Area.Top + 10),
+                new Vector2(SGScreen.Area.Right - 10, SGScreen.Area.Bottom - 10),
+                false
+            );
+            line.Render(GraphicsDevice);
+
+            // END OF Draw()
         }
     }
 }

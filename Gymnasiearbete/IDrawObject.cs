@@ -32,6 +32,8 @@ namespace Gymnasiearbete
         float radius;
         Vector2 pos;
         Vector2[] preCalc;
+        // Outline
+        VertexPositionColor[] lines;
 
         public Vector2 Position
         {
@@ -65,12 +67,14 @@ namespace Gymnasiearbete
             
             if (type == UnitCircle.Point16)
             {
+                lines = new VertexPositionColor[17];
                 vertices = new VertexPositionColor[16];
                 triangles = 14;
                 preCalc = PreCalc.Point16UnitCircle;
             }
             else
             {
+                lines = new VertexPositionColor[9];
                 vertices = new VertexPositionColor[8];
                 triangles = 6;
                 preCalc = PreCalc.Point8UnitCircle;
@@ -81,25 +85,14 @@ namespace Gymnasiearbete
             {
                 vertices[i].Color = color;
             }
+            // Give each line vertex the color black
+            for (int i = 0; i < lines.Length; i++)
+            {
+                lines[i].Color = Color.Black;
+            }
 
             // Positionate each vertex
-            for (int i = 0, j = 0; i < vertices.Length; i++)
-            {
-                if (i == 0)
-                    vertices[0].Position = new Vector3(pos + preCalc[0] * radius, 0);
-                else
-                {
-                    if (i % 2 == 1)
-                    {
-                        j++;
-                        vertices[i].Position = new Vector3(pos + preCalc[j] * radius, 0);
-                    }
-                    else
-                    {
-                        vertices[i].Position = new Vector3(pos + preCalc[preCalc.Length - j] * radius, 0);
-                    }
-                }
-            }
+            UpdateVertices();
         }
 
         public void UpdateVertices()
@@ -122,6 +115,15 @@ namespace Gymnasiearbete
                     }
                 }
             }
+
+            // Position each vertex (Outline)
+            for (int i = 0; i < lines.Length; i++)
+            {
+                if (i < preCalc.Length)
+                    lines[i].Position = new Vector3(pos + preCalc[i] * radius, 0);
+                else
+                    lines[i].Position = new Vector3(pos + preCalc[0] * radius, 0);
+            }
         }
 
         private void UpdateColor(Color color)
@@ -130,6 +132,16 @@ namespace Gymnasiearbete
             {
                 vertices[i].Color = color;
             }
+        }
+
+        new public void Render(GraphicsDevice GraphicsDevice)
+        {
+            base.Render(GraphicsDevice);
+            GraphicsDevice.DrawUserPrimitives<VertexPositionColor>(
+                PrimitiveType.LineStrip,
+                lines,
+                0,
+                triangles + 2);
         }
     }
 
@@ -252,7 +264,7 @@ namespace Gymnasiearbete
             set { rect.Height = value; UpdateVertices(); }
         }
 
-        public GraphicRectangle(BasicEffect effect, Color color, int x, int y, int width, int height)
+        public GraphicRectangle(Color color, int x, int y, int width, int height)
         {
             rect = new Rect(x, y, width, height);
 
