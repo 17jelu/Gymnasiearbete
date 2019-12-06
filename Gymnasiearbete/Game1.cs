@@ -55,9 +55,6 @@ namespace Gymnasiearbete
             SGScreen.Initialize(Window.ClientBounds);
             Render.Initialize();
             Camera.Initialize();
-
-            StaticGlobal.CM = new CellManager();
-            StaticGlobal.CM.Initilize();
             
             base.Initialize();
         }
@@ -101,10 +98,10 @@ namespace Gymnasiearbete
                 this.Exit();
             }
 
-            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.R) || StaticGlobal.CM.simulationEnd)
+            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.R) || StaticGlobal.CM.SimulationEnd)
             {
-                //Initialize();
                 StaticGlobal.CM.Initilize();
+                Camera.ChangeSpectatingCell(0, StaticGlobal.CM);
             }
 
             int h = (int)(Math.Floor((StaticGlobal.CM.civilazationTime) / 60) / 60);
@@ -115,39 +112,45 @@ namespace Gymnasiearbete
             if (m > 0){debugMessage += " m:" + m;}
             debugMessage += " s:" + s;
 
-            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Space))
-            {
-                StaticGlobal.CM.Pause();
-            }
-
             StaticGlobal.CM.Update(gameTime);
+
+            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Space))
+            { StaticGlobal.CM.TogglePause(); }
 
             // Jesper
             if (StaticGlobal.Keyboard.IsKeyHeld(Keys.Up))
-                Camera.Zoom += 0.005f;
+            { Camera.Zoom += 0.005f; }
+
             if (StaticGlobal.Keyboard.IsKeyHeld(Keys.Down))
-                Camera.Zoom -= 0.005f;
+            { Camera.Zoom -= 0.005f; }
+
+            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Left))
+            { Camera.ChangeSpectatingCell(-1, StaticGlobal.CM); }
+
+            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Right))
+            { Camera.ChangeSpectatingCell(1, StaticGlobal.CM); }
+
             if (StaticGlobal.Mouse.ScrollWheelDifference != 0)
-            {
-                Camera.Zoom += StaticGlobal.Mouse.ScrollWheelDifference * 0.001f;
-            }
+            { Camera.Zoom += StaticGlobal.Mouse.ScrollWheelDifference * 0.001f; }
+
             if (StaticGlobal.Keyboard.IsKeyClicked(Keys.F))
-                Camera.ToggleFreeCam();
+            { Camera.ToggleFreeCam(); }
             if (StaticGlobal.Keyboard.IsKeyClicked(Keys.W) ||
                 StaticGlobal.Keyboard.IsKeyClicked(Keys.A) ||
                 StaticGlobal.Keyboard.IsKeyClicked(Keys.S) ||
                 StaticGlobal.Keyboard.IsKeyClicked(Keys.D))
-                Camera.FreeCam = true;
+            { Camera.FreeCam = true; }
+
             if (Camera.FreeCam)
             {
                 if (StaticGlobal.Keyboard.IsKeyHeld(Keys.W))
-                    Camera.Position += new Vector2(0, -5 / Camera.Zoom);
+                { Camera.Position += new Vector2(0, -5 / Camera.Zoom); }
                 if (StaticGlobal.Keyboard.IsKeyHeld(Keys.S))
-                    Camera.Position += new Vector2(0, 5 / Camera.Zoom);
+                { Camera.Position += new Vector2(0, 5 / Camera.Zoom); }
                 if (StaticGlobal.Keyboard.IsKeyHeld(Keys.A))
-                    Camera.Position += new Vector2(-5 / Camera.Zoom, 0);
+                { Camera.Position += new Vector2(-5 / Camera.Zoom, 0); }
                 if (StaticGlobal.Keyboard.IsKeyHeld(Keys.D))
-                    Camera.Position += new Vector2(5 / Camera.Zoom, 0);
+                { Camera.Position += new Vector2(5 / Camera.Zoom, 0); }
             }
 
             StaticGlobal.Keyboard.End();
@@ -166,14 +169,11 @@ namespace Gymnasiearbete
 
             spriteBatch.DrawString(spriteFont, debugMessage, new Vector2(4, 10), Color.Gold);
             spriteBatch.DrawString(spriteFont, Camera.Zoom.ToString(), new Vector2(10, 40), Color.Gold);
-            if (StaticGlobal.CM.Content.Cells.Count > 0)
+            if (Camera.SpectatingCell != null)
             {
-                if (Camera.SpectatingCell != null)
-                {
-                    spriteBatch.DrawString(spriteFont, Camera.SpectatingCell.Energy.ToString(), new Vector2(10, 80 + 0 * 16), Color.LawnGreen);
-                    spriteBatch.DrawString(spriteFont, Camera.SpectatingCell.AI.family, new Vector2(10, 80 + 1 * 16), Color.LawnGreen);
-                    spriteBatch.DrawString(spriteFont, Camera.SpectatingCell.AI.lastMemory.ToString(), new Vector2(10, 80 + 2 * 16), Color.LawnGreen);
-                }
+                spriteBatch.DrawString(spriteFont, Camera.SpectatingCell.Energy.ToString(), new Vector2(10, 80 + 0 * 16), Color.LawnGreen);
+                spriteBatch.DrawString(spriteFont, Camera.SpectatingCell.AI.family, new Vector2(10, 80 + 1 * 16), Color.LawnGreen);
+                spriteBatch.DrawString(spriteFont, Camera.SpectatingCell.AI.lastMemory.ToString(), new Vector2(10, 80 + 2 * 16), Color.LawnGreen);
             }
 
             spriteBatch.End();
@@ -207,6 +207,11 @@ namespace Gymnasiearbete
         {
             Console.WriteLine(sender.ToString());
             SGBasicEffect.Resize(GraphicsDevice);
+        }
+
+        void KeyboardUpdate()
+        {
+
         }
     }
 }

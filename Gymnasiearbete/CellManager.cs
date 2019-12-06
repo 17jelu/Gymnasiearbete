@@ -27,7 +27,13 @@ namespace Gymnasiearbete
         int spawnTimer = 0;
 
         bool pause = false;
-        public bool simulationEnd = false;
+        public bool SimulationEnd
+        {
+            get
+            {
+                return (content.Cells.Count <= 0);
+            }
+        }
 
         Dictionary<Point, SectorContent> sectors = new Dictionary<Point, SectorContent>();
         public Dictionary<Point, SectorContent> Sectors
@@ -40,15 +46,14 @@ namespace Gymnasiearbete
 
         public CellManager()
         {
-            Initilize();
+
         }
 
         public void Initilize()
         {
-            Sectors.Clear();
+            Content.Clear();
             civilazationTime = 0;
             pause = false;
-            simulationEnd = false;
 
             const int starterCells = 5;
 
@@ -98,7 +103,7 @@ namespace Gymnasiearbete
             }
         }
 
-        public void Pause()
+        public void TogglePause()
         {
             pause = !pause;
         }
@@ -115,7 +120,7 @@ namespace Gymnasiearbete
 
         public void Update(GameTime gameTime)
         {
-            if (pause || simulationEnd)
+            if (pause || SimulationEnd)
             {
                 return;
             }
@@ -246,12 +251,6 @@ namespace Gymnasiearbete
             foreach (Food f in Content.Foods)
             {
                 f.Update();
-            }
-
-            if (content.Cells.Count() <= 0)
-            {
-                simulationEnd = true;
-                //Console.Beep(100, 1000);
             }
         }
     }

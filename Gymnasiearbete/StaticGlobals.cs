@@ -46,16 +46,12 @@ This is survival. This is war.";
             }
         }
 
-        static CellManager cm;
+        static readonly CellManager cm = new CellManager();
         public static CellManager CM
         {
             get
             {
                 return cm;
-            }
-            set
-            {
-                cm = value;
             }
         }
 
