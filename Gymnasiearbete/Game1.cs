@@ -132,7 +132,7 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
             if (StaticGlobal.Keyboard.IsKeyClicked(Keys.R) || StaticGlobal.CM.SimulationEnd)
             {
                 StaticGlobal.CM.Initilize();
-                Camera.ChangeSpectatingCell(0, StaticGlobal.CM);
+                Camera.ChangeSpectatingCell(0);
             }
             
             StaticGlobal.CM.Update(gameTime);
@@ -144,19 +144,13 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
             { Camera.Zoom += 0.005f; }
 
             if (StaticGlobal.Keyboard.IsKeyHeld(Keys.Down))
-
             { Camera.Zoom -= 0.005f; }
 
             if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Left))
-            { Camera.ChangeSpectatingCell(-1, StaticGlobal.CM); }
+            { Camera.ChangeSpectatingCell(-1); }
 
             if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Right))
-            { Camera.ChangeSpectatingCell(1, StaticGlobal.CM); }
-
-            if (StaticGlobal.Mouse.ScrollWheelDifference != 0)
-            { Camera.Zoom += StaticGlobal.Mouse.ScrollWheelDifference * 0.001f; }
-
-                Camera.Zoom -= 0.005f;
+            { Camera.ChangeSpectatingCell(1); }
 
             if (StaticGlobal.Mouse.ScrollWheelDifference != 0)
             {
@@ -165,9 +159,6 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                     StaticGlobal.Mouse.ScrollWheelDifference * 0.001f);
                 Camera.Zoom -= StaticGlobal.Mouse.ScrollWheelDifference * 0.001f;
             }
-            //if (Keyboard.GetState().IsKeyDown(Keys.F))
-            //    Camera.ToggleFreeCam();
-            //if (StaticGlobal.Keyboard.IsKeyClicked())
 
             if (StaticGlobal.Keyboard.IsKeyClicked(Keys.F))
             { Camera.ToggleFreeCam(); }
@@ -226,7 +217,7 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
 
             RasterizerState rasterizerState;
             rasterizerState = new RasterizerState();
-            rasterizerState.FillMode = FillMode.WireFrame;
+            rasterizerState.FillMode = FillMode.Solid;
             GraphicsDevice.RasterizerState = rasterizerState;
 
             Render.Draw(StaticGlobal.CM, GraphicsDevice);
@@ -251,16 +242,14 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
 
                 spriteBatch.DrawString(spriteFont, LORE, new Vector2(StaticGlobal.Screen.Area.Center.X - 239, StaticGlobal.Screen.Area.Center.Y - 74), Color.Black);
 
-                debugRectangle.X = StaticGlobal.Screen.Area.Center.X - 239- 6;
+                debugRectangle.X = StaticGlobal.Screen.Area.Center.X - 239 - 6;
                 debugRectangle.Y = StaticGlobal.Screen.Area.Center.Y - 74 - 6;
 
                 debugRectangle.Render(GraphicsDevice);
-
-            if (StaticGlobal.CM.Content.Cells.Count > 0 && !Camera.FreeCam)
-            {
-                Camera.Position = Vector2.Lerp(Camera.Position, StaticGlobal.CM.Content.Cells[0].Position, 0.125f);
             }
 
+            if (StaticGlobal.CM.Pause)
+            {
                 spriteBatch.DrawString(spriteFont, 
                     "Press [Spacebar] to resume the simulation",
                     new Vector2(10, 10 + 25 * 0), Color.White);
@@ -276,7 +265,6 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                 spriteBatch.DrawString(spriteFont,
                     "Press [R] to restart the simulation",
                     new Vector2(10, 10 + 25 * 4), Color.White);
-                
                 spriteBatch.DrawString(spriteFont,
                     "Press [ESC] to quit the application",
                     new Vector2(10, Window.ClientBounds.Height - 10 - 25 * 1), Color.White);

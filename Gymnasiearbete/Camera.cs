@@ -67,17 +67,17 @@ namespace Gymnasiearbete
             return temp;
         }
 
-        public static void ChangeSpectatingCell(int num, CellManager CM)
+        public static void ChangeSpectatingCell(int num)
         {
-            int index = CM.Content.Cells.IndexOf(cell);
+            int index = StaticGlobal.CM.Content.Cells.IndexOf(cell);
 
-            if (CM.Content.Cells.Count > 0)
+            if (StaticGlobal.CM.Content.Cells.Count > 0)
             {
-                cell = CM.Content.Cells[
-                    (CM.Content.Cells.Count
+                cell = StaticGlobal.CM.Content.Cells[
+                    (StaticGlobal.CM.Content.Cells.Count
                     + index
                     + num)
-                    % (CM.Content.Cells.Count)
+                    % (StaticGlobal.CM.Content.Cells.Count)
                 ];
             }
         }
