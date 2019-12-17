@@ -14,7 +14,21 @@ namespace Gymnasiearbete
     /// </summary>
     class CellManager
     {
-        public double civilazationTime = 0;
+        double civilazationTime = 0;
+        public String CivilizationTime
+        {
+            get
+            {
+                string t = "";
+                int h = (int)(Math.Floor((StaticGlobal.CM.civilazationTime) / 60) / 60);
+                int m = (int)(Math.Floor(StaticGlobal.CM.civilazationTime) / 60) - (60 * h);
+                int s = (int)Math.Floor(StaticGlobal.CM.civilazationTime) - (60 * m);
+                if (h > 0) { t += " h:" + h; }
+                if (m > 0) { t += " m:" + m; }
+                t += " s:" + s;
+                return t;
+            }
+        }
         SectorContent content = new SectorContent();
         public SectorContent Content
         {

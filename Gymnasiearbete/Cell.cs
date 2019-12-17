@@ -148,10 +148,13 @@ namespace Gymnasiearbete
 
         public void Update(List<GameObject> detectionCheck, Random random)
         {
-            PerceptionCheck(detectionCheck);
-            CollisionCheck(detectionCheck);
-            //ReproduceCheck();
             EnergyManagement();
+            if (!isMarkedForDelete)
+            {
+                PerceptionCheck(detectionCheck);
+                CollisionCheck(detectionCheck);
+                //ReproduceCheck();
+            }
         }
 
         protected override void Collision(GameObject g)
