@@ -51,6 +51,10 @@ namespace Gymnasiearbete
             {
                 return ai;
             }
+            set
+            {
+                ai = value;
+            }
         }
 
         public bool isMarkForReproduce = false;

@@ -126,7 +126,7 @@ namespace Gymnasiearbete
                     },
                     Action = () =>
                     {
-                        Camera.FreeCam = true;
+                        Camera.FreeCam = false;
                         Camera.Position = new Vector2(int.MaxValue, int.MinValue);
                     }
                 }

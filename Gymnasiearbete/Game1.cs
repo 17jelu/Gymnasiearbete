@@ -168,6 +168,9 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                 StaticGlobal.Keyboard.IsKeyClicked(Keys.D))
             { Camera.FreeCam = true; }
 
+            if (Camera.SpectatingCell.AI.GetAIType == AI.AIType.Player)
+                Camera.FreeCam = false;
+
             if (Camera.FreeCam)
             {
                 if (StaticGlobal.Keyboard.IsKeyHeld(Keys.W))
@@ -183,6 +186,21 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
             if (StaticGlobal.Keyboard.IsKeyClicked(Keys.F11))
             {
                 StaticGlobal.Screen.ToggleFullScreen(graphics, GraphicsDevice);
+            }
+
+            if (Camera.SpectatingCell.isMarkedForDelete)
+            {
+                Camera.ChangeSpectatingCell(0);
+            }
+
+            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Delete))
+                Camera.SpectatingCell.isMarkedForDelete = true;
+
+            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.LeftControl))
+            {
+                //Camera.SpectatingCell.AI = AI.GetAI(AI.AIType.Player);
+                Camera.SpectatingCell.AI
+                    = new Player();
             }
 
             UIElementHandler.Update();
@@ -229,9 +247,11 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
             if (Camera.SpectatingCell != null && !Camera.FreeCam)
             {
                 spriteBatch.DrawString(spriteFont, "About current Cell:", new Vector2(10, 80 - 20 * 1), Color.Black);
-                spriteBatch.DrawString(spriteFont, "Energy: " + Camera.SpectatingCell.Energy.ToString(), new Vector2(10, 80 + 20 * 0), Color.Black);
+                spriteBatch.DrawString(spriteFont, "Energy: " + Math.Floor(Camera.SpectatingCell.Energy).ToString(), new Vector2(10, 80 + 20 * 0), Color.Black);
                 spriteBatch.DrawString(spriteFont, "Family: " + Camera.SpectatingCell.AI.family.ToString(), new Vector2(10, 80 + 20 * 1), Color.Black);
                 spriteBatch.DrawString(spriteFont, "FamilyCount: " + StaticGlobal.Family.FamilyCount(Camera.SpectatingCell.AI.family).ToString(), new Vector2(10, 80 + 20 * 2), Color.Black);
+                spriteBatch.DrawString(spriteFont, "Memory: " + Camera.SpectatingCell.AI.lastMemory.ToString(), new Vector2(10, 80 + 20 * 3), Color.Black);
+                spriteBatch.DrawString(spriteFont, "Points: " + Camera.SpectatingCell.AI.lastMemory.Points.ToString(), new Vector2(10, 80 + 20 * 4), Color.Black);
             }
 
             if (StaticGlobal.CM.Pause)
