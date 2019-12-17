@@ -206,5 +206,10 @@ namespace Gymnasiearbete
             CheckOther();
             return currentState.IsKeyUp(key);
         }
+        public bool IsKeyReleased(Keys key)
+        {
+            CheckOther();
+            return (currentState.IsKeyUp(key) && oldState.IsKeyDown(key));
+        }
     }
 }
