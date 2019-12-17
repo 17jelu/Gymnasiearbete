@@ -56,6 +56,7 @@ namespace Gymnasiearbete
                 else
                 {
                     family = parent.AI.family;
+                    StaticGlobal.Family.AddMember(family);
                 }
             }
 

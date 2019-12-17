@@ -53,16 +53,16 @@ namespace Gymnasiearbete
         {
             return ( pos - _pos ) * zoom +
                 new Vector2(
-                    SGScreen.Area.Width / 2,
-                    SGScreen.Area.Height / 2
+                    StaticGlobal.Screen.Area.Width / 2,
+                    StaticGlobal.Screen.Area.Height / 2
                 );
         }
         public static Vector3 GetRelativePosition(Vector3 pos)
         {
             Vector3 temp = pos;
 
-            temp.X = (temp.X - _pos.X) * zoom + SGScreen.Area.Width / 2;
-            temp.Y = (temp.Y - _pos.Y) * zoom + SGScreen.Area.Height / 2;
+            temp.X = (temp.X - _pos.X) * zoom + StaticGlobal.Screen.Area.Width / 2;
+            temp.Y = (temp.Y - _pos.Y) * zoom + StaticGlobal.Screen.Area.Height / 2;
 
             return temp;
         }

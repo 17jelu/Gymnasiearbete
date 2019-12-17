@@ -165,6 +165,7 @@ namespace Gymnasiearbete
                         Cell c = (Cell)g;
                         c.AI.MemoryReward(-2, false);
                         c.AI.MemoryFileWrite();
+                        StaticGlobal.Family.KillMember(c.AI.family);
                     }
 
                     Content.Remove(g);
