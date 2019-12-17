@@ -3,7 +3,12 @@ using Microsoft.Xna.Framework;
 
 namespace Gymnasiearbete
 {
-    class DrawObject
+    interface IDrawObject
+    {
+        void Render(GraphicsDevice GraphicsDevice);
+    }
+
+    class DrawObject : IDrawObject
     {
         protected VertexPositionColor[] vertices;
         /// <summary>
@@ -231,11 +236,11 @@ namespace Gymnasiearbete
 
     class GraphicRectangle : DrawObject
     {
-        Rect rect;
-        private struct Rect
+        _Rectangle rect;
+        private struct _Rectangle
         {
             public int X, Y, Width, Height;
-            public Rect(int x, int y, int width, int height)
+            public _Rectangle(int x, int y, int width, int height)
             {
                 X = x;
                 Y = y;
@@ -264,16 +269,22 @@ namespace Gymnasiearbete
             set { rect.Height = value; UpdateVertices(); }
         }
 
+        // Outline
+        VertexPositionColor[] lines;
+
         public GraphicRectangle(Color color, int x, int y, int width, int height)
         {
-            rect = new Rect(x, y, width, height);
+            rect = new _Rectangle(x, y, width, height);
 
             vertices = new VertexPositionColor[4];
+            lines = new VertexPositionColor[5];
             triangles = 2;
 
-            for (int i = 0; i < vertices.Length; i++)
+            Color = color;
+
+            for (int i = 0; i < lines.Length; i++)
             {
-                vertices[i].Color = color;
+                lines[i].Color = Microsoft.Xna.Framework.Color.Black;
             }
 
             UpdateVertices();
@@ -292,6 +303,110 @@ namespace Gymnasiearbete
 
             vertices[3].Position.X = rect.X + rect.Width;
             vertices[3].Position.Y = rect.Y;
+
+            // Outline
+            lines[0].Position.X = rect.X;
+            lines[0].Position.Y = rect.Y;
+
+            lines[1].Position.X = rect.X + rect.Width;
+            lines[1].Position.Y = rect.Y;
+
+            lines[2].Position.X = rect.X + rect.Width;
+            lines[2].Position.Y = rect.Y + rect.Height;
+
+            lines[3].Position.X = rect.X;
+            lines[3].Position.Y = rect.Y + rect.Height;
+
+            lines[4].Position = lines[0].Position;
+        }
+
+        public void SetCustomColor(Color color1, Color color2, Color color3, Color color4)
+        {
+            // Top Right Bottom Left
+            vertices[1].Color = color1;
+            vertices[3].Color = color2;
+            vertices[2].Color = color3;
+            vertices[0].Color = color4;
+        }
+
+        public object Color
+        {
+            set
+            {
+                if (value.GetType() == typeof(Color))
+                {
+                    for (int i = 0; i < vertices.Length; i++)
+                    {
+                        vertices[i].Color = (Color)value;
+                    }
+                }
+                else if (value.GetType() == typeof(Color[]))
+                {
+                    Color[] color = (Color[])value;
+                    for (int i = 0; i < 4; i++)
+                    {
+                        vertices[i].Color =
+                            color[i % color.Length];
+                    }
+                }
+            }
+        }
+
+        new public void Render(GraphicsDevice GraphicsDevice)
+        {
+            base.Render(GraphicsDevice);
+            GraphicsDevice.DrawUserPrimitives<VertexPositionColor>(
+                PrimitiveType.LineStrip,
+                lines,
+                0,
+                triangles + 2);
+        }
+    }
+
+    class CustomDrawObject : DrawObject
+    {
+        Vector2[] initVertices;
+
+        private float scale;
+        public float Scale
+        {
+            get { return scale; }
+            set { scale = value; UpdateVertices(); }
+        }
+
+        new public void Render(GraphicsDevice GraphicsDevice)
+        {
+            GraphicsDevice.DrawUserPrimitives<VertexPositionColor>(
+                PrimitiveType.TriangleList,
+                vertices,
+                0,
+                triangles);
+        }
+
+        public CustomDrawObject(Vector2[] vertices, Vector2[] outline)
+        {
+            if (vertices.Length % 3 != 0)
+                throw new System.ArgumentException("A CustomDrawObject must have a length dividable by 3", "vertices");
+
+            scale = 1f;
+
+            initVertices = new Vector2[vertices.Length];
+            this.vertices = new VertexPositionColor[initVertices.Length];
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                initVertices[i] = vertices[i];
+            }
+            UpdateVertices();
+            triangles = this.vertices.Length / 3;
+        }
+
+        private void UpdateVertices()
+        {
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                vertices[i].Position = new Vector3(initVertices[i] * scale, 0);
+                vertices[i].Color = Color.Black;
+            }
         }
     }
 }

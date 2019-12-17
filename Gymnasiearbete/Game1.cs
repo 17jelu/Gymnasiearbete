@@ -19,6 +19,14 @@ namespace Gymnasiearbete
     {
         GraphicsDeviceManager graphics;
 
+        const string LORE =
+@"                                             As the story goes:
+                      War. War, always war. The year is 2151. 
+                            The nukes erased life as we know it. 
+      Left are only somewhat mindless blobs of radiated mass,
+ruled by their primal instinct of; fight or flight, eat or get eaten.
+                                      This is survival. This is war.";
+
         // Martin
         SpriteFont spriteFont;
         public static string debugMessage = "";
@@ -26,12 +34,21 @@ namespace Gymnasiearbete
         // Jesper
         SpriteBatch spriteBatch;
 
+        GraphicRectangle debugRectangle;
+        GraphicRectangle shadowRectangle;
+
+        CustomDrawObject custom;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
+            
         }
 
+        GraphicRectangle rect;
+        float rectWidth;
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
         /// This is where it can query for any required services and load any non-graphic
@@ -45,17 +62,31 @@ namespace Gymnasiearbete
             Window.AllowUserResizing = true;
             if (!graphics.IsFullScreen)
             {
+                graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+                graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
                 //graphics.ToggleFullScreen();
             }
 
             Window.ClientSizeChanged += new EventHandler<EventArgs>(OnResize);
 
 
-            SGBasicEffect.Initialize(GraphicsDevice);
-            SGScreen.Initialize(Window.ClientBounds);
+            // SGBasicEffect.Initialize(GraphicsDevice);
+            StaticGlobal.BasicEffect.Initialize(GraphicsDevice);
+            StaticGlobal.Screen.Initialize(Window.ClientBounds);
             Render.Initialize();
             Camera.Initialize();
-            
+
+            UIElementHandler.Initialize();
+
+            debugRectangle = new GraphicRectangle(Color.White, 0, 0, 490, 148);
+
+            shadowRectangle = new GraphicRectangle(
+                new Color(0, 0, 0, 0.85f),
+                0, 0,
+                Window.ClientBounds.Width,
+                Window.ClientBounds.Height
+            );
+
             base.Initialize();
         }
 
@@ -103,25 +134,17 @@ namespace Gymnasiearbete
                 StaticGlobal.CM.Initilize();
                 Camera.ChangeSpectatingCell(0, StaticGlobal.CM);
             }
-
-            int h = (int)(Math.Floor((StaticGlobal.CM.civilazationTime) / 60) / 60);
-            int m = (int)(Math.Floor(StaticGlobal.CM.civilazationTime) / 60) - (60 * h);
-            int s = (int)Math.Floor(StaticGlobal.CM.civilazationTime) - (60 * m);
-            debugMessage = "";
-            if (h > 0){debugMessage += " h:" + h;}
-            if (m > 0){debugMessage += " m:" + m;}
-            debugMessage += " s:" + s;
-
+            
             StaticGlobal.CM.Update(gameTime);
 
             if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Space))
             { StaticGlobal.CM.TogglePause(); }
 
-            // Jesper
             if (StaticGlobal.Keyboard.IsKeyHeld(Keys.Up))
             { Camera.Zoom += 0.005f; }
 
             if (StaticGlobal.Keyboard.IsKeyHeld(Keys.Down))
+
             { Camera.Zoom -= 0.005f; }
 
             if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Left))
@@ -132,6 +155,19 @@ namespace Gymnasiearbete
 
             if (StaticGlobal.Mouse.ScrollWheelDifference != 0)
             { Camera.Zoom += StaticGlobal.Mouse.ScrollWheelDifference * 0.001f; }
+
+                Camera.Zoom -= 0.005f;
+
+            if (StaticGlobal.Mouse.ScrollWheelDifference != 0)
+            {
+                Console.WriteLine("{0} -> {1}",
+                    StaticGlobal.Mouse.ScrollWheelDifference,
+                    StaticGlobal.Mouse.ScrollWheelDifference * 0.001f);
+                Camera.Zoom -= StaticGlobal.Mouse.ScrollWheelDifference * 0.001f;
+            }
+            //if (Keyboard.GetState().IsKeyDown(Keys.F))
+            //    Camera.ToggleFreeCam();
+            //if (StaticGlobal.Keyboard.IsKeyClicked())
 
             if (StaticGlobal.Keyboard.IsKeyClicked(Keys.F))
             { Camera.ToggleFreeCam(); }
@@ -153,8 +189,21 @@ namespace Gymnasiearbete
                 { Camera.Position += new Vector2(5 / Camera.Zoom, 0); }
             }
 
+            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.F11))
+            {
+                StaticGlobal.Screen.ToggleFullScreen(graphics, GraphicsDevice);
+            }
+
+            UIElementHandler.Update();
+
+
             StaticGlobal.Keyboard.End();
             StaticGlobal.Mouse.End();
+
+            // Check for shutdown
+            if (StaticGlobal.ExitInProgress)
+                Shutdown();
+
             base.Update(gameTime);
         }
 
@@ -164,38 +213,89 @@ namespace Gymnasiearbete
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            // TODO: Add your drawing code here
-            spriteBatch.Begin();
+            // Needed before Render.Draw();
+            StaticGlobal.BasicEffect.ApplyCurrentTechnique();
 
-            spriteBatch.DrawString(spriteFont, debugMessage, new Vector2(4, 10), Color.Gold);
-            spriteBatch.DrawString(spriteFont, Camera.Zoom.ToString(), new Vector2(10, 40), Color.Gold);
-            if (Camera.SpectatingCell != null)
+            // clear screen
+            GraphicsDevice.Clear(Color.WhiteSmoke);
+
+            if (Camera.SpectatingCell != null && !Camera.FreeCam)
             {
-                spriteBatch.DrawString(spriteFont, Camera.SpectatingCell.Energy.ToString(), new Vector2(10, 80 + 0 * 16), Color.LawnGreen);
-                spriteBatch.DrawString(spriteFont, Camera.SpectatingCell.AI.family, new Vector2(10, 80 + 1 * 16), Color.LawnGreen);
-                spriteBatch.DrawString(spriteFont, Camera.SpectatingCell.AI.lastMemory.ToString(), new Vector2(10, 80 + 2 * 16), Color.LawnGreen);
+                Camera.Position = Vector2.Lerp(Camera.Position, Camera.SpectatingCell.Position, 0.125f);
             }
 
-            spriteBatch.End();
-            base.Draw(gameTime);
+            RasterizerState rasterizerState;
+            rasterizerState = new RasterizerState();
+            rasterizerState.FillMode = FillMode.WireFrame;
+            GraphicsDevice.RasterizerState = rasterizerState;
 
-            SGBasicEffect.ApplyCurrentTechnique();
+            Render.Draw(StaticGlobal.CM, GraphicsDevice);
+
+            spriteBatch.Begin();
+
+            spriteBatch.DrawString(spriteFont, debugMessage, new Vector2(10, 35), Color.Black);
+
+            if (Camera.SpectatingCell != null && !Camera.FreeCam)
+            {
+                spriteBatch.DrawString(spriteFont, "About current Cell:", new Vector2(10, 80 - 20 * 1), Color.Black);
+                spriteBatch.DrawString(spriteFont, "Energy: " + Camera.SpectatingCell.Energy.ToString(), new Vector2(10, 80 + 20 * 0), Color.Black);
+                spriteBatch.DrawString(spriteFont, "Family: " + Camera.SpectatingCell.AI.family.ToString(), new Vector2(10, 80 + 20 * 1), Color.Black);
+                spriteBatch.DrawString(spriteFont, "FamilyCount: " + StaticGlobal.Family.FamilyCount(Camera.SpectatingCell.AI.family).ToString(), new Vector2(10, 80 + 20 * 2), Color.Black);
+            }
+
+            if (StaticGlobal.CM.Pause)
+            {
+                shadowRectangle.Width = Window.ClientBounds.Width;
+                shadowRectangle.Height = Window.ClientBounds.Height;
+                shadowRectangle.Render(GraphicsDevice);
+
+                spriteBatch.DrawString(spriteFont, LORE, new Vector2(StaticGlobal.Screen.Area.Center.X - 239, StaticGlobal.Screen.Area.Center.Y - 74), Color.Black);
+
+                debugRectangle.X = StaticGlobal.Screen.Area.Center.X - 239- 6;
+                debugRectangle.Y = StaticGlobal.Screen.Area.Center.Y - 74 - 6;
+
+                debugRectangle.Render(GraphicsDevice);
 
             if (StaticGlobal.CM.Content.Cells.Count > 0 && !Camera.FreeCam)
             {
                 Camera.Position = Vector2.Lerp(Camera.Position, StaticGlobal.CM.Content.Cells[0].Position, 0.125f);
-                //Vector2.Lerp(
-                //    Camera.Position,
-                //    CM.Content.Cells[0].Position,
-                //    0.125f
-                //);
-                //Camera.Position -= new Vector2(
-                //    SGScreen.Area.Width / (2 * Camera.Zoom),
-                //    SGScreen.Area.Height / (2 * Camera.Zoom)
-                //);
             }
 
-            Render.Draw(StaticGlobal.CM, GraphicsDevice);
+                spriteBatch.DrawString(spriteFont, 
+                    "Press [Spacebar] to resume the simulation",
+                    new Vector2(10, 10 + 25 * 0), Color.White);
+                spriteBatch.DrawString(spriteFont,
+                    "Use WASD to enter free-cam mode and move the Camera",
+                    new Vector2(10, 10 + 25 * 1), Color.White);
+                spriteBatch.DrawString(spriteFont,
+                    "Press [F] to toggle between free-cam mode",
+                    new Vector2(10, 10 + 25 * 2), Color.White);
+                spriteBatch.DrawString(spriteFont,
+                    "Press [Left Arrow] and [Right Arrow] to switch between which cell you're spectating",
+                    new Vector2(10, 10 + 25 * 3), Color.White);
+                spriteBatch.DrawString(spriteFont,
+                    "Press [R] to restart the simulation",
+                    new Vector2(10, 10 + 25 * 4), Color.White);
+                
+                spriteBatch.DrawString(spriteFont,
+                    "Press [ESC] to quit the application",
+                    new Vector2(10, Window.ClientBounds.Height - 10 - 25 * 1), Color.White);
+                spriteBatch.DrawString(spriteFont,
+                    "Press [Up Arrow] and [Down Arrow] or use [Scrollwheel] to zoom in and out in the simulation",
+                    new Vector2(10, Window.ClientBounds.Height - 10 - 25 * 2), Color.White);
+                spriteBatch.DrawString(spriteFont,
+                    "Press [F11] to toggle between fullscreen mode and window mode",
+                    new Vector2(10, Window.ClientBounds.Height - 10 - 25 * 3), Color.White);
+            }
+            else
+            {
+                spriteBatch.DrawString(spriteFont, "Press [Spacebar] to pause the simulation, see controls, and read the lore", new Vector2(10, 10), Color.Black);
+            }
+
+            UIElementHandler.Render(GraphicsDevice);
+
+            spriteBatch.End();
+            base.Draw(gameTime);
         }
 
         /// <summary>
@@ -206,12 +306,24 @@ namespace Gymnasiearbete
         void OnResize(Object sender, EventArgs e)
         {
             Console.WriteLine(sender.ToString());
-            SGBasicEffect.Resize(GraphicsDevice);
+            StaticGlobal.BasicEffect.Resize(GraphicsDevice);
+            StaticGlobal.Screen.Resize(Window.ClientBounds);
         }
 
-        void KeyboardUpdate()
+        /// <summary>
+        /// Exits the game the correct way
+        /// </summary>
+        private void Shutdown()
         {
+            Console.WriteLine("SHUTDOWN INITIATED");
 
+            // Implement Save function if save & exit???
+            if (StaticGlobal.SaveModeON)
+            {
+
+            }
+
+            Exit();
         }
     }
 }

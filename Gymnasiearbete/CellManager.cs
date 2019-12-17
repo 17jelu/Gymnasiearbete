@@ -41,6 +41,7 @@ namespace Gymnasiearbete
         int spawnTimer = 0;
 
         bool pause = false;
+        public bool Pause => pause;
         public bool SimulationEnd
         {
             get
@@ -171,7 +172,9 @@ namespace Gymnasiearbete
                         c.AI.MemoryReward(2, true);
                         c.AI.MemoryReward(-(int)Math.Floor(c.Energy / 100) + 2);
                         c.AI.MemoryFileWrite();
-                        //StaticGlobal.Family.KillMember(c.AI.family);
+
+                        StaticGlobal.Family.KillMember(c.AI.family);
+
                     }
 
                     Content.Remove(g);

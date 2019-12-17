@@ -19,8 +19,8 @@ namespace Gymnasiearbete
         public static void Draw(CellManager CM, GraphicsDevice GraphicsDevice)
         {
             byte
-                gridWidth = (byte)(1+ SGScreen.Area.Width / (CellManager.SectorSize * Camera.Zoom)),
-                gridHeight = (byte)(1+ SGScreen.Area.Height / (CellManager.SectorSize * Camera.Zoom));
+                gridWidth = (byte)(1+ StaticGlobal.Screen.Area.Width / (CellManager.SectorSize * Camera.Zoom)),
+                gridHeight = (byte)(1+ StaticGlobal.Screen.Area.Height / (CellManager.SectorSize * Camera.Zoom));
             float
                 offset;
 
@@ -30,11 +30,11 @@ namespace Gymnasiearbete
                 offset =
                     y * CellManager.SectorSize * Camera.Zoom
                     - (Camera.Position.Y % CellManager.SectorSize * Camera.Zoom)
-                    + (SGScreen.Area.Height >> 1);
+                    + (StaticGlobal.Screen.Area.Height >> 1);
 
                 gridLine.SetLine(
                     new Vector2(0, offset),
-                    new Vector2(SGScreen.Area.Width, offset),
+                    new Vector2(StaticGlobal.Screen.Area.Width, offset),
                     false
                 );
                 gridLine.Render(GraphicsDevice);
@@ -45,11 +45,11 @@ namespace Gymnasiearbete
                 offset =
                     x * CellManager.SectorSize * Camera.Zoom
                     - (Camera.Position.X % CellManager.SectorSize * Camera.Zoom)
-                    + (SGScreen.Area.Width >> 1);
+                    + (StaticGlobal.Screen.Area.Width >> 1);
 
                 gridLine.SetLine(
                     new Vector2(offset, 0),
-                    new Vector2(offset, SGScreen.Area.Height),
+                    new Vector2(offset, StaticGlobal.Screen.Area.Height),
                     false
                 );
                 gridLine.Render(GraphicsDevice);
@@ -62,7 +62,6 @@ namespace Gymnasiearbete
                     - (gridHeight >> 1) - 2 // - 2 because out of screen
             ;
             // Drawing content inside of Chunks
-            // TODO: add offset to points
             for (int y = yoff; y < gridHeight + yoff + 3; y++) // + 3 because out of screen
             {
                 for (int x = xoff; x < gridWidth + xoff + 3; x++) // + 3 because out of screen
@@ -132,40 +131,8 @@ namespace Gymnasiearbete
                             line.Render(GraphicsDevice);
                         }
                     }
-                    else
-                    {
-                        /*
-                        line.SetLine(
-                            new Vector2(
-                                x * CellManager.SectorSize,
-                                y * CellManager.SectorSize),
-                            new Vector2(
-                                x * CellManager.SectorSize + CellManager.SectorSize,
-                                y * CellManager.SectorSize + CellManager.SectorSize
-                            ));
-                        line.Render(GraphicsDevice);
-
-                        line.SetLine(
-                            new Vector2(
-                                x * CellManager.SectorSize + CellManager.SectorSize,
-                                y * CellManager.SectorSize),
-                            new Vector2(
-                                x * CellManager.SectorSize,
-                                y * CellManager.SectorSize + CellManager.SectorSize
-                            ));
-                        line.Render(GraphicsDevice);
-                        */
-                    }
                 }
             }
-
-            // DEBUG THING
-            line.SetLine(
-                new Vector2(SGScreen.Area.Left + 10, SGScreen.Area.Top + 10),
-                new Vector2(SGScreen.Area.Right - 10, SGScreen.Area.Bottom - 10),
-                false
-            );
-            line.Render(GraphicsDevice);
 
             // END OF Draw()
         }
