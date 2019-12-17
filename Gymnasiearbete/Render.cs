@@ -19,8 +19,8 @@ namespace Gymnasiearbete
         public static void Draw(CellManager CM, GraphicsDevice GraphicsDevice)
         {
             byte
-                gridWidth = (byte)(1+ StaticGlobal.Screen.Area.Width / (CellManager.SectorSize * Camera.Zoom)),
-                gridHeight = (byte)(1+ StaticGlobal.Screen.Area.Height / (CellManager.SectorSize * Camera.Zoom));
+                gridWidth = (byte)(1+ StaticGlobal.Screen.Area.Width / (StaticGlobal.SectorSize * Camera.Zoom)),
+                gridHeight = (byte)(1+ StaticGlobal.Screen.Area.Height / (StaticGlobal.SectorSize * Camera.Zoom));
             float
                 offset;
 
@@ -28,8 +28,8 @@ namespace Gymnasiearbete
             for (int y = -(gridHeight >> 1) - 1; y < (gridHeight << 1); y++)
             {
                 offset =
-                    y * CellManager.SectorSize * Camera.Zoom
-                    - (Camera.Position.Y % CellManager.SectorSize * Camera.Zoom)
+                    y * StaticGlobal.SectorSize * Camera.Zoom
+                    - (Camera.Position.Y % StaticGlobal.SectorSize * Camera.Zoom)
                     + (StaticGlobal.Screen.Area.Height >> 1);
 
                 gridLine.SetLine(
@@ -43,8 +43,8 @@ namespace Gymnasiearbete
             for (int x = -(gridWidth >> 1) - 1; x < (gridWidth << 1); x++)
             {
                 offset =
-                    x * CellManager.SectorSize * Camera.Zoom
-                    - (Camera.Position.X % CellManager.SectorSize * Camera.Zoom)
+                    x * StaticGlobal.SectorSize * Camera.Zoom
+                    - (Camera.Position.X % StaticGlobal.SectorSize * Camera.Zoom)
                     + (StaticGlobal.Screen.Area.Width >> 1);
 
                 gridLine.SetLine(
@@ -56,9 +56,9 @@ namespace Gymnasiearbete
             }
 
             int
-                xoff = (int)(Camera.Position.X / CellManager.SectorSize)
+                xoff = (int)(Camera.Position.X / StaticGlobal.SectorSize)
                     - (gridWidth >> 1) - 2, // - 2 because out of screen
-                yoff = (int)(Camera.Position.Y / CellManager.SectorSize)
+                yoff = (int)(Camera.Position.Y / StaticGlobal.SectorSize)
                     - (gridHeight >> 1) - 2 // - 2 because out of screen
             ;
             // Drawing content inside of Chunks

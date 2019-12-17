@@ -87,6 +87,7 @@
     <Compile Include="Render.cs" />
     <Compile Include="Sectorcontent.cs" />
     <Compile Include="StaticGlobals.cs" />
+    <Compile Include="UIElement.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />
