@@ -12,7 +12,7 @@ namespace Gymnasiearbete
     /// </summary>
     class AI
     {
-        public string family;
+        public string family = "";
         string dataPath;
 
         List<Memory> memory = new List<Memory>();
@@ -54,7 +54,7 @@ namespace Gymnasiearbete
                 idleDestination = new P(cell.Position);
                 direction = -parent.AI.Direction;
                 direction.Normalize();
-                if (parent.AI.family == null)
+                if (parent.AI.family == null || parent.AI.family == "")
                 {
                     family = StaticGlobal.Family.NewFamily;
                 }
@@ -72,7 +72,13 @@ namespace Gymnasiearbete
         /// </summary>
         public void MemoryFileExsist()
         {
-            dataPath = this.GetType().ToString().Split('.')[1] + "_" + family + ".memory";
+            dataPath = "Memories/";
+            if (!Directory.Exists(dataPath))
+            {
+                var directory = Directory.CreateDirectory(dataPath);
+            }
+
+            dataPath += this.GetType().ToString().Split('.')[1] + "_" + family.Split(' ')[0] + ".memory";
             if (!File.Exists(dataPath))
             {
                 var file = File.Create(dataPath);
@@ -535,7 +541,7 @@ namespace Gymnasiearbete
         public AI_PointsTargeting(Cell parent, Cell cell) : base(parent, cell)
         {
             aiType = AIType.PointsTargeting;
-            choises = new string[] { "MOVETO", "MOVEFROM", "IDLE" };
+            choises = new string[] { "MOVETO", "MOVEFROM", "IDLE", "STOP", "REPRODUCE" };
         }
 
         protected override void Intresst(Cell cell, SectorContent percivableObjects)
@@ -615,6 +621,13 @@ namespace Gymnasiearbete
 
                 case "MOVEFROM":
                     cell.Move(-moveDirection);
+                    break;
+
+                case "STOP":
+                    break;
+
+                case "REPRODUCE":
+                    cell.isMarkForReproduce = true;
                     break;
             }
         }

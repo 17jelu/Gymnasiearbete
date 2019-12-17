@@ -78,7 +78,6 @@ namespace Gymnasiearbete
         {
             if (energy > 2 * energyRequirement)
             {
-                energy -= energyRequirement;
                 isMarkForReproduce = true;
             } else
             {
@@ -86,18 +85,20 @@ namespace Gymnasiearbete
             }
         }
 
-        public Cell Reproduce(Random random)
+        public Cell Reproduce()
         {
+            isMarkForReproduce = false;
+            energy -= energyRequirement;
             AI.MemoryReward(1, true);
             AI.MemoryFileWrite();
             Cell cchild = new Cell(CM, this, ai.GetAIType, Position, this.size, this.speed, this.perception);
 
             int mutationChance = 50;
-            if (random.Next(100) < mutationChance)
+            if (StaticGlobal.Random.Next(100) < mutationChance)
             {
-                cchild.size = Math.Max(1, cchild.size + random.Next(-5, 5+1));
-                cchild.speed = Math.Max(1, cchild.speed + random.Next(-5, 5+1));
-                cchild.perception = Math.Max(1, cchild.perception + random.Next(-5, 5+1));
+                cchild.size = Math.Max(1, cchild.size + StaticGlobal.Random.Next(-5, 5+1));
+                cchild.speed = Math.Max(1, cchild.speed + StaticGlobal.Random.Next(-5, 5+1));
+                cchild.perception = Math.Max(1, cchild.perception + StaticGlobal.Random.Next(-5, 5+1));
             }
 
             cchild.position = this.position + cchild.ai.Direction * this.Detectionrange + cchild.ai.Direction * cchild.Detectionrange;
@@ -149,7 +150,7 @@ namespace Gymnasiearbete
         {
             PerceptionCheck(detectionCheck);
             CollisionCheck(detectionCheck);
-            ReproduceCheck();
+            //ReproduceCheck();
             EnergyManagement();
         }
 

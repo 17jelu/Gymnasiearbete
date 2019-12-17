@@ -181,15 +181,17 @@ namespace Gymnasiearbete
                         }
                     }
                     
+                    
                     if (IsCell(g))
                     {
                         Cell c = (Cell)g;
 
                         if (c.isMarkForReproduce)
                         {
-                            Content.AddRange(new GameObject[1] { c.Reproduce(StaticGlobal.Random) });
+                            Content.Add( c.Reproduce() );
                         }
                     }
+                    
                 }
             }
 

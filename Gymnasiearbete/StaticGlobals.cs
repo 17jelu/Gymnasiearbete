@@ -55,7 +55,7 @@ This is survival. This is war.";
             }
         }
 
-        public float Clamp(float min, float max, float num)
+        public static float Clamp(float num, float min, float max)
         {
             return Math.Max(Math.Min(num, max), min);
         }
