@@ -90,6 +90,8 @@
     <Compile Include="UIElement.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AI Process.txt" />
+    <Content Include="AIProcess.txt" />
     <Content Include="Game.ico" />
     <Content Include="GameThumbnail.png">
       <XnaPlatformSpecific>true</XnaPlatformSpecific>
