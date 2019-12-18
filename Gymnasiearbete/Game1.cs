@@ -243,7 +243,7 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
             spriteBatch.Begin();
 
             spriteBatch.DrawString(spriteFont, debugMessage, new Vector2(10, 35), Color.Black);
-
+            spriteBatch.DrawString(spriteFont, "Civilization time: " + StaticGlobal.CM.CivilizationTime, new Vector2(10, 80 - 20 * 2), Color.Black);
             if (Camera.SpectatingCell != null && !Camera.FreeCam)
             {
                 spriteBatch.DrawString(spriteFont, "About current Cell:", new Vector2(10, 80 - 20 * 1), Color.Black);
@@ -251,7 +251,6 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                 spriteBatch.DrawString(spriteFont, "Family: " + Camera.SpectatingCell.AI.family.ToString(), new Vector2(10, 80 + 20 * 1), Color.Black);
                 spriteBatch.DrawString(spriteFont, "FamilyCount: " + StaticGlobal.Family.FamilyCount(Camera.SpectatingCell.AI.family).ToString(), new Vector2(10, 80 + 20 * 2), Color.Black);
                 spriteBatch.DrawString(spriteFont, "Memory: " + Camera.SpectatingCell.AI.lastMemory.ToString(), new Vector2(10, 80 + 20 * 3), Color.Black);
-                spriteBatch.DrawString(spriteFont, "Points: " + Camera.SpectatingCell.AI.lastMemory.Points.ToString(), new Vector2(10, 80 + 20 * 4), Color.Black);
             }
 
             if (StaticGlobal.CM.Pause)

@@ -20,12 +20,12 @@ namespace Gymnasiearbete
             get
             {
                 string t = "";
-                int h = (int)(Math.Floor((StaticGlobal.CM.civilazationTime) / 60) / 60);
-                int m = (int)(Math.Floor(StaticGlobal.CM.civilazationTime) / 60) - (60 * h);
-                int s = (int)Math.Floor(StaticGlobal.CM.civilazationTime) - (60 * m);
-                if (h > 0) { t += " h:" + h; }
-                if (m > 0) { t += " m:" + m; }
-                t += " s:" + s;
+                int h = (int)(Math.Floor((civilazationTime) / 60) / 60);
+                int m = (int)(Math.Floor(civilazationTime) / 60) - (60 * h);
+                int s = (int)Math.Floor(civilazationTime) - (60 * m);
+                if (h > 0) { t += h + "h "; }
+                if (m > 0) { t += m + "m "; }
+                t += s + "s ";
                 return t;
             }
         }
