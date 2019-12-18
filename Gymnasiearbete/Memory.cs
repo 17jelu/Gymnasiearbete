@@ -54,4 +54,5 @@ namespace Gymnasiearbete
             return situation + z + points + z + decision;
         }
     }
+
 }

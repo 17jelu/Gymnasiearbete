@@ -74,11 +74,11 @@ namespace Gymnasiearbete
 
             AI.AIType[] starterAI = new AI.AIType[starterCells]
             {
-                AI.AIType.PointsTargeting,
-                AI.AIType.PointsTargeting,
-                AI.AIType.PointsTargeting,
-                AI.AIType.PointsTargeting,
-                AI.AIType.PointsTargeting
+                AI.AIType.AdvancedMovement,
+                AI.AIType.AdvancedMovement,
+                AI.AIType.AdvancedMovement,
+                AI.AIType.AdvancedMovement,
+                AI.AIType.AdvancedMovement
             };
 
             int[,] starterDNA = new int[starterCells, 3]

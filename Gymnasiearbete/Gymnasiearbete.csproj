@@ -72,7 +72,9 @@
     <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AI_Types.cs" />
+    <Compile Include="AI.cs" />
+    <Compile Include="AIType_AdvanceMovement.cs" />
+    <Compile Include="AIType_Targeting.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Cell.cs" />
     <Compile Include="CellManager.cs" />
@@ -90,8 +92,7 @@
     <Compile Include="UIElement.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AI Process.txt" />
-    <Content Include="AIProcess.txt" />
+    <Content Include="AI Process.txt" />
     <Content Include="Game.ico" />
     <Content Include="GameThumbnail.png">
       <XnaPlatformSpecific>true</XnaPlatformSpecific>

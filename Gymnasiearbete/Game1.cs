@@ -137,6 +137,22 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
             
             StaticGlobal.CM.Update(gameTime);
 
+            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.OemPlus))
+            {
+                foreach (Cell c in StaticGlobal.CM.Content.Cells)
+                {
+                    c.AI.MemoryFileWrite();
+                }
+            }
+
+            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.OemMinus))
+            {
+                foreach (Cell c in StaticGlobal.CM.Content.Cells)
+                {
+                    c.AI.MemoryFilePurge();
+                }
+            }
+
             if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Space))
             { StaticGlobal.CM.TogglePause(); }
 
