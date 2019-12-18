@@ -67,6 +67,24 @@ This is survival. This is war.";
             exit = true;
         }
 
+        public static bool IsCell(GameObject g)
+        {
+            if (g.GetType() == typeof(Cell))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public static bool IsFood(GameObject g)
+        {
+            if (g.GetType() == typeof(Food))
+            {
+                return true;
+            }
+            return false;
+        }
+
         static Random random = new Random();
         public static Random Random => random;
 
@@ -332,7 +350,7 @@ This is survival. This is war.";
 
     struct AIControlls
     {
-        public static bool NoMemorySave = true;
+        public static bool NoMemorySave = false;
     }
 
     struct CellManagerControlls

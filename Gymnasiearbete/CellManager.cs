@@ -123,16 +123,6 @@ namespace Gymnasiearbete
             pause = !pause;
         }
 
-        public bool IsCell(GameObject g)
-        {
-            if (g.GetType() == typeof(Cell))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
         public void Update(GameTime gameTime)
         {
             if (pause || SimulationEnd)
@@ -166,7 +156,7 @@ namespace Gymnasiearbete
 
                 if (g.isMarkedForDelete)
                 {
-                    if (IsCell(g))
+                    if (StaticGlobal.IsCell(g))
                     {
                         Cell c = (Cell)g;
                         c.AI.MemoryReward(2, true);
@@ -199,7 +189,7 @@ namespace Gymnasiearbete
                     }
                     
                     
-                    if (IsCell(g))
+                    if (StaticGlobal.IsCell(g))
                     {
                         Cell c = (Cell)g;
 
