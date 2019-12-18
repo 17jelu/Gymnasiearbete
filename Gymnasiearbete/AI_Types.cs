@@ -302,19 +302,6 @@ namespace Gymnasiearbete
             return dataOut;
         }
 
-        //Striver ut relevant data för debug
-        public string DEBIUG()
-        {
-            string result = "";
-            result += "[" + family + "]";
-            result += "[" + lastMemory.ToString() + "]";
-            foreach (Memory m in memory)
-            {
-                result += "[" + m.ToString() + "]";
-            }
-            return "{" + result + "}";
-        }
-
         //Retunerar AI för initiering av ny celler
         public static AI GetAI(AIType type, Cell parent, Cell cell)
         {
@@ -395,6 +382,11 @@ namespace Gymnasiearbete
             lastMemory = new Memory("NULL", "0", "NULL");
             lastIntresst = null;
         }
+
+        protected override void Actions(Cell cell, string decision, int[] parameters)
+        {
+            cell.EnergyManagement(-10);
+        }
     }
 
     /// <summary>
@@ -405,7 +397,7 @@ namespace Gymnasiearbete
         public Player() : base(null, null)
         {
             aiType = AIType.Player;
-            choises = new string[] { "W", "A", "S", "D", "WA", "WD", "SA", "SD" };
+            choises = new string[0];
             direction = new Vector2(1, 1);
             lastMemory = new Memory("PLAYER", "0", "PLAYER");
         }
@@ -450,19 +442,107 @@ namespace Gymnasiearbete
 
         protected override void Actions(Cell cell, string decision, int[] parameters)
         {
-            cell.Move(new Vector2(parameters[0], parameters[1]));
+            Vector2 moveDirection = new Vector2(parameters[0], parameters[1]);
+            cell.Move(moveDirection);
+
+            if (moveDirection != Vector2.Zero)
+            {
+                cell.EnergyManagement(-(
+                cell.Size / CellManagerControlls.DefaultCellSize +
+                cell.Speed / CellManagerControlls.DefaultCellSpeed +
+                (cell.Detectionrange - cell.Size) / CellManagerControlls.DefaultCellPerception
+                ) / 3);
+            }
+            else
+            {
+                cell.EnergyManagement(-10);
+            }
+        }
+    }
+
+    class baseTargetingAI : AI
+    {
+        public baseTargetingAI(Cell parent, Cell cell) : base(parent, cell)
+        {
+            aiType = AIType.NoBrain;
+            choises = new string[] { "MOVETO", "MOVEFROM", "IDLE", "STOP", "REPRODUCE" };
+        }
+
+        protected override void Decision(Cell cell, GameObject intresst)
+        {
+            //Om AI har nått-, är för långt ifrån- eller inte hunnit till idle positionen, sätts en ny idle position.
+            if (Math.Pow(idleDestination.Position.X - cell.Position.X, 2) + Math.Pow(idleDestination.Position.Y - cell.Position.Y, 2) < Math.Pow(2, 2) ||
+                Math.Pow(idleDestination.Position.X - cell.Position.X, 2) + Math.Pow(idleDestination.Position.Y - cell.Position.Y, 2) > Math.Pow(2 * cell.Detectionrange, 2) ||
+                --idleTimer <= 0)
+            {
+                idleTimer = (int)Math.Floor(cell.Detectionrange / cell.Speed * 10);
+                double angle = StaticGlobal.Random.NextDouble() * 2 * Math.PI;
+                idleDestination.SetPosition(new Vector2(
+                    (float)(cell.Position.X + cell.Detectionrange * Math.Cos(angle)),
+                    (float)(cell.Position.Y + cell.Detectionrange * Math.Sin(angle))
+                    ));
+            }
+
+            direction = intresst.Position - cell.Position;
+
+            Actions(cell, MemoryChoice(Data(cell, intresst)).Desicion, new int[2] { (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) });
+        }
+
+        protected override void Actions(Cell cell, string decision, int[] parameters)
+        {
+            Vector2 moveDirection = new Vector2(parameters[0], parameters[1]);
+            switch (decision)
+            {
+                case "IDLE":
+                    cell.EnergyManagement(-(
+                cell.Size / CellManagerControlls.DefaultCellSize +
+                cell.Speed / CellManagerControlls.DefaultCellSpeed +
+                (cell.Detectionrange - cell.Size) / CellManagerControlls.DefaultCellPerception
+                ) / 3);
+                    cell.Move(moveDirection);
+                    break;
+
+                case "MOVETO":
+                    cell.EnergyManagement(-(
+                cell.Size / CellManagerControlls.DefaultCellSize +
+                cell.Speed / CellManagerControlls.DefaultCellSpeed +
+                (cell.Detectionrange - cell.Size) / CellManagerControlls.DefaultCellPerception
+                ) / 3);
+                    cell.Move(moveDirection);
+                    break;
+
+                case "MOVEFROM":
+                    cell.EnergyManagement(-(
+                cell.Size / CellManagerControlls.DefaultCellSize +
+                cell.Speed / CellManagerControlls.DefaultCellSpeed +
+                (cell.Detectionrange - cell.Size) / CellManagerControlls.DefaultCellPerception
+                ) / 3);
+                    cell.Move(-moveDirection);
+                    break;
+
+                case "STOP":
+                    cell.EnergyManagement(-(
+                        (cell.Detectionrange - cell.Size) / CellManagerControlls.DefaultCellPerception)
+                        );
+                    break;
+
+                case "REPRODUCE":
+                    cell.EnergyManagement((float)-EnergyControlls.CellEnergyRequirement);
+                    cell.isMarkForReproduce = true;
+                    break;
+            }
         }
     }
 
     /// <summary>
     /// AI-Typ vilken endast bryr sig om vad som är närmast den
     /// </summary>
-    class AI_ClosestTargeting : AI
+    class AI_ClosestTargeting : baseTargetingAI
     {
         public AI_ClosestTargeting(Cell parent, Cell cell) : base(parent, cell)
         {
             aiType = AIType.CloseTargeting;
-            choises = new string[] { "MOVETO", "MOVEFROM", "IDLE"};
+            //choises = new string[] { "MOVETO", "MOVEFROM", "IDLE", "STOP", "REPRODUCE" };
         }
 
         protected override void Intresst(Cell cell, SectorContent percivableObjects)
@@ -492,57 +572,17 @@ namespace Gymnasiearbete
             lastIntresst = intresst;
             Decision(cell, lastIntresst);
         }
-
-        protected override void Decision(Cell cell, GameObject intresst)
-        {
-            //Om AI har nått-, är för långt ifrån- eller inte hunnit till idle positionen, sätts en ny idle position.
-            if (Math.Pow(idleDestination.Position.X - cell.Position.X, 2) + Math.Pow(idleDestination.Position.Y - cell.Position.Y, 2) < Math.Pow(2, 2) || 
-                Math.Pow(idleDestination.Position.X - cell.Position.X, 2) + Math.Pow(idleDestination.Position.Y - cell.Position.Y, 2) > Math.Pow(2 * cell.Detectionrange, 2) ||
-                --idleTimer <= 0)
-            {
-                idleTimer = (int)Math.Floor(cell.Detectionrange/cell.Speed*10);
-                idleDestination.SetPosition(new Vector2(
-                    StaticGlobal.Random.Next((int)Math.Floor(cell.Position.X - 2 * cell.Detectionrange), (int)Math.Floor(cell.Position.X + 2 * cell.Detectionrange)),
-                    StaticGlobal.Random.Next((int)Math.Floor(cell.Position.Y - 2 * cell.Detectionrange), (int)Math.Floor(cell.Position.Y + 2 * cell.Detectionrange))
-                    ));
-            }
-
-            direction = intresst.Position - cell.Position;
-
-            Actions(cell, MemoryChoice(Data(cell, intresst)).Desicion, new int[2] { (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) });
-
-        }
-
-        protected override void Actions(Cell cell, string decision, int[] parameters)
-        {
-            //Utför val
-            Vector2 moveDirection = new Vector2(parameters[0], parameters[1]);
-            switch (decision)
-            {
-                case "IDLE":
-                    cell.Move(moveDirection);
-                    break;
-
-                case "MOVETO":
-                    cell.Move(moveDirection);
-                    break;
-
-                case "MOVEFROM":
-                    cell.Move(-moveDirection);
-                    break;
-            }
-        }
     }
 
     /// <summary>
     /// AI-Typ vilken bryr sig om situationer med mest poäng
     /// </summary>
-    class AI_PointsTargeting : AI
+    class AI_PointsTargeting : baseTargetingAI
     {
         public AI_PointsTargeting(Cell parent, Cell cell) : base(parent, cell)
         {
             aiType = AIType.PointsTargeting;
-            choises = new string[] { "MOVETO", "MOVEFROM", "IDLE", "STOP", "REPRODUCE" };
+            //choises = new string[] { "MOVETO", "MOVEFROM", "IDLE", "STOP", "REPRODUCE" };
         }
 
         protected override void Intresst(Cell cell, SectorContent percivableObjects)
@@ -567,7 +607,6 @@ namespace Gymnasiearbete
                 }
             }
 
-            
             //Om det inte finns minnen
             if(bestIntrest.Count <= 0)
             {
@@ -584,53 +623,6 @@ namespace Gymnasiearbete
             //Väljer slumpvalt val utifrån val med mest poäng
             lastIntresst = bestIntrest[StaticGlobal.Random.Next(bestIntrest.Count)];
             Decision(cell, lastIntresst);
-        }
-
-        protected override void Decision(Cell cell, GameObject intresst)
-        {
-            //Om AI har nått-, är för långt ifrån- eller inte hunnit till idle positionen, sätts en ny idle position.
-            if (Math.Pow(idleDestination.Position.X - cell.Position.X, 2) + Math.Pow(idleDestination.Position.Y - cell.Position.Y, 2) < Math.Pow(2, 2) ||
-                Math.Pow(idleDestination.Position.X - cell.Position.X, 2) + Math.Pow(idleDestination.Position.Y - cell.Position.Y, 2) > Math.Pow(2 * cell.Detectionrange, 2) ||
-                --idleTimer <= 0)
-            {
-                idleTimer = (int)Math.Floor(cell.Detectionrange/cell.Speed*10);
-                idleDestination.SetPosition(new Vector2(
-                    StaticGlobal.Random.Next((int)Math.Floor(cell.Position.X - 2 * cell.Detectionrange), (int)Math.Floor(cell.Position.X + 2 * cell.Detectionrange)),
-                    StaticGlobal.Random.Next((int)Math.Floor(cell.Position.Y - 2 * cell.Detectionrange), (int)Math.Floor(cell.Position.Y + 2 * cell.Detectionrange))
-                    ));
-            }
-
-            direction = intresst.Position - cell.Position;
-
-            Actions(cell, MemoryChoice(Data(cell, intresst)).Desicion, new int[2] { (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) });
-
-        }
-
-        protected override void Actions(Cell cell, string decision, int[] parameters)
-        {
-            //Utför val
-            Vector2 moveDirection = new Vector2(parameters[0], parameters[1]);
-            switch (decision)
-            {
-                case "IDLE":
-                    cell.Move(moveDirection);
-                    break;
-
-                case "MOVETO":
-                    cell.Move(moveDirection);
-                    break;
-
-                case "MOVEFROM":
-                    cell.Move(-moveDirection);
-                    break;
-
-                case "STOP":
-                    break;
-
-                case "REPRODUCE":
-                    cell.isMarkForReproduce = true;
-                    break;
-            }
         }
     }
 }

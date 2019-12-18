@@ -109,24 +109,26 @@ namespace Gymnasiearbete
             return cchild;
         }
         
-        void EnergyManagement()
+        public void EnergyManagement(float amount = 0)
         {
+            /*
             energy -= (
                 this.size/CellManagerControlls.DefaultCellSize + 
                 this.speed/CellManagerControlls.DefaultCellSpeed + 
                 this.perception/CellManagerControlls.DefaultCellPerception
                 )/3;
+                */
 
+            if (amount > 0)
+            {
+                ai.MemoryReward((int)Math.Floor(amount / 100));
+            }
+
+            energy += amount;
             if (energy <= 0)
             {
                 this.isMarkedForDelete = true;
             }
-        }
-
-        void EnergyGain(float amount)
-        {
-            energy += amount;
-            ai.MemoryReward((int)Math.Floor(amount / 100));
         }
 
         //Perception
@@ -152,7 +154,7 @@ namespace Gymnasiearbete
 
         public void Update(List<GameObject> detectionCheck, Random random)
         {
-            EnergyManagement();
+            //EnergyManagement();
             if (!isMarkedForDelete)
             {
                 PerceptionCheck(detectionCheck);
@@ -173,7 +175,7 @@ namespace Gymnasiearbete
                 Cell c = (Cell)g;
                 if(g.Size * consumeScale < this.size)
                 {
-                    EnergyGain(c.energy);
+                    EnergyManagement(c.Energy);
                     g.isMarkedForDelete = true;
                 }
             }
@@ -181,7 +183,7 @@ namespace Gymnasiearbete
             if (g.GetType() == typeof(Food))
             {
                 Food f = (Food)g;
-                EnergyGain(f.Energy);
+                EnergyManagement(f.Energy);
                 g.isMarkedForDelete = true;
             }
         }
