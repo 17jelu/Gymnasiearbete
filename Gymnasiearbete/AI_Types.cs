@@ -460,9 +460,9 @@ namespace Gymnasiearbete
         }
     }
 
-    class baseTargetingAI : AI
+    class BaseTargetingAI : AI
     {
-        public baseTargetingAI(Cell parent, Cell cell) : base(parent, cell)
+        public BaseTargetingAI(Cell parent, Cell cell) : base(parent, cell)
         {
             aiType = AIType.NoBrain;
             choises = new string[] { "MOVETO", "MOVEFROM", "IDLE", "STOP", "REPRODUCE" };
@@ -537,7 +537,7 @@ namespace Gymnasiearbete
     /// <summary>
     /// AI-Typ vilken endast bryr sig om vad som är närmast den
     /// </summary>
-    class AI_ClosestTargeting : baseTargetingAI
+    class AI_ClosestTargeting : BaseTargetingAI
     {
         public AI_ClosestTargeting(Cell parent, Cell cell) : base(parent, cell)
         {
@@ -577,7 +577,7 @@ namespace Gymnasiearbete
     /// <summary>
     /// AI-Typ vilken bryr sig om situationer med mest poäng
     /// </summary>
-    class AI_PointsTargeting : baseTargetingAI
+    class AI_PointsTargeting : BaseTargetingAI
     {
         public AI_PointsTargeting(Cell parent, Cell cell) : base(parent, cell)
         {

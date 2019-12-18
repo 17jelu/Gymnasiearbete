@@ -111,14 +111,6 @@ namespace Gymnasiearbete
         
         public void EnergyManagement(float amount = 0)
         {
-            /*
-            energy -= (
-                this.size/CellManagerControlls.DefaultCellSize + 
-                this.speed/CellManagerControlls.DefaultCellSpeed + 
-                this.perception/CellManagerControlls.DefaultCellPerception
-                )/3;
-                */
-
             if (amount > 0)
             {
                 ai.MemoryReward((int)Math.Floor(amount / 100));
@@ -154,7 +146,7 @@ namespace Gymnasiearbete
 
         public void Update(List<GameObject> detectionCheck, Random random)
         {
-            //EnergyManagement();
+            EnergyManagement();
             if (!isMarkedForDelete)
             {
                 PerceptionCheck(detectionCheck);
@@ -188,13 +180,16 @@ namespace Gymnasiearbete
             }
         }
 
-        public override string DEBUG()
+        public Cell PlayerCopy()
         {
-            string result = "";
-            result += "[" + Math.Floor(Position.X) + ":" + Math.Floor(Position.Y) + "]";
-            result += "[" + Size + "; " + Speed + "; " + perception + "]";
-            result += "[" + energy + "]";
-            return "{" + result + "}";
+            Cell copy = new Cell(StaticGlobal.CM, null, AI.AIType.Player, this.Position, this.Size, this.Speed, this.perception)
+            {
+                energy = this.energy
+            };
+
+            copy.AI.family = "Player";
+
+            return copy;
         }
     }
 }
