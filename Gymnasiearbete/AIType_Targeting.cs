@@ -11,7 +11,7 @@ namespace Gymnasiearbete
     {
         public BaseTargetingAI(Cell parent, Cell cell) : base(parent, cell)
         {
-            choises = new string[] { "MOVETO", "MOVEFROM", "IDLE", "STOP", "REPRODUCE" };
+            choises = new string[] { "MOVETO", "MOVEFROM", "IDLE", "STOP" };
         }
 
         protected override void Decision(Cell cell, GameObject intresst)
@@ -71,11 +71,6 @@ namespace Gymnasiearbete
                         (cell.Detectionrange - cell.Size) / CellManagerControlls.DefaultCellPerception)
                         );
                     break;
-
-                case "REPRODUCE":
-                    cell.EnergyManagement((float)-EnergyControlls.CellEnergyRequirement);
-                    cell.isMarkForReproduce = true;
-                    break;
             }
         }
     }
@@ -88,7 +83,7 @@ namespace Gymnasiearbete
         public AI_ClosestTargeting(Cell parent, Cell cell) : base(parent, cell)
         {
             aiType = AIType.TargetingClose;
-            //choises = new string[] { "MOVETO", "MOVEFROM", "IDLE", "STOP", "REPRODUCE" };
+            //choises = new string[] { "MOVETO", "MOVEFROM", "IDLE", "STOP" };
         }
 
         protected override void Intresst(Cell cell, SectorContent percivableObjects)
@@ -128,7 +123,7 @@ namespace Gymnasiearbete
         public AI_PointsTargeting(Cell parent, Cell cell) : base(parent, cell)
         {
             aiType = AIType.TargetingPoints;
-            //choises = new string[] { "MOVETO", "MOVEFROM", "IDLE", "STOP", "REPRODUCE" };
+            //choises = new string[] { "MOVETO", "MOVEFROM", "IDLE", "STOP"};
         }
 
         public override string Data(Cell cell, GameObject dataObject)

@@ -55,7 +55,7 @@ namespace Gymnasiearbete
                 direction.Normalize();
                 if (parent.AI.family == null || parent.AI.family == "")
                 {
-                    family = StaticGlobal.Family.NewFamily;
+                    family = StaticGlobal.Family.NewFamily();
                 }
                 else
                 {
@@ -90,7 +90,7 @@ namespace Gymnasiearbete
                 var directory = Directory.CreateDirectory(dataPath);
             }
 
-            dataPath += this.GetType().ToString().Split('.')[1] + "_" + family.Split(' ')[0] + ".memory";
+            dataPath += this.GetType().ToString().Split('.')[1] + "_" + family.ToString() + ".memory";
             if (!File.Exists(dataPath))
             {
                 var file = File.Create(dataPath);
@@ -240,6 +240,11 @@ namespace Gymnasiearbete
         /// </summary>
         public void MemoryReward(int reward, bool amplify = false)
         {
+            if (lastMemory == null)
+            {
+                return;
+            }
+
             foreach (Memory m in memory)
             {
                 if (!amplify)

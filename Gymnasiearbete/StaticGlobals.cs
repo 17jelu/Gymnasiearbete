@@ -101,6 +101,7 @@ This is survival. This is war.";
         {
             Dictionary<string, int> families = new Dictionary<string, int>();
             #region NameList
+
             string[] nl_color = new string[]
             {
                     "Red",
@@ -169,6 +170,7 @@ This is survival. This is war.";
 
             private string GenerateRandomName()
             {
+                /*
                 string name = string.Empty;
                 name += nl_color[random.Next(nl_color.Length)];
                 name += " ";
@@ -177,8 +179,12 @@ This is survival. This is war.";
                 name += nl_noun[random.Next(nl_noun.Length)];
 
                 return name;
+                //*/
+                string name = nl_color[random.Next(nl_color.Length)];
+                return name;
             }
 
+            /*
             public string NewFamily
             {
                 get
@@ -194,6 +200,20 @@ This is survival. This is war.";
 
                     return name;
                 }
+            }
+            */
+
+            public string NewFamily()
+            {
+
+                string name = GenerateRandomName();
+
+                if (!families.ContainsKey(name))
+                {
+                    families.Add(name, 1);
+                }
+
+                return name;
             }
 
             public void KillMember(string family)
@@ -357,6 +377,7 @@ This is survival. This is war.";
     {
         public static bool DeleteSectorIfEmpty = false;
 
+        public static int starterCellsNum = 5;
         public static int DefaultCellSize = 10;
         public static int DefaultCellSpeed = 20;
         public static int DefaultCellPerception = 100;

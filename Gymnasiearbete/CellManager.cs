@@ -64,63 +64,65 @@ namespace Gymnasiearbete
 
         }
 
-        public void Initilize()
+        public void Initilize(int startCellCount, AI.AIType startAiType)
         {
             Content.Clear();
             civilazationTime = 0;
             pause = false;
 
-            const int starterCells = 5;
-
-            AI.AIType[] starterAI = new AI.AIType[starterCells]
+            AI.AIType[] starterAiTypes = new AI.AIType[]
             {
-                AI.AIType.AdvancedMovement,
-                AI.AIType.AdvancedMovement,
-                AI.AIType.AdvancedMovement,
-                AI.AIType.AdvancedMovement,
-                AI.AIType.AdvancedMovement
+                AI.AIType.TargetingClose,
+                AI.AIType.TargetingPoints
             };
 
-            int[,] starterDNA = new int[starterCells, 3]
+            int[] starterDNASize = new int[] { 10-8, 10+5 };
+            int[] starterDNASpeed = new int[] { 20-18, 20+7 };
+            int[] starterDNAPerception = new int[] { 100-80, 100+50 };
+
+            for (int i = 0; i < startCellCount; i++)
             {
-                { 10, 20, 100 },
-                { 10, 20, 100 },
-                { 14, 30, 50 },
-                { 14, 30, 50 },
-                { 14, 30, 50 }
-            };
-
-            for (int i = 0; i < starterCells; i++)
-            {
-                Cell c = new Cell
-                        (this, new Cell(this, null, AI.AIType.NoBrain, Vector2.Zero, 0, 0, 0), starterAI[i],
-                        new Vector2(
-                            StaticGlobal.Random.Next(-0 * StaticGlobal.SectorSize, starterCells * 2 * StaticGlobal.SectorSize), 
-                            StaticGlobal.Random.Next(-0 * StaticGlobal.SectorSize, starterCells * 2 * StaticGlobal.SectorSize)),
-                        starterDNA[i, 0], starterDNA[i, 1], starterDNA[i, 2]
-                        );
-
-                Content.Add(c);
-
-                for (int f = 0; f < 3; f++)
-                {
-                    int[] nORp = new int[] { -1, 1 };
-                    Content.Add
-                        (
-                        new Food(
-                            new Vector2(
-                                c.Position.X + nORp[StaticGlobal.Random.Next(2)] * StaticGlobal.Random.Next((int)Math.Floor(c.Size), (int)Math.Floor(c.Size) + StaticGlobal.SectorSize),
-                                c.Position.Y + nORp[StaticGlobal.Random.Next(2)] * StaticGlobal.Random.Next((int)Math.Floor(c.Size), (int)Math.Floor(c.Size) + StaticGlobal.SectorSize)
-                                )
-                            )
-                        );
-                }
+                AddCell(
+                    starterAiTypes[StaticGlobal.Random.Next(2)], 
+                    new int[] {
+                        StaticGlobal.Random.Next(starterDNASize[0], starterDNASize[1]),
+                        StaticGlobal.Random.Next(starterDNASpeed[0], starterDNASpeed[1]),
+                        StaticGlobal.Random.Next(starterDNAPerception[0], starterDNAPerception[1]) }, 
+                    new int[] { i * 2 * StaticGlobal.SectorSize, StaticGlobal.SectorSize });
             }
         }
 
         public void TogglePause()
         {
             pause = !pause;
+        }
+
+        public void AddCell(AI.AIType aIType, int[] dnaZSP, int[] pos)
+        {
+            Cell c = new Cell
+                        (this, new Cell(this, null, AI.AIType.NoBrain, Vector2.Zero, 0, 0, 0), aIType,
+                        new Vector2(pos[0], pos[1]), dnaZSP[0], dnaZSP[1], dnaZSP[2]);
+
+            Content.Add(c);
+
+            for (int f = 0; f < 3; f++)
+            {
+                int[] nORp = new int[] { -1, 1 };
+                Content.Add
+                    (
+                    new Food(
+                        new Vector2(
+                            c.Position.X + nORp[StaticGlobal.Random.Next(2)] * StaticGlobal.Random.Next((int)Math.Floor(c.Size), (int)Math.Floor(c.Size) + StaticGlobal.SectorSize),
+                            c.Position.Y + nORp[StaticGlobal.Random.Next(2)] * StaticGlobal.Random.Next((int)Math.Floor(c.Size), (int)Math.Floor(c.Size) + StaticGlobal.SectorSize)
+                            )
+                        )
+                    );
+            }
+        }
+
+        public Rectangle simulationArea()
+        {
+            return new Rectangle(0, 0, StaticGlobal.SectorSize * Content.Cells.Count, StaticGlobal.SectorSize * Content.Cells.Count);
         }
 
         public void Update(GameTime gameTime)

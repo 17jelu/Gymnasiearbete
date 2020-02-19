@@ -80,7 +80,7 @@ namespace Gymnasiearbete
 
         void ReproduceCheck()
         {
-            if (energy > 2 * energyRequirement)
+            if (energy > 1.5 * energyRequirement)
             {
                 isMarkForReproduce = true;
             } else
@@ -91,8 +91,7 @@ namespace Gymnasiearbete
 
         public Cell Reproduce()
         {
-            isMarkForReproduce = false;
-            energy -= energyRequirement;
+            EnergyManagement(-energyRequirement);
             AI.MemoryReward(1, true);
             AI.MemoryFileWrite();
             Cell cchild = new Cell(CM, this, ai.GetAIType, Position, this.size, this.speed, this.perception);
@@ -114,6 +113,7 @@ namespace Gymnasiearbete
             if (amount > 0)
             {
                 ai.MemoryReward((int)Math.Floor(amount / 100));
+                ReproduceCheck();
             }
 
             energy += amount;

@@ -131,7 +131,7 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
 
             if (StaticGlobal.Keyboard.IsKeyClicked(Keys.R) || StaticGlobal.CM.SimulationEnd)
             {
-                StaticGlobal.CM.Initilize();
+                StaticGlobal.CM.Initilize(10, AI.AIType.TargetingPoints);//new int[] { 10, 20, 100 }
                 Camera.ChangeSpectatingCell(0);
             }
             
