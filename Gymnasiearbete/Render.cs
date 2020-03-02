@@ -16,6 +16,9 @@ namespace Gymnasiearbete
             gridLine = new Line { Color = Color.Gray };
         }
 
+        /// <summary>
+        /// Renders the simulation
+        /// </summary>
         public static void Draw(CellManager CM, GraphicsDevice GraphicsDevice)
         {
             byte

@@ -42,6 +42,8 @@ namespace Gymnasiearbete
             set { action = value; }
         }
 
+        public string Text { get; set; }
+
         public Button()
         {
             old_active = false;
@@ -59,78 +61,38 @@ namespace Gymnasiearbete
         }
     }
 
-    class UIElementHandler
+    class UIElementButtonGroup
     {
-        static Button[] buttons;
-        static GraphicRectangle body;
-        static GraphicRectangle bottom;
+        GraphicRectangle body;
+        GraphicRectangle bottom;
 
         // Implementing "select" aka TAB thingy
-        static VertexPositionColor[] vertices;
-        static int selectedButtonIndex;
+        VertexPositionColor[] vertices;
+        int selectedButtonIndex;
         const int outlineThickness = 5;
+        public const int OutlineMargin = outlineThickness;
 
-        public static void Initialize()
+        Action onResize;
+        public Action OnResize
         {
+            set { onResize = value; }
+        }
+
+        Texture2D[] buttonStrings;
+        Button[] buttons;
+        public Button[] Buttons
+        {
+            get { return buttons; }
+            set { buttons = value; }
+        }
+
+        public void Initialize()
+        {
+            buttonStrings = new Texture2D[buttons.Length];
+
             #region Buttons
             body = new GraphicRectangle(Color.White, 0, 0, 0, 0);
             bottom = new GraphicRectangle(Color.White, 0, 0, 0, 0);
-
-            buttons = new Button[]
-            {
-                // NULL BUTTON
-                new Button
-                {
-                    Bounds = new Rectangle(-100, -100, 0, 0)
-                },
-
-                // Hello
-                new Button
-                {
-                    Bounds = new Rectangle
-                    {
-                        Width = 150,
-                        Height = 50,
-                        X = 20,
-                        Y = 20
-                    },
-                    Action = () => Console.WriteLine("Hello")
-                },
-
-                // Exit button
-                new Button
-                {
-                    Bounds = new Rectangle
-                    {
-                        Width = 100,
-                        Height = 100,
-                        X = 200,
-                        Y = 200
-                    },
-                    Action = () =>
-                    {
-                        StaticGlobal.SaveModeON = true;
-                        StaticGlobal.Shutdown();
-                    }
-                },
-
-                // Just cause
-                new Button
-                {
-                    Bounds = new Rectangle
-                    {
-                        Width = 50,
-                        Height = 50,
-                        X = StaticGlobal.Screen.Area.Width - 100,
-                        Y = 100
-                    },
-                    Action = () =>
-                    {
-                        Camera.FreeCam = true;
-                        Camera.Position = new Vector2(int.MaxValue, int.MinValue);
-                    }
-                }
-            };
             #endregion Buttons
 
             #region Select Outline
@@ -144,7 +106,16 @@ namespace Gymnasiearbete
             #endregion Select Outline
         }
 
-        public static void Update()
+        /// <summary>
+        /// Invokes OnResize() action.
+        /// </summary>
+        public void Resize()
+        {
+            // custom resize (placement)
+            onResize?.Invoke();
+        }
+
+        public void Update()
         {
             foreach (var button in buttons)
             {
@@ -168,15 +139,23 @@ namespace Gymnasiearbete
             {
                 buttons[selectedButtonIndex].Active = true;
             }
-            if (StaticGlobal.Keyboard.IsKeyReleased(Keys.Enter))
+            if (StaticGlobal.Keyboard.IsKeyReleased(Keys.Enter) && buttons[selectedButtonIndex].Action != null)
             {
                 buttons[selectedButtonIndex].Action();
             }
         }
 
-        public static void Render(GraphicsDevice GraphicsDevice)
+        /// <summary>
+        /// Sets selectedButtonIndex to 0.
+        /// </summary>
+        public void ResetIndex()
         {
-            foreach (Button button in buttons)
+            selectedButtonIndex = 0;
+        }
+
+        public void Render(GraphicsDevice GraphicsDevice, SpriteBatch spriteBatch, SpriteFont font)
+        {
+            foreach (var button in buttons)
             {
                 // Default placement
                 bottom.Width = button.Bounds.Width;
@@ -208,6 +187,15 @@ namespace Gymnasiearbete
 
                 bottom.Render(GraphicsDevice);
                 body.Render(GraphicsDevice);
+
+                if (button.Text != null)
+                {
+                    var measure = font.MeasureString(button.Text);
+                    spriteBatch.DrawString(font, button.Text, new Vector2(
+                        body.X + (body.Width >> 1) - ((int)measure.X >> 1),
+                        body.Y + (body.Height >> 1) - ((int)measure.Y >> 1)),
+                    Color.Black);
+                }
             }
 
             #region Selected Outline

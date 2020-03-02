@@ -151,7 +151,7 @@ namespace Gymnasiearbete
         {
             get
             {
-                return oldState.ScrollWheelValue - currentState.ScrollWheelValue;
+                return currentState.ScrollWheelValue - oldState.ScrollWheelValue;
             }
         }
 
