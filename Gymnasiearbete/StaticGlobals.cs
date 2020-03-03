@@ -243,6 +243,13 @@ This is survival. This is war.";
 
         internal class sgScreen
         {
+            private Point location;
+            public Point Location
+            {
+                get { return location; }
+                set { location = value; }
+            }
+
             private Rectangle area;
             public Rectangle Area
             {
@@ -258,6 +265,7 @@ This is survival. This is war.";
                 area = new Rectangle();
                 area.Width = ClientBounds.Width;
                 area.Height = ClientBounds.Height;
+                location = ClientBounds.Location;
             }
 
             /// <summary>
@@ -268,6 +276,7 @@ This is survival. This is war.";
             {
                 area.Width = ClientBounds.Width;
                 area.Height = ClientBounds.Height;
+                location = ClientBounds.Location;
             }
 
             /// <summary>
@@ -382,61 +391,5 @@ This is survival. This is war.";
         public static int DefaultCellSpeed = 20;
         public static int DefaultCellPerception = 100;
         public static int[] DefaultCellDNA = new int[3] { DefaultCellSize, DefaultCellSpeed, DefaultCellPerception };
-    }
-
-    struct SGScreen
-    {
-        static Rectangle area;
-        public static Rectangle Area
-        {
-            get { return area; }
-            set { area = value; }
-        }
-
-        public static void Initialize(Rectangle ClientBounds)
-        {
-            area = new Rectangle();
-            area.Width = ClientBounds.Width;
-            area.Height = ClientBounds.Height;
-        }
-
-        public static void Resize(Rectangle ClientBounds)
-        {
-            area.Width = ClientBounds.Width;
-            area.Height = ClientBounds.Height;
-        }
-    }
-
-    struct SGBasicEffect
-    {
-        static BasicEffect effect;
-        public static BasicEffect Effect
-        {
-            get { return effect; }
-        }
-
-        public static void Initialize(GraphicsDevice GraphicsDevice)
-        {
-            effect = new BasicEffect(GraphicsDevice);
-            effect.VertexColorEnabled = true;
-            effect.Projection = Matrix.CreateOrthographicOffCenter
-                (0, GraphicsDevice.Viewport.Width,     // left, right
-                GraphicsDevice.Viewport.Height, 0,    // bottom, top
-                0, 1);
-            effect.CurrentTechnique.Passes[0].Apply();
-        }
-
-        public static void ApplyCurrentTechnique()
-        {
-            effect.CurrentTechnique.Passes[0].Apply();
-        }
-
-        public static void Resize(GraphicsDevice GraphicsDevice)
-        {
-            effect.Projection = Matrix.CreateOrthographicOffCenter
-                (0, GraphicsDevice.Viewport.Width,     // left, right
-                GraphicsDevice.Viewport.Height, 0,    // bottom, top
-                0, 1);
-        }
     }
 }
