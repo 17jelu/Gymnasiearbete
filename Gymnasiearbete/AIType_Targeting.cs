@@ -69,7 +69,7 @@ namespace Gymnasiearbete
                 case "STOP":
                     cell.EnergyManagement(-(
                         (cell.Detectionrange - cell.Size) / CellManagerControlls.DefaultCellPerception)
-                        );
+                        / 3);
                     break;
             }
         }
