@@ -384,7 +384,7 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                         Console.WriteLine("{0} -> {1}",
                             StaticGlobal.Mouse.ScrollWheelDifference,
                             StaticGlobal.Mouse.ScrollWheelDifference * 0.001f);
-                        Camera.Zoom -= StaticGlobal.Mouse.ScrollWheelDifference * 0.001f;
+                        Camera.Zoom += StaticGlobal.Mouse.ScrollWheelDifference * 0.001f;
                     }
 
                     if (StaticGlobal.Keyboard.IsKeyClicked(Keys.F))
