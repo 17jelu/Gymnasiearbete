@@ -11,7 +11,53 @@ namespace Gymnasiearbete
     {
         public BaseTargetingAI(Cell parent, Cell cell) : base(parent, cell)
         {
-            choises = new string[] { "MOVETO", "MOVEFROM", "IDLE", "STOP" };
+            choises = new string[] { "MOVETO", "MOVEFROM", "IDLE", "RUNTO", "RUNFROM", "STOP" };
+        }
+
+        public override string Data(Cell cell, GameObject dataObject)
+        {
+            string dataOut = "NULL"; // + "/E" + (cell.Energy > Cell.energyRequirement);
+            if (dataObject != null)
+            {
+                if (dataObject.GetType() == typeof(Cell))
+                {
+                    Cell dataCell = (Cell)dataObject;
+
+                    dataOut = "CELL";
+
+                    dataOut += "/S";
+                    string sizeData = "=";
+                    if (dataCell.Size > Cell.consumeScale * cell.Size)
+                    {
+                        sizeData = ">";
+                    }
+
+                    if (dataCell.Size * Cell.consumeScale < cell.Size)
+                    {
+                        sizeData = "<";
+                    }
+                    dataOut += sizeData;
+
+                    dataOut += "/V";
+                    string speedData = "=";
+                    if (dataCell.Speed > cell.Speed)
+                    {
+                        speedData = ">";
+                    }
+                    if (dataCell.Speed < cell.Speed)
+                    {
+                        speedData = "<";
+                    }
+                    dataOut += speedData;
+                }
+
+                if (dataObject.GetType() == typeof(Food))
+                {
+                    dataOut = "FOOD";
+                }
+            }
+
+            return dataOut;
         }
 
         protected override void Decision(Cell cell, GameObject intresst)
@@ -66,6 +112,24 @@ namespace Gymnasiearbete
                     cell.Move(-moveDirection);
                     break;
 
+                case "RUNTO":
+                    cell.EnergyManagement(2 * -(
+                cell.Size / CellManagerControlls.DefaultCellSize +
+                cell.Speed / CellManagerControlls.DefaultCellSpeed +
+                (cell.Detectionrange - cell.Size) / CellManagerControlls.DefaultCellPerception
+                ) / 3);
+                    cell.Move(moveDirection, 2);
+                    break;
+
+                case "RUNFROM":
+                    cell.EnergyManagement(2 * -(
+                cell.Size / CellManagerControlls.DefaultCellSize +
+                cell.Speed / CellManagerControlls.DefaultCellSpeed +
+                (cell.Detectionrange - cell.Size) / CellManagerControlls.DefaultCellPerception
+                ) / 3);
+                    cell.Move(-moveDirection, 2);
+                    break;
+
                 case "STOP":
                     cell.EnergyManagement(-(
                         (cell.Detectionrange - cell.Size) / CellManagerControlls.DefaultCellPerception)
@@ -83,7 +147,7 @@ namespace Gymnasiearbete
         public AI_ClosestTargeting(Cell parent, Cell cell) : base(parent, cell)
         {
             aiType = AIType.TargetingClose;
-            //choises = new string[] { "MOVETO", "MOVEFROM", "IDLE", "STOP" };
+            //choises = new string[] { "MOVETO", "MOVEFROM", "IDLE", "RUNTO", "RUNFROM", "STOP" };
         }
 
         protected override void Intresst(Cell cell, SectorContent percivableObjects)
@@ -126,51 +190,7 @@ namespace Gymnasiearbete
             //choises = new string[] { "MOVETO", "MOVEFROM", "IDLE", "STOP"};
         }
 
-        public override string Data(Cell cell, GameObject dataObject)
-        {
-            string dataOut = "NULL" + "/E" + (cell.Energy > Cell.energyRequirement);
-            if (dataObject != null)
-            {
-                if (dataObject.GetType() == typeof(Cell))
-                {
-                    Cell dataCell = (Cell)dataObject;
-
-                    dataOut = "CELL";
-
-                    dataOut += "/S";
-                    string sizeData = "=";
-                    if (dataCell.Size > Cell.consumeScale * cell.Size)
-                    {
-                        sizeData = ">";
-                    }
-
-                    if (dataCell.Size * Cell.consumeScale < cell.Size)
-                    {
-                        sizeData = "<";
-                    }
-                    dataOut += sizeData;
-
-                    dataOut += "/V";
-                    string speedData = "=";
-                    if (dataCell.Speed > cell.Speed)
-                    {
-                        speedData = ">";
-                    }
-                    if (dataCell.Speed < cell.Speed)
-                    {
-                        speedData = "<";
-                    }
-                    dataOut += speedData;
-                }
-
-                if (dataObject.GetType() == typeof(Food))
-                {
-                    dataOut = "FOOD";
-                }
-            }
-
-            return dataOut;
-        }
+        
 
         protected override void Intresst(Cell cell, SectorContent percivableObjects)
         {

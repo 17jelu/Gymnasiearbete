@@ -105,13 +105,13 @@ namespace Gymnasiearbete
 
         }
 
-        public void Move(Vector2 direction)
+        public void Move(Vector2 direction, float amplify = 1)
         {
             if (direction != Vector2.Zero)
             {
                 direction.Normalize();
 
-                position = Vector2.Lerp(position, position + direction * speed / 10, 0.85f);
+                position = Vector2.Lerp(position, position + direction * amplify * speed / 10, 0.85f);
             }
         }
     }
