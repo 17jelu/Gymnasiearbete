@@ -51,6 +51,10 @@ namespace Gymnasiearbete
             {
                 return ai;
             }
+            set
+            {
+                ai = value;
+            }
         }
 
         public bool isMarkForReproduce = false;
@@ -76,7 +80,7 @@ namespace Gymnasiearbete
 
         void ReproduceCheck()
         {
-            if (energy > 2 * energyRequirement)
+            if (energy > 1.5 * energyRequirement)
             {
                 isMarkForReproduce = true;
             } else
@@ -87,8 +91,7 @@ namespace Gymnasiearbete
 
         public Cell Reproduce()
         {
-            isMarkForReproduce = false;
-            energy -= energyRequirement;
+            EnergyManagement(-energyRequirement);
             AI.MemoryReward(1, true);
             AI.MemoryFileWrite();
             Cell cchild = new Cell(CM, this, ai.GetAIType, Position, this.size, this.speed, this.perception);
@@ -105,24 +108,19 @@ namespace Gymnasiearbete
             return cchild;
         }
         
-        void EnergyManagement()
+        public void EnergyManagement(float amount = 0)
         {
-            energy -= (
-                this.size/CellManagerControlls.DefaultCellSize + 
-                this.speed/CellManagerControlls.DefaultCellSpeed + 
-                this.perception/CellManagerControlls.DefaultCellPerception
-                )/3;
+            if (amount > 0)
+            {
+                ai.MemoryReward((int)Math.Floor(amount / 100));
+                ReproduceCheck();
+            }
 
+            energy += amount;
             if (energy <= 0)
             {
                 this.isMarkedForDelete = true;
             }
-        }
-
-        void EnergyGain(float amount)
-        {
-            energy += amount;
-            ai.MemoryReward((int)Math.Floor(amount / 100));
         }
 
         //Perception
@@ -169,7 +167,7 @@ namespace Gymnasiearbete
                 Cell c = (Cell)g;
                 if(g.Size * consumeScale < this.size)
                 {
-                    EnergyGain(c.energy);
+                    EnergyManagement(c.Energy);
                     g.isMarkedForDelete = true;
                 }
             }
@@ -177,18 +175,21 @@ namespace Gymnasiearbete
             if (g.GetType() == typeof(Food))
             {
                 Food f = (Food)g;
-                EnergyGain(f.Energy);
+                EnergyManagement(f.Energy);
                 g.isMarkedForDelete = true;
             }
         }
 
-        public override string DEBUG()
+        public Cell PlayerCopy()
         {
-            string result = "";
-            result += "[" + Math.Floor(Position.X) + ":" + Math.Floor(Position.Y) + "]";
-            result += "[" + Size + "; " + Speed + "; " + perception + "]";
-            result += "[" + energy + "]";
-            return "{" + result + "}";
+            Cell copy = new Cell(StaticGlobal.CM, null, AI.AIType.Player, this.Position, this.Size, this.Speed, this.perception)
+            {
+                energy = this.energy
+            };
+
+            copy.AI.family = "Player";
+
+            return copy;
         }
     }
 }

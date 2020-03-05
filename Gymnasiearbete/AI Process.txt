@@ -1,0 +1,46 @@
+﻿AIR():
+“AI Run”
+Är den publika funktionen för att initiera AI processen
+kallar Intresst() med alla object cellen ser
+
+
+Intresst():
+Väljer vad av vad cellen ser som den ska reagera på.
+class AI_ClosestTargetin väljer vad som är närmast
+class AI_PointsTargering väljer vad som gett den mest poäng
+kallar Decision() med intresset
+
+
+Decision():
+Hanterar idleposition och riktningar.
+kallar Action() med MemoryChoise() av Data() av intresset
+
+
+Action():
+En switch med de olika möjliga agerandena av cellerna
+
+
+Data():
+Tar fram data av gameobject, vilket kan vara relevant att göra beslut på
+
+
+MemoryChoice():
+utifrån Data() härleda till ett bra beslut
+1. Hitta minnen med data
+2a. Hittar minnet med mest poäng utifrån data, 
+3a. Väljer slumpvalt från minnena med mest poäng
+
+
+2b. Om inget finns eller pga mutation, skapar ett nytt minne med data och slumpvald action
+3b. Väljer det nyligen skapade minnet
+
+
+MemoryReward():
+funktion vilken ger poäng till val
+a. Ge poäng till senaste valet
+b. Amplifiera poäng. Ge mer poäng till bra val, ta bort poäng från dåliga val.
+
+
+choises[]:
+lista med alla möjliga val
+Individuell för olika AI typer

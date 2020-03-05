@@ -143,6 +143,7 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
             #endregion ButtonGroup_InfoScreen
             // Declare menu.ButtonGroup_PausedSimulation
             #region ButtonGroup_PausedSimulation
+
             menu.ButtonGroup_PausedSimulation = new UIElementButtonGroup
             {
                 Buttons = new Button[]
@@ -163,7 +164,7 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                         Bounds = new Rectangle(0, 0, 300, 50),
                         Action =()=>
                         {
-                            StaticGlobal.CM.Initilize();
+                            StaticGlobal.CM.Initilize(10, AI.AIType.TargetingPoints);
                             Camera.ChangeSpectatingCell(0);
                             menu.ChangeState(Menu.State.Simulation);
                         }
@@ -352,7 +353,7 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                     /* START OF case Menu.State.Simulation */
                     if (StaticGlobal.Keyboard.IsKeyClicked(Keys.R) || StaticGlobal.CM.SimulationEnd)
                     {
-                        StaticGlobal.CM.Initilize();
+                        StaticGlobal.CM.Initilize(10, AI.AIType.TargetingPoints);
                         Camera.ChangeSpectatingCell(0);
                     }
 
@@ -438,6 +439,7 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                 StaticGlobal.Screen.ToggleFullScreen(graphics, GraphicsDevice);
             }
 
+
             // Check for shutdown
             if (StaticGlobal.ExitInProgress)
                 Shutdown();
@@ -458,6 +460,7 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
 
             // clear screen
             GraphicsDevice.Clear(Color.WhiteSmoke);
+
 
             // Begin spriteBatch with closest neighbour
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
@@ -495,6 +498,7 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                         spriteBatch.DrawString(spriteFont, "Family: " + Camera.SpectatingCell.AI.family.ToString(), new Vector2(10, 80 + 20 * 1), Color.Black);
                         spriteBatch.DrawString(spriteFont, "FamilyCount: " + StaticGlobal.Family.FamilyCount(Camera.SpectatingCell.AI.family).ToString(), new Vector2(10, 80 + 20 * 2), Color.Black);
                         spriteBatch.DrawString(spriteFont, "Memory: " + Camera.SpectatingCell.AI.lastMemory?.ToString(), new Vector2(10, 80 + 20 * 3), Color.Black);
+                        spriteBatch.DrawString(spriteFont, "AI Type: " + Camera.SpectatingCell.AI.GetAIType.ToString(), new Vector2(10, 80 + 20 * 4), Color.Black);
 
                         float energy = Camera.SpectatingCell.Energy;
                         if (energy > 1500)

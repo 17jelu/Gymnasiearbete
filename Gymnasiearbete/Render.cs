@@ -89,7 +89,7 @@ namespace Gymnasiearbete
                         // Draw Cells
                         for (int i = 0; i < sector.Cells.Count; i++)
                         {
-                            switch (sector.Cells[i].AI.family.Split(' ')[0])
+                            switch (sector.Cells[i].AI.family)
                             {
                                 case "Red":
                                     circleCell.Color = Color.Red;
