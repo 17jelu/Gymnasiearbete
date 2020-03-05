@@ -38,7 +38,7 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
 
         SpriteBatch spriteBatch;
 
-        GraphicRectangle debugRectangle;
+        GraphicRectangle energyBar;
         GraphicRectangle shadowPauseOverlay;
 
         CustomDrawObject custom;
@@ -159,12 +159,13 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                     // Kill / restart simulation # Same thing as pressing R button
                     new Button
                     {
-                        Text = "Keys.R.Invoke()",
+                        Text = "Restart simulation",
                         Bounds = new Rectangle(0, 0, 300, 50),
                         Action =()=>
                         {
                             StaticGlobal.CM.Initilize();
                             Camera.ChangeSpectatingCell(0);
+                            menu.ChangeState(Menu.State.Simulation);
                         }
                     },
                     // Mainmenu Button
@@ -179,7 +180,10 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                     {
                         Text = "Exit",
                         Bounds = new Rectangle(0, 0, 150, 50),
-                        Action =()=> StaticGlobal.Shutdown()
+                        Action =()=>
+                        {
+                            StaticGlobal.Shutdown();
+                        }
                     },
                 }
             };
@@ -227,7 +231,7 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
             #endregion .OnResize =()> ...
             #endregion menu.ButtonGroups
 
-            debugRectangle = new GraphicRectangle(Color.White, 0, 0, 490, 148);
+            energyBar = new GraphicRectangle(Color.White, 0, 0, 48, 148);
 
             shadowPauseOverlay = new GraphicRectangle(
                 new Color(0, 0, 0, 0.85f),
@@ -355,13 +359,9 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                     StaticGlobal.CM.Update(gameTime);
 
                     // Pause
-                    if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Space))
-                    {
-                        menu.ChangeState(Menu.State.PausedSimulation);
-                    }
-
-                    // ESC
-                    if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Escape))
+                    if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Space)
+                        || StaticGlobal.Keyboard.IsKeyClicked(Keys.Escape)
+                        || StaticGlobal.Keyboard.IsKeyClicked(Keys.P))
                     {
                         menu.ChangeState(Menu.State.PausedSimulation);
                     }
@@ -418,7 +418,15 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                     break;
                 case Menu.State.PausedSimulation:
                     /* START OF case Menu.State.PausedSimulation */
+                    // Update
                     menu.ButtonGroup_PausedSimulation.Update();
+                    // Return to Simulation (Unpause)
+                    if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Space)
+                        || StaticGlobal.Keyboard.IsKeyClicked(Keys.Escape)
+                        || StaticGlobal.Keyboard.IsKeyClicked(Keys.P))
+                    {
+                        menu.ChangeState(Menu.State.Simulation);
+                    }
                     /* END OF case Menu.State.PausedSimulation */
                     break;
                 default: break;
@@ -487,52 +495,21 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                         spriteBatch.DrawString(spriteFont, "Family: " + Camera.SpectatingCell.AI.family.ToString(), new Vector2(10, 80 + 20 * 1), Color.Black);
                         spriteBatch.DrawString(spriteFont, "FamilyCount: " + StaticGlobal.Family.FamilyCount(Camera.SpectatingCell.AI.family).ToString(), new Vector2(10, 80 + 20 * 2), Color.Black);
                         spriteBatch.DrawString(spriteFont, "Memory: " + Camera.SpectatingCell.AI.lastMemory?.ToString(), new Vector2(10, 80 + 20 * 3), Color.Black);
-                    }
 
-                    if (StaticGlobal.CM.Pause)
-                    {
-                        shadowPauseOverlay.Width = Window.ClientBounds.Width;
-                        shadowPauseOverlay.Height = Window.ClientBounds.Height;
-                        shadowPauseOverlay.Render(GraphicsDevice);
-
-                        spriteBatch.DrawString(spriteFont, LORE, new Vector2(StaticGlobal.Screen.Area.Center.X - 239, StaticGlobal.Screen.Area.Center.Y - 74), Color.Black);
-
-                        debugRectangle.X = StaticGlobal.Screen.Area.Center.X - 239 - 6;
-                        debugRectangle.Y = StaticGlobal.Screen.Area.Center.Y - 74 - 6;
-
-                        debugRectangle.Render(GraphicsDevice);
-                    }
-
-                    if (StaticGlobal.CM.Pause)
-                    {
-                        spriteBatch.DrawString(spriteFont,
-                            "Press [Spacebar] to resume the simulation",
-                            new Vector2(10, 10 + 25 * 0), Color.White);
-                        spriteBatch.DrawString(spriteFont,
-                            "Use WASD to enter free-cam mode and move the Camera",
-                            new Vector2(10, 10 + 25 * 1), Color.White);
-                        spriteBatch.DrawString(spriteFont,
-                            "Press [F] to toggle between free-cam mode",
-                            new Vector2(10, 10 + 25 * 2), Color.White);
-                        spriteBatch.DrawString(spriteFont,
-                            "Press [Left Arrow] and [Right Arrow] to switch between which cell you're spectating",
-                            new Vector2(10, 10 + 25 * 3), Color.White);
-                        spriteBatch.DrawString(spriteFont,
-                            "Press [R] to restart the simulation",
-                            new Vector2(10, 10 + 25 * 4), Color.White);
-                        spriteBatch.DrawString(spriteFont,
-                            "Press [ESC] to quit the application",
-                            new Vector2(10, Window.ClientBounds.Height - 10 - 25 * 1), Color.White);
-                        spriteBatch.DrawString(spriteFont,
-                            "Press [Up Arrow] and [Down Arrow] or use [Scrollwheel] to zoom in and out in the simulation",
-                            new Vector2(10, Window.ClientBounds.Height - 10 - 25 * 2), Color.White);
-                        spriteBatch.DrawString(spriteFont,
-                            "Press [F11] to toggle between fullscreen mode and window mode",
-                            new Vector2(10, Window.ClientBounds.Height - 10 - 25 * 3), Color.White);
-                    }
-                    else
-                    {
-                        spriteBatch.DrawString(spriteFont, "Press [Spacebar] to pause the simulation, see controls, and read the lore", new Vector2(10, 10), Color.Black);
+                        float energy = Camera.SpectatingCell.Energy;
+                        if (energy > 1500)
+                        {
+                            energyBar.Color = Color.Lerp(Color.DodgerBlue, Color.Blue, 0.5f * ((float)Math.Sin(gameTime.TotalGameTime.TotalSeconds * 2) + 1));
+                            energyBar.Height = (int)MathHelper.Lerp(energyBar.Height, 380, 0.5f);
+                        }
+                        else
+                        {
+                            energyBar.Height = (int)MathHelper.Lerp(energyBar.Height, (int)energy >> 2, 0.5f);
+                            energyBar.Color = Color.Lerp(Color.Red, Color.LawnGreen, energy / 1500);
+                        }
+                        energyBar.X = StaticGlobal.Screen.Area.Right - (energyBar.Width + 16);
+                        energyBar.Y = StaticGlobal.Screen.Area.Bottom - (energyBar.Height + 16);
+                        energyBar.Render(GraphicsDevice);
                     }
 
                     /* END OF case Menu.State.Simulation */
@@ -540,6 +517,10 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                 case Menu.State.PausedSimulation:
                     /* START OF case Menu.State.PausedSimulation */
                     Render.Draw(StaticGlobal.CM, GraphicsDevice);
+
+                    shadowPauseOverlay.Width = Window.ClientBounds.Width;
+                    shadowPauseOverlay.Height = Window.ClientBounds.Height;
+                    shadowPauseOverlay.Render(GraphicsDevice);
 
                     menu.ButtonGroup_PausedSimulation.Render(GraphicsDevice, spriteBatch, spriteFont);
                     /* END OF case Menu.State.PausedSimulation */
