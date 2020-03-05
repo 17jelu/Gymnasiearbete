@@ -96,8 +96,6 @@ This is survival. This is war.";
             };
             string[] nl_adjective = new string[]
             {
-                    "Superior",
-                    "Inferior",
                     "Innocent",
                     "Physical",
                     "Yummy",
