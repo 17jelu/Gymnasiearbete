@@ -28,6 +28,13 @@ namespace Gymnasiearbete
             }
         }
 
+        protected Vector2 dbgdirection;
+        public Vector2 DEBUG_Direction
+        {
+            get { return dbgdirection; }
+            set { dbgdirection = value; }
+        }
+
         protected Vector2 direction;
         public Vector2 Direction
         {

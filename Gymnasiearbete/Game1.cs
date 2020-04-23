@@ -41,17 +41,12 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
         GraphicRectangle energyBar;
         GraphicRectangle shadowPauseOverlay;
 
-        CustomDrawObject custom;
-
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-
-            
         }
-
-        float rectWidth;
+        
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
         /// This is where it can query for any required services and load any non-graphic
@@ -71,6 +66,9 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                 graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
                 //graphics.ToggleFullScreen();
             }
+
+            graphics.SynchronizeWithVerticalRetrace = true;
+            this.IsFixedTimeStep = false;
 
             Window.ClientSizeChanged += new EventHandler<EventArgs>(OnResize);
 
@@ -278,6 +276,9 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            // Calculate FPS
+            Render.UpdateFPS(gameTime);
+
             menu.FirstUpdate();
 
             StaticGlobal.Keyboard.Begin();
@@ -294,6 +295,7 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                 case Menu.State.InfoScreen:
                     /* START OF case Menu.State.InfoScreen */
 
+                    // MOUSE CONTROL
                     // Zooming Scroll
                     if ((StaticGlobal.Keyboard.IsKeyHeld(Keys.LeftControl)
                         || StaticGlobal.Keyboard.IsKeyHeld(Keys.RightControl))
@@ -336,6 +338,34 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                         infoRectangle.Y += StaticGlobal.Mouse.ScrollWheelDifference;
                     }
 
+                    // KEYBOARD CONTROL
+                    // Vertical scroll
+                    if (StaticGlobal.Keyboard.IsKeyHeld(Keys.Down))
+                    {
+                        infoRectangle.Y -= 5;
+                    }
+                    if (StaticGlobal.Keyboard.IsKeyHeld(Keys.Up))
+                    {
+                        infoRectangle.Y += 5;
+                    }
+                    if (StaticGlobal.Keyboard.IsKeyClicked(Keys.PageUp))
+                    {
+                        infoRectangle.Y += 200;//sk�rmh�jd inb4 ingen tid. ska b�rja skriva rapport :-)
+                    }
+                    if (StaticGlobal.Keyboard.IsKeyClicked(Keys.PageDown))
+                    {
+                        infoRectangle.Y -= 200;
+                    }
+                    // Horizontal scroll
+                    if (StaticGlobal.Keyboard.IsKeyHeld(Keys.Right))
+                    {
+                        infoRectangle.X -= 5;
+                    }
+                    if (StaticGlobal.Keyboard.IsKeyHeld(Keys.Left))
+                    {
+                        infoRectangle.X += 5;
+                    }
+
                     // Don't let infoText escape the Screen more than it being hidden
                     if (infoRectangle.Right < StaticGlobal.Screen.Area.Left) // Left Side
                         infoRectangle.X = StaticGlobal.Screen.Area.Left - infoRectangle.Width;
@@ -360,9 +390,10 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                     StaticGlobal.CM.Update(gameTime);
 
                     // Pause
-                    if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Space)
-                        || StaticGlobal.Keyboard.IsKeyClicked(Keys.Escape)
-                        || StaticGlobal.Keyboard.IsKeyClicked(Keys.P))
+                    if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Space) // Video Pause
+                        || StaticGlobal.Keyboard.IsKeyClicked(Keys.Escape) // ESC -> Show Menu
+                        || StaticGlobal.Keyboard.IsKeyClicked(Keys.P) // Regular Pause
+                        || StaticGlobal.Keyboard.IsKeyClicked(Keys.K)) // YouTube Pause
                     {
                         menu.ChangeState(Menu.State.PausedSimulation);
                     }
@@ -422,9 +453,10 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                     // Update
                     menu.ButtonGroup_PausedSimulation.Update();
                     // Return to Simulation (Unpause)
-                    if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Space)
-                        || StaticGlobal.Keyboard.IsKeyClicked(Keys.Escape)
-                        || StaticGlobal.Keyboard.IsKeyClicked(Keys.P))
+                    if (StaticGlobal.Keyboard.IsKeyClicked(Keys.Space) // Video Pause
+                        || StaticGlobal.Keyboard.IsKeyClicked(Keys.Escape) // ESC -> Show Menu
+                        || StaticGlobal.Keyboard.IsKeyClicked(Keys.P) // Regular Pause
+                        || StaticGlobal.Keyboard.IsKeyClicked(Keys.K)) // YouTube Pause
                     {
                         menu.ChangeState(Menu.State.Simulation);
                     }
@@ -434,7 +466,7 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
             }
             /* END OF switch(menu.CurrentState) */
 
-            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.F11))
+            if (StaticGlobal.Keyboard.IsKeyClicked(Keys.F11) || ((StaticGlobal.Keyboard.IsKeyHeld(Keys.LeftAlt) || StaticGlobal.Keyboard.IsKeyHeld(Keys.RightAlt)) && StaticGlobal.Keyboard.IsKeyClicked(Keys.Enter)))
             {
                 StaticGlobal.Screen.ToggleFullScreen(graphics, GraphicsDevice);
             }
@@ -487,7 +519,7 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                         Camera.Position = Vector2.Lerp(Camera.Position, Camera.SpectatingCell.Position, 0.125f);
                     }
 
-                    Render.Draw(StaticGlobal.CM, GraphicsDevice);
+                    Render.Draw(StaticGlobal.CM, GraphicsDevice, gameTime);
 
                     spriteBatch.DrawString(spriteFont, debugMessage, new Vector2(10, 35), Color.Black);
 
@@ -499,28 +531,16 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                         spriteBatch.DrawString(spriteFont, "FamilyCount: " + StaticGlobal.Family.FamilyCount(Camera.SpectatingCell.AI.family).ToString(), new Vector2(10, 80 + 20 * 2), Color.Black);
                         spriteBatch.DrawString(spriteFont, "Memory: " + Camera.SpectatingCell.AI.lastMemory?.ToString(), new Vector2(10, 80 + 20 * 3), Color.Black);
                         spriteBatch.DrawString(spriteFont, "AI Type: " + Camera.SpectatingCell.AI.GetAIType.ToString(), new Vector2(10, 80 + 20 * 4), Color.Black);
-
-                        float energy = Camera.SpectatingCell.Energy;
-                        if (energy > 1500)
-                        {
-                            energyBar.Color = Color.Lerp(Color.DodgerBlue, Color.Blue, 0.5f * ((float)Math.Sin(gameTime.TotalGameTime.TotalSeconds * 2) + 1));
-                            energyBar.Height = (int)MathHelper.Lerp(energyBar.Height, 380, 0.5f);
-                        }
-                        else
-                        {
-                            energyBar.Height = (int)MathHelper.Lerp(energyBar.Height, (int)energy >> 2, 0.5f);
-                            energyBar.Color = Color.Lerp(Color.Red, Color.LawnGreen, energy / 1500);
-                        }
-                        energyBar.X = StaticGlobal.Screen.Area.Right - (energyBar.Width + 16);
-                        energyBar.Y = StaticGlobal.Screen.Area.Bottom - (energyBar.Height + 16);
-                        energyBar.Render(GraphicsDevice);
+                        spriteBatch.DrawString(spriteFont, "Generation: " + Camera.SpectatingCell.Generation.ToString(), new Vector2(10, 90 + 20 * 5), Color.Black);
+                        spriteBatch.DrawString(spriteFont, "EnergyRequirement: " + EnergyControlls.CellEnergyRequirement.ToString(), new Vector2(10, 100 + 20 * 6), Color.Black);
                     }
+                    spriteBatch.DrawString(spriteFont, "Time: " + gameTime.ElapsedGameTime.TotalMilliseconds.ToString(), Vector2.Zero, Color.Black);
 
                     /* END OF case Menu.State.Simulation */
                     break;
                 case Menu.State.PausedSimulation:
                     /* START OF case Menu.State.PausedSimulation */
-                    Render.Draw(StaticGlobal.CM, GraphicsDevice);
+                    Render.Draw(StaticGlobal.CM, GraphicsDevice, gameTime);
 
                     shadowPauseOverlay.Width = Window.ClientBounds.Width;
                     shadowPauseOverlay.Height = Window.ClientBounds.Height;
@@ -532,6 +552,8 @@ ruled by their primal instinct of; fight or flight, eat or get eaten.
                 default: break;
             }
             /* END OF switch(menu.CurrentState) */
+            
+            Render.DrawFPS(GraphicsDevice);
             
             spriteBatch.End();
 

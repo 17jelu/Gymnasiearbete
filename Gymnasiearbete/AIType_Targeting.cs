@@ -75,7 +75,12 @@ namespace Gymnasiearbete
                     ));
             }
 
+            if (dbgdirection == null)
+                dbgdirection = direction;
             direction = intresst.Position - cell.Position;
+            dbgdirection = new Vector2(
+                MathHelper.Lerp(dbgdirection.X, direction.X, 0.5f),
+                MathHelper.Lerp(dbgdirection.Y, direction.Y, 0.5f));
 
             Actions(cell, MemoryChoice(Data(cell, intresst)).Desicion, new int[2] { (int)Math.Floor(direction.X), (int)Math.Floor(direction.Y) });
         }

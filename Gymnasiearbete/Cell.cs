@@ -30,6 +30,14 @@ namespace Gymnasiearbete
     //CELL
     class Cell : Entity
     {
+        private int generation = 0;
+        public int Generation
+        {
+            get { return generation; }
+            set { generation = value; }
+        }
+
+
         public float Energy
         {
             get
@@ -76,6 +84,14 @@ namespace Gymnasiearbete
             perception = dnaPerception;
 
             energy = energyRequirement;
+
+            if (parent != null)
+            {
+                if (parent.generation == null)
+                    generation = 0;
+                else
+                    generation = parent.generation + 1;
+            }
         }
 
         void ReproduceCheck()
